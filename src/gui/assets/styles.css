@@ -1,0 +1,54 @@
+/* DESCRIPTION: Use this file for the base classes/id css config
+
+  - Use inline styling to overwrite the base classes config (cant get css nesting to work in dash)
+
+*/
+
+/* FONT IMPORTS */
+/* /*  */
+@import url("https://fonts.googleapis.com/css?family=Oswald&display=swap");
+@import url("https://fonts.googleapis.com/css?family=Raleway&display=swap");
+@import url("https://fonts.googleapis.com/css?family=Quicksand&display=swap");
+
+body {
+  font: lighter 16px Oswald-Light, sans-serif;
+}
+/* BODY */
+html {
+  background-color: black;
+  /* font-size: 1em !important; */
+}
+
+.root-container {
+  /* background: url("background.png"); */
+  /* background-image: url("background.png"); */
+  background-color: #0a0a0a;
+  /* background-position: left top; */
+
+  /* font-family: "Arial, sans-serif"; */
+  /* background-position: bottom; */
+  /* background-size: auto; */
+  /* background-repeat: no-repeat; */
+  /* height: 180vh; */
+  /* height: 90%; */
+  /* min-height: 754px; */
+  /* max-height: 680px; */
+  /* min-height: 1252px; */
+  width: 100%;
+  /* width: 700px; */
+  margin: 0px 0px -22px 0px;
+  /* padding: 0; */
+  /* padding-bottom: 1000px; */
+}
+
+.checkboxes label {
+  display: inline-block;
+  padding-right: 10px;
+  white-space: nowrap;
+}
+.checkboxes input {
+  vertical-align: middle;
+}
+.checkboxes label span {
+  vertical-align: middle;
+}
