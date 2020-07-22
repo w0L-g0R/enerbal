@@ -27,7 +27,8 @@ def assign_eev_table(
     df = df.apply(pd.to_numeric, errors="coerce").round(2)
 
     # Extract row and col index for testing purposes
-    energy_source_index = dfs[energy_source].iloc[3:193, 0].reset_index(drop=True)
+    energy_source_index = dfs[energy_source].iloc[3:193, 0].reset_index(
+        drop=True)
 
     eev_template_index = pd.Series(data=row_indices["IDX_EEV"][0], name=0)
 
@@ -84,7 +85,8 @@ def assign_renewables_table(
         conversion_multiplicator=conversion_multiplicator,
     )
 
-    renewables_template_index = pd.Series(data=row_indices["IDX_RENEWABLES"][0], name=0)
+    renewables_template_index = pd.Series(
+        data=row_indices["IDX_RENEWABLES"][0], name=0)
 
     try:
 
@@ -107,7 +109,8 @@ def assign_renewables_table(
         print("Index name mismatch")
 
     # Assign column multindex to current df
-    renewables_sheet.columns = renewables_df.loc[IDX[:], IDX[bundesland, :]].columns
+    renewables_sheet.columns = renewables_df.loc[IDX[:],
+                                                 IDX[bundesland, :]].columns
 
     # Copy values from current energy source df to eev_df
     renewables_df.loc[IDX[:], IDX[bundesland, :]] = renewables_sheet
@@ -138,18 +141,20 @@ def assign_sectors_consumption_table(
     df.set_index(df.iloc[:, 0], inplace=True)
     df.drop(df.columns[[0]], axis=1, inplace=True)
 
-    start_index = df.index.get_indexer_for(["Sektoraler Energetischer Endverbrauch"])[0]
+    start_index = df.index.get_indexer_for(
+        ["Sektoraler Energetischer Endverbrauch"])[0]
 
     print("SEC_Consump start_index: ", start_index)
 
     if start_index == [-1]:
-        sector_consumptions_df.loc[:, IDX[bundesland, energy_source, :]] = float("NaN")
+        sector_consumptions_df.loc[:, IDX[bundesland,
+                                          energy_source, :]] = float("NaN")
 
         sector_consumptions_idx_check_df[energy_source] = False
 
         return
 
-    df = df.iloc[start_index : start_index + 27, :31]
+    df = df.iloc[start_index: start_index + 27, :31]
 
     assert len(df.columns) == len(years_range_data), "Years not equal"
     assert "Terajoule" in df.index[1], "Row slicing mismatch"
@@ -192,10 +197,11 @@ def assign_sector_energy_consumption_table(
         sector_energy_consumption_idx_check_df[energy_source] = False
         return
 
-    df = df.iloc[start_index : start_index + 10, :31]
+    df = df.iloc[start_index: start_index + 10, :31]
 
     assert len(df.columns) == len(years_range_data), "Years not equal"
-    assert "Terajoule" in df.index[1], "Row slicing mismatch: {}".format(df.index[1])
+    assert "Terajoule" in df.index[1], "Row slicing mismatch: {}".format(
+        df.index[1])
     assert (
         df.index[-2] == "Energieversorgung (Elektrizität, Erdgas, Fernwärme)"
     ), "Row slicing mismatch"

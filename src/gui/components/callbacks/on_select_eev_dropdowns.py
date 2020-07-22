@@ -154,7 +154,31 @@ def create_on_select_eev_dropdowns(graph_id: str):
 
             if "Umwandlungsausstoß" in idx_0_value:
 
+                if idx_1_value in [
+                    "Gesamt",
+                    "davon:  Kokerei",
+                    "Hochofen",
+                    "Raffinerie",
+                    "Holzkohlenproduktion",
+                    "Gaserzeugung"
+                ]:
+
+                    print("CASE 1")
+                    return callback_on_select_eev_dropdowns(
+                        idx_1_disabled=False,
+                        idx_2_disabled=True,
+                        idx_3_disabled=True,
+                        idx_4_disabled=True,
+                        # idx_2_disabled=False,
+                        idx_1=eev_indices[1],
+                        idx_2=only_total,
+                        idx_3=only_total,
+                        idx_4=only_total,
+                    )
+
                 if "Kraftwerke" in idx_1_value or "KWK" in idx_1_value or "Heizwerke" in idx_1_value:
+
+                    print("CASE 2")
 
                     idx_3_options = eev_indices[3].copy()
                     if "Heizwerke" in idx_1_value:
@@ -165,18 +189,23 @@ def create_on_select_eev_dropdowns(graph_id: str):
 
                     if idx_2_value != "Gesamt":
 
+                        print("CASE 2.1")
+
                         idx_4_options = only_total
                         idx_4_disabled = True
 
                         if "Kohlegase" in idx_3_value:
+                            print("Kohlegase")
                             idx_4_options = kohlegase
                             idx_4_disabled = False
 
                         if "Abfälle" in idx_3_value:
+                            print("Abfälle")
                             idx_4_options = abfälle
                             idx_4_disabled = False
 
                         if "Biogenen" in idx_3_value:
+                            print("Biogene")
                             idx_4_options = biogene
                             idx_4_disabled = False
 
@@ -188,54 +217,23 @@ def create_on_select_eev_dropdowns(graph_id: str):
                             idx_1=eev_indices[1],
                             idx_2=eev_indices[2],
                             idx_3=eev_indices[3],
-                            idx_4=idx_4_options
+                            idx_4=idx_4_options,
                         )
                     else:
+                        print("CASE 2.2")
 
                         return callback_on_select_eev_dropdowns(
                             idx_1_disabled=False,
                             idx_2_disabled=False,
-                            idx_1=eev_indices[1],
+                            idx_3_disabled=True,
+                            idx_4_disabled=True,
                             idx_2=eev_indices[2],
+                            idx_3=only_total,
+                            idx_4=only_total,
                         )
+            print("CASE EXIT")
 
-                    # idx_4_options = only_total
-
-                    # if idx_2_value == "Gesamt":
-                    #     return callback_on_select_eev_dropdowns(
-                    #         idx_1_disabled=False,
-                    #         idx_1=eev_indices[1],
-                    #         idx_2=eev_indices[2],
-                    #         idx_3=eev_indices[3],
-                    #         idx_4=idx_4_options
-                    #     )
-                    # else:
-                    #     if "aus Kohlegase" in idx_3_value:
-                    #         idx_4_options = kohlegase
-
-                    #     if "aus Brennbare Abfälle" in idx_3_value:
-                    #         idx_4_options = abfälle
-
-                    #     if "aus Biogenen" in idx_3_value:
-                    #         idx_4_options = biogene
-
-                    #     return callback_on_select_eev_dropdowns(
-                    #         idx_1_disabled=False,
-                    #         idx_2_disabled=False,
-                    #         idx_1=eev_indices[1],
-                    #         idx_2=eev_indices[2],
-                    #         idx_3=eev_indices[3],
-                    #         idx_4=idx_4_options
-                    #     )
-
-                else:
-
-                    return callback_on_select_eev_dropdowns(
-                        idx_1_disabled=False,
-                        idx_1=eev_indices[1],
-                    )
-
-            # CASE: Set all to false and reset
+            # CASE: Set all to Gesamt except idx_0
             return callback_on_select_eev_dropdowns(
                 idx_1_disabled=True,
                 idx_2_disabled=True,
@@ -248,11 +246,3 @@ def create_on_select_eev_dropdowns(graph_id: str):
             )
         else:
             raise PreventUpdate
-            # idx_1_disabled=True,
-            # idx_2_disabled=True,
-            # idx_3_disabled=True,
-            # idx_4_disabled=True,
-            # idx_1=eev_indices[1],
-            # idx_2=eev_indices[2],
-            # idx_3=eev_indices[3],
-            # idx_4=eev_indices[4],

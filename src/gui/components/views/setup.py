@@ -1,441 +1,195 @@
-import dash_bootstrap_components as dbc
-import dash_core_components as dcc
-import dash_html_components as html
+import inspect
+import logging
+import os
+from pathlib import Path
 from typing import List
-from files.energiebilanzen.processing.eb_sheets import eb_sheets
 
-from settings import energy_sources_options, eev_indices, sectors_indices
-
-range_slider_style = {"font-family": "Roboto, sans-serif",
-                      "font-size": 12, "color": "black", }
-label_style = {"font-family": "Roboto, sans-serif",
-               "font-size": 14, "color": "cadetblue"}
+import dash_bootstrap_components as dbc
+import dash_html_components as html
 
 
-def create_eev_graph_view(graph_id: str):
+def create_setup_layout(graph_id: str, title: str):
 
-    return dbc.Container(
-        # fluid=True,
+    return dbc.Card(
+        style={"width": "100%", "border": "1px yellow solid"},
         children=[
-            title_row(graph_id=graph_id)[0],
-            html.Br(),
-            # html.Hr(style={"width": "100%", "margin-bottom": 8}),
-            #
-            data_scale_row(graph_id=graph_id)[0],
-            html.Br(),
-            # html.Hr(style={"width": "100%", "margin-bottom": 8}),
-            #
-            chart_options_row(graph_id=graph_id)[0],
-            # seventh_row(graph_id=graph_id)[0],
-            html.Br(style={"margin-bottom": 12}),
-            # html.Hr(style={"width": "100%", "margin-bottom": 8}),
-            #
-            eb_aggregate_row(graph_id=graph_id)[0],
-            eb_data_section_row(graph_id=graph_id)[0],
-            html.Div(
-                id=f"idx-section-{graph_id}",
-                children=eev_idx_rows(graph_id=graph_id)[0],
-            )
+            dbc.CardHeader(
+                children=[
+                    dbc.Row(
+                        # justify="end",
+                        no_gutters=True,
+                        children=[
+                            dbc.Col(
+                                # width=2,
+                                children=[
+                                    title
+                                ],
+                            ),
+                            dbc.Col(
+                                # style={"margin-left": 64},
+                                width={"offset": 3, "width": 9},
+                                children=[
+                                    dbc.Tabs(
+                                        [
+                                            dbc.Tab(
+                                                label="EB", tab_id=f"tab-eb-{graph_id}",
+                                            ),
+                                            dbc.Tab(
+                                                label="NEA", tab_id=f"tab-nea-{graph_id}",
+                                            ),
+                                            dbc.Tab(
+                                                label="THG", tab_id=f"tab-thg-{graph_id}",
+                                            ),
+                                            dbc.Tab(
+                                                label="STATS",
+                                                tab_id=f"tab-stats-{graph_id}",
+                                            ),
+                                        ],
+                                        id=f"tabs-{graph_id}",
+                                        card=True,
+                                        active_tab=f"tab-eb-{graph_id}",
+                                    ),
+                                ],
+                            ),
+                        ],
+                    ),
+                ]
+            ),
+            dbc.CardBody(id=f"content-{graph_id}",),
+            dbc.CardFooter(
+                dbc.Button(
+                    "Update",
+                    color="primary",
+                    id=f"update-{graph_id}",
+                    block=True
+                ),
 
-        ]
+            )
+        ],
     )
 
 
-# def create_sectors_graph_view(graph_id: str):
+title_A = html.Img(
+    style={"margin-top": 0, "margin-bottom": -4},
+    src="https://fontmeme.com/permalink/200718/c53ecf1fd39235d3f8a16935633bbdfa.png",
+    # style=navbar_logo_style,
+)
 
-#     return dbc.Container(
-#         # fluid=True,
-#         children=[
-#             title_row(graph_id=graph_id)[0],
-#             html.Br(),
-#             # html.Hr(style={"width": "100%", "margin-bottom": 8}),
-#             #
-#             data_scale_row(graph_id=graph_id)[0],
-#             html.Br(),
-#             # html.Hr(style={"width": "100%", "margin-bottom": 8}),
-#             #
-#             chart_options_row(graph_id=graph_id)[0],
-#             # seventh_row(graph_id=graph_id)[0],
-#             html.Br(style={"margin-bottom": 12}),
-#             # html.Hr(style={"width": "100%", "margin-bottom": 8}),
-#             #
-#             eb_aggregate_row(graph_id=graph_id)[0],
-#             eb_data_type_row(graph_id=graph_id)[0],
-#             sectors_idx_rows(graph_id=graph_id)[0],
+title_B = html.Img(
+    style={"margin-top": 0, "margin-bottom": -4},
+    src="https://fontmeme.com/permalink/200718/f155c17403325746f18dfe4eea451281.png",
+    # style=navbar_logo_style,
+)
 
+
+setup_A = create_setup_layout(
+    graph_id="graph-A", title=title_A)
+setup_B = create_setup_layout(
+    graph_id="graph-B", title=title_B)
+
+
+# @app.callback(
+#     Output(component_id="text-graph-A", component_property="children"),
+#     [Input(component_id="button-graph-A", component_property="n_clicks")],
+# )
+# def update_output_div(n_clicks):
+#     return "Output: {}".format(n_clicks)
+
+
+# @app.callback(
+#     Output(f"content-graph-A", "children"),
+#     [Input(f"button-graph-A", "n_clicks")],
+#     # [State(f"tabs-graph-A", "active_tab")],
+# )
+# def on_graph_tab_change(active_tab):
+
+#     show_callback_context(
+#         verbose=True,
+#         func_name=inspect.stack()[0][3],
+#         file_name=inspect.stack()[0][1].rsplit(os.sep, 1)[-1].upper(),
+#     )
+
+#     logging.getLogger().debug("Blue")
+
+#     return "HIIII"
+# if active_tab == f"tab-1-graph_A":
+
+#     return "Hi"
+
+#     # if "graph_A" in active_tab:
+#     #     return "HULLI"  # views["eev_A"]
+
+#     # elif "graph_B" in active_tab:
+#     #     return views["eev_B"]
+
+# elif "tab-2" in active_tab:
+#     return
+
+
+# create_on_graph_tab_change(graph_id="graph_A")
+# create_on_graph_tab_change(graph_id="graph_B")
+
+
+# @app.callback(Output("card-content", "children"), [Input("card-tabs", "active_tab")])
+# def tab_content(active_tab):
+#     if active_tab == "tab-1":
+#         return tab1_content
+#     elif active_tab == "tab-2":
+#         return tab2_content
+#     return "This is tab {}".format(active_tab)
+
+
+# def create_graph_title_layout(graph_id: str):
+
+#     return dbc.FormGroup(
+#         [
+#             dbc.Label("Plot title"),
+#             dbc.Input(
+#                 placeholder="Title name goes here...",
+#                 type="text",
+#                 id=f"title-{graph_id}",
+#             ),
 #         ]
 #     )
 
-# ////////////////////////////////////////////////////////////////////// ROWS
 
+# def create_graph_data_scale_type_layout(graph_id: str):
 
-def title_row(graph_id: str):
-    return (
-        dbc.Row(
-            no_gutters=True,
-            children=[dbc.Col(width=12, children=[
-                              get_title(graph_id=graph_id)],), ],
-        ),
-    )
-
-
-def data_scale_row(graph_id: str):
-    return (
-        dbc.Row(
-            no_gutters=True,
-            children=[
-                dbc.Col(width=10, children=[
-                        get_scale(graph_id=graph_id)],),
-                dbc.Col(width=2, children=[
-                        get_index_year(graph_id=graph_id)],),
-            ],
-        ),
-    )
-
-
-def eb_aggregate_row(graph_id: str):
-    return (
-        dbc.Row(
-            no_gutters=True,
-            children=[
-                dbc.Col(width=2, children=[get_aggregate(graph_id=graph_id)],),
-                dbc.Col(width=8, children=[
-                        get_energy_source(graph_id=graph_id)],),
-                dbc.Col(
-                    width=2, children=[get_energy_source_index(graph_id=graph_id)],
-                ),
-            ],
-        ),
-    )
-
-
-def eb_data_section_row(graph_id: str):
-    return (
-        dbc.Row(
-            justify="center",
-            align="center",
-            children=[
-                dbc.Col(width=10, children=[
-                        get_data_section(graph_id=graph_id)],),
-                dbc.Col(width=2, children=[
-                        get_energy_unit(graph_id=graph_id)],),
-            ],
-        ),
-    )
-
-
-# def sectors_idx_rows(graph_id: str):
-#     return (
-#         dbc.Row(
-#             no_gutters=True,
-#             # style={"margin-top": 24},
-#             children=[
-#                 dbc.Col(
-#                     width=12,
-#                     children=[get_index_select(
-#                         graph_id=graph_id, name="IDX 0", options=sectors_indices[0], value="Eisen- und Stahlerzeugung")],
-#                 ),
-#             ],
-#         ),
+#     return dbc.FormGroup(
+#         [
+#             dbc.Label("Choose one"),
+#             dbc.RadioItems(
+#                 options=[
+#                     {"label": "Absolute", "value": 1},
+#                     {"label": "Normalized", "value": 2},
+#                     {"label": "Index Year", "value": 3},
+#                 ],
+#                 inline=True,
+#                 value=1,
+#                 id=f"radioitems-data-scale-{graph_id}",
+#             ),
+#             dbc.Input(
+#                 placeholder="Title name goes here...",
+#                 type="text",
+#                 id=f"title-{graph_id}",
+#             ),
+#         ]
 #     )
 
 
-def eev_idx_rows(graph_id: str):
-    return (
-        dbc.Row(
-            no_gutters=True,
-            # style={"margin-top": 24},
-            children=[
-                dbc.Col(
-                    width=12,
-                    children=[get_index_select(
-                        graph_id=f"eev-0-{graph_id}", name="IDX 0", options=eev_indices[0], value="Energetischer Endverbrauch", disabled=False)],
-                ),
-                dbc.Col(
-                    width=12,
-                    children=[get_index_select(
-                        graph_id=f"eev-1-{graph_id}", name="IDX 1", options=eev_indices[1], value="Gesamt")],
-                ),
-                dbc.Col(
-                    width=12,
-                    children=[get_index_select(
-                        graph_id=f"eev-2-{graph_id}", name="IDX 2", options=eev_indices[2], value="Gesamt")],
-                ),
-                dbc.Col(
-                    width=12,
-                    children=[get_index_select(
-                        graph_id=f"eev-3-{graph_id}", name="IDX 3", options=eev_indices[3], value="Gesamt")],
-                ),
-                dbc.Col(
-                    width=12,
-                    children=[get_index_select(
-                        graph_id=f"eev-4-{graph_id}", name="IDX 4", options=eev_indices[4], value="Gesamt")],
-                ),
-            ],
-        ),
-    )
+# def create_graph_output_control_layout(graph_id: str):
 
-
-def chart_options_row(graph_id: str):
-    return (
-        dbc.Row(
-            # style={"margin-top": 24},
-            no_gutters=True,
-            children=[
-                dbc.Col(
-                    width=12,
-                    children=[
-                        dbc.Label("Chart type options",
-                                  style=label_style),
-                        get_chart_options(graph_id=graph_id)
-                    ],
-                ),
-            ],
-        ),
-    )
-
-
-# def seventh_row(graph_id: str):
-#     return (
-#         dbc.Row(
-#             style={"margin-top": 24},
-#             no_gutters=True,
-#             children=[
-#                 dbc.Col(
-#                     width=12,
-#                     children=[
-#                         get_bar_chart_options(graph_id=graph_id)
-#                     ],
-#                 ),
-#             ],
-#         ),
+#     return dbc.FormGroup(
+#         [
+#             dbc.Label("Choose one"),
+#             dbc.RadioItems(
+#                 options=[
+#                     {"label": "Absolute", "value": 1},
+#                     {"label": "Normalized", "value": 2},
+#                     {"label": "Index Year", "value": 3},
+#                 ],
+#                 value=1,
+#                 id=f"radioitems-data-scale-{graph_id}",
+#             ),
+#         ]
 #     )
-
-
-# ////////////////////////////////////////////////////////////////////// GETTER
-
-
-def get_title(graph_id: str):
-    return dbc.FormGroup(
-        [
-            dbc.Label(children="Titel", style=label_style),
-            dbc.Input(
-                placeholder="Title goes here...", type="text", id=f"title-{graph_id}", value=f"{graph_id}"
-            ),
-        ]
-    )
-
-
-def get_scale(graph_id: str):
-    return dbc.FormGroup(
-        children=[
-            dbc.Label("Datenskalierung", style=label_style),
-            dbc.RadioItems(
-                style={"padding-top": 6, "margin-right": 4},
-                options=[
-                    {"label": "Absolut", "value": 1, },
-                    {"label": "Normalisiert", "value": 2, },
-                    {"label": "Index Jahr", "value": 3, },
-                ],
-                value=1,
-                id=f"scale-{graph_id}",
-                inline=True,
-            ),
-        ]
-    )
-
-
-def get_index_year(graph_id: str):
-    return dbc.FormGroup(
-        [
-            dbc.Label("Index Jahr", style=label_style),
-            dbc.Input(placeholder="", type="text",
-                      id=f"index-year-{graph_id}",),
-        ]
-    )
-
-
-def get_aggregate(graph_id: str):
-    return dbc.FormGroup(
-        style={"margin-right": 4},
-        children=[
-            dbc.Label("Aggregat", style=label_style),
-            dbc.Select(
-                id=f"aggregate-{graph_id}",
-                options=[
-                    {"label": "Option 1", "value": "1"},
-                    {"label": "Option 2", "value": "2"},
-                ],
-            ),
-        ],
-    )
-
-
-def get_energy_source(graph_id: str):
-
-    return dbc.FormGroup(
-        style={"margin-right": 4},
-        children=[
-            dbc.Label("Energieträger", style=label_style),
-            # dbc.Select(
-            #     id=f"energy-sources-{graph_id}",
-            #     options=energy_sources_options,
-            #     value=[0]
-            # ),
-            dcc.Dropdown(
-                id=f"energy-sources-{graph_id}",
-                options=energy_sources_options,
-                value=["Gesamtenergiebilanz"],
-                multi=True,
-            ),
-        ],
-    )
-
-
-def get_energy_source_index(graph_id: str):
-
-    return dbc.FormGroup(
-        [
-            dbc.Label("Nummer", style=label_style),
-            dbc.Input(placeholder="", type="number",
-                      id=f"source-index-{graph_id}",),
-        ]
-    )
-
-
-def get_data_section(graph_id: str):
-
-    return dbc.FormGroup(
-        children=[
-            dbc.Label("Datenbereich", style=label_style),
-            dbc.RadioItems(
-                style={"padding-top": 6, "margin-right": 4},
-                options=[
-                    {"label": "EEV", "value": "EEV", },
-                    {"label": "Sektoren", "value": "Sektoren", },
-                    {"label": "Sektor Energie", "value": "Sektor Energie", },
-                    {"label": "ErnRL", "value": "ErnRL", },
-                ],
-                value="EEV",
-                id=f"data-section-{graph_id}",
-                inline=True,
-            ),
-        ]
-    )
-
-
-def get_energy_unit(graph_id: str):
-
-    return dbc.FormGroup(
-        style={"margin-left": -24},
-        children=[
-            dbc.Label("Einheit", style=label_style),
-            dbc.Select(
-                id=f"unit-{graph_id}",
-                options=[
-                    {"label": "GWh", "value": "GWh"},
-                    {"label": "TJ", "value": "TJ"},
-                    {"label": "PJ", "value": "PJ"},
-                ],
-                value="TJ"
-            ),
-        ],
-    )
-
-
-def get_index_select(graph_id: str, name: str, value: str, options: List = None, disabled: bool = True):
-    return dbc.InputGroup(
-        [
-            dbc.InputGroupAddon(name, addon_type="prepend", style=label_style),
-            dbc.Select(
-                id=f"idx-{graph_id}",
-                options=options,
-                value=value,
-                disabled=disabled
-            ),
-        ],
-        className="mb-3",
-    )
-
-
-def get_chart_options(graph_id: str):
-    return dbc.Row(children=[
-
-        dbc.Col(
-            width=3,
-            children=[
-                dcc.RangeSlider(
-                    id=f"chart-type-{graph_id}",
-                    min=0,
-                    max=1,
-                    step=1,
-                    marks={
-                        0: {"label": "Line", "style": range_slider_style},
-                        1: {"label": "Bar", "style": range_slider_style},
-                    },
-                    value=[1],
-                    vertical=True,
-                    verticalHeight=100,
-                ),
-            ]),
-
-
-        dbc.Col(
-            width=3,
-            children=[
-                dcc.RangeSlider(
-                    id=f"xaxis-type-{graph_id}",
-                    min=0,
-                    max=1,
-                    step=1,
-                    marks={
-                        0: {"label": "x=Länder", "style": range_slider_style},
-                        1: {"label": "x=Jahre", "style": range_slider_style},
-                    },
-                    value=[1],
-                    vertical=True,
-                    verticalHeight=100,
-                ),
-            ]),
-        dbc.Col(
-            width=3,
-            children=[
-                dcc.RangeSlider(
-                    id=f"bar-chart-options-1-{graph_id}",
-                    min=0,
-                    max=1,
-                    step=1,
-                    marks={
-                        0: {"label": "Horizontal", "style": range_slider_style},
-                        1: {"label": "Vertikal", "style": range_slider_style},
-                    },
-                    value=[1],
-                    vertical=True,
-                    verticalHeight=100,
-                ),
-            ]),
-        dbc.Col(
-            width=3,
-
-            children=[
-                dcc.RangeSlider(
-                    id=f"bar-chart-options-2-{graph_id}",
-                    min=0,
-                    max=1,
-                    step=1,
-                    marks={
-                        0: {"label": "Gruppiert", "style": range_slider_style},
-                        1: {"label": "Gestapelt", "style": range_slider_style},
-                    },
-                    value=[1],
-                    vertical=True,
-                    verticalHeight=100,
-                )
-            ])
-
-    ])
-
-
-eev = {}
-eev["graph-A"] = create_eev_graph_view(graph_id="graph-A")
-eev["graph-B"] = create_eev_graph_view(graph_id="graph-B")

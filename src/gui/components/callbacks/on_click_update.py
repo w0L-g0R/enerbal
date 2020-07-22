@@ -25,30 +25,24 @@ IDX = pd.IndexSlice
 # ///////////////////////////////////////////////////////////////// DISPATCH EL
 
 
-def callback_on_click_update(eev: object = no_update, sectors: object = no_update, sector_energy: object = no_update, renewables: object = no_update, nea: object = no_update, thg: object = no_update, stats: object = no_update):
+def callback_return_on_click_update(_type: object = no_update):
 
     return [
-        eev,
-        sectors,
-        sector_energy,
-        renewables,
-        nea,
-        thg,
-        stats
+        _type
     ]
 
 
 def create_on_click_update(graph_id: str):
     @app.callback(
         [
-            # Output(f"box-{graph_id}", "children"),
-            Output(f"{graph_id}-clicked-eev-update", "data"),
-            Output(f"{graph_id}-clicked-sectors-update", "data"),
-            Output(f"{graph_id}-clicked-sector-energy-update", "data"),
-            Output(f"{graph_id}-clicked-renewables-update", "data"),
-            Output(f"{graph_id}-clicked-nea-update", "data"),
-            Output(f"{graph_id}-clicked-thg-update", "data"),
-            Output(f"{graph_id}-clicked-stats-update", "data"),
+            # Output(f"{graph_id}-box", "children"),
+            Output(f"{graph_id}-updates", "data"),
+            # Output(f"{graph_id}-clicked-sectors-update", "data"),
+            # Output(f"{graph_id}-clicked-sector-energy-update", "data"),
+            # Output(f"{graph_id}-clicked-renewables-update", "data"),
+            # Output(f"{graph_id}-clicked-nea-update", "data"),
+            # Output(f"{graph_id}-clicked-thg-update", "data"),
+            # Output(f"{graph_id}-clicked-stats-update", "data"),
         ],
         [Input(f"update-{graph_id}", "n_clicks"), ],
         [State(f"tabs-{graph_id}", "active_tab"),
@@ -71,7 +65,7 @@ def create_on_click_update(graph_id: str):
         # Get callback information to define the triggered input
         ctx = callback_context
         triggered = ctx.triggered
-
+        print('eb_data_type: ', eb_data_type)
         if triggered:
 
             # Store the selected dropdown item in a variable
@@ -82,11 +76,15 @@ def create_on_click_update(graph_id: str):
 
                 if eb_data_type == "EEV":
                     # print('eb_data_type: ', eb_data_type)
-                    return callback_on_click_update(eev="True")
+                    return callback_return_on_click_update(_type="EEV")
 
                 if eb_data_type == "Sektoren":
 
-                    return callback_on_click_update(sectors="True")
+                    return callback_return_on_click_update(_type="Sektoren")
+
+                if eb_data_type == "ErnRL":
+
+                    return callback_return_on_click_update(_type="ErnRL")
         else:
             # callback_on_click_update(eev="True")
             raise PreventUpdate

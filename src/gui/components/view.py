@@ -16,7 +16,7 @@ layout = dbc.Container(
                 dbc.Col(
                     style={"margin-bottom": 12, },
                     width=12,
-                    children=views["header_layout"],
+                    children=views["header"],
                 ),
 
                 # html.Div(style={"border-top": "1px solid #2A2A57"}),
@@ -30,7 +30,7 @@ layout = dbc.Container(
                             md=12,
                             lg=6,
                             xl=6,
-                            children=views["years_layout"],
+                            children=views["years"],
                             style={"padding": 6},
                         ),
                         dbc.Col(
@@ -39,7 +39,7 @@ layout = dbc.Container(
                             md=12,
                             lg=6,
                             xl=6,
-                            children=views["provinces_layout"],
+                            children=views["provinces"],
                             style={"padding": 6, },
                         ),
                     ],
@@ -53,7 +53,7 @@ layout = dbc.Container(
                             md=12,
                             lg=6,
                             xl=6,
-                            children=views["graph_setup_A_layout"],
+                            children=views["setup_A"],
                             style={"padding": 6},
                         ),
                         dbc.Col(
@@ -62,7 +62,7 @@ layout = dbc.Container(
                             md=12,
                             lg=6,
                             xl=6,
-                            children=views["graph_setup_B_layout"],
+                            children=views["setup_B"],
                             style={"padding": 6, },
                         ),
                     ],
@@ -76,7 +76,7 @@ layout = dbc.Container(
                             md=12,
                             lg=6,
                             xl=6,
-                            children=views["graph_A_layout"],
+                            children=views["box_A"],
                             style={"padding": 6},
                         ),
                         dbc.Col(
@@ -85,13 +85,14 @@ layout = dbc.Container(
                             md=12,
                             lg=6,
                             xl=6,
-                            children=views["graph_B_layout"],
+                            children=views["box_B"],
                             style={"padding": 6, },
                         ),
                     ],
                 ),
 
                 dbc.Row(
+                    no_gutters=True,
                     style={"width": 1164},
                     children=[
                         dbc.Col(
@@ -100,7 +101,7 @@ layout = dbc.Container(
                             md=12,
                             lg=12,
                             xl=12,
-                            children=views["graph_AB_layout"],
+                            children=views["box_table"],
                             style={"padding": 6, "width": "100%"},
                         ),
                     ],

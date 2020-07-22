@@ -1,21 +1,13 @@
 import logging
 from logger.setup import setup_logging
-
-
 import inspect
 import os
 from pathlib import Path
 from typing import List
 
-from dash import no_update
-from dash.dependencies import Input
-from dash.dependencies import Output
-from dash.dependencies import State
-
 from gui.utils import run_server
 from gui.index import layout
 from gui.components.controller import register_callbacks
-from gui.components.views.setup import eev
 
 from gui.app import app
 
@@ -29,34 +21,6 @@ from gui.components.controller import register_callbacks
 app.layout = layout
 
 register_callbacks()
-
-
-# def create_on_graph_tab_change(graph_id: str):
-#     @app.callback(
-#         Output(f"content-{graph_id}", "children"),
-#         [Input(f"tabs-{graph_id}", "active_tab")],
-#     )
-#     def on_graph_tab_change(active_tab):
-
-#         # show_callback_context(
-#         #     verbose=True,
-#         #     func_name=inspect.stack()[0][3],
-#         #     file_name=inspect.stack()[0][1].rsplit(os.sep, 1)[-1].upper(),
-#         # )
-
-#         if active_tab == f"tab-1-{graph_id}":
-
-#             # return "Hi"
-
-#             if "graph-A" in active_tab:
-#                 return eev["graph-A"]
-
-#             elif "graph-B" in active_tab:
-#                 return eev["graph-B"]
-
-#         elif "tab-2" in active_tab:
-#             return
-
 
 # Assign URL and port info
 connection = dict(url="127.0.0.1", port="8050")

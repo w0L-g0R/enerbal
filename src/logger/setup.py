@@ -57,10 +57,10 @@ def setup_logging(
         "version": 1,
         "disable_existing_loggers": False,
         "filters": {
-            "debug_only": {"()": DebugFilter,},
-            "info_only": {"()": InfoFilter,},
-            "warning_only": {"()": WarningFilter,},
-            "critical_only": {"()": CriticalFilter,},
+            "debug_only": {"()": DebugFilter, },
+            "info_only": {"()": InfoFilter, },
+            "warning_only": {"()": WarningFilter, },
+            "critical_only": {"()": CriticalFilter, },
         },
         "formatters": {
             "standard": {"format": LOG_OUTPUT_STANDARD, "datefmt": LOG_DATE_FORMAT},
@@ -72,7 +72,7 @@ def setup_logging(
         "handlers": {
             "null_out": {"class": "logging.NullHandler"},
             "console_out": {
-                "class": "dispaset.misc.colorstreamhandler.ColorStreamHandler",
+                "class": "logger.colorstreamhandler.ColorStreamHandler",
                 "stream": "ext://sys.stderr",
                 # 'filters': ["last_part"],
                 # "stream": "ext://sys.stdout",
@@ -99,7 +99,7 @@ def setup_logging(
             #     "level": "WARNING",
             # },
         },
-        "root": {"level": "DEBUG", "handlers": [],},
+        "root": {"level": "DEBUG", "handlers": [], },
         # "interface": {
         #     "level": "INFO",
         #     "handlers": ["info_html_out", "warning_html_out"],

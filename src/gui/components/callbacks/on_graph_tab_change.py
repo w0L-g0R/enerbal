@@ -8,7 +8,7 @@ from dash.dependencies import Input, Output, State
 
 from gui.app import app
 from gui.utils import show_callback_context
-from gui.components.views.setup import eev
+from gui.components.views.setup_components import eev
 
 
 def create_on_graph_tab_change(graph_id: str):

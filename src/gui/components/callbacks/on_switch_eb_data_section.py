@@ -14,7 +14,8 @@ from gui.app import app
 from gui.utils import show_callback_context
 from dash import no_update
 
-from gui.components.views.setup import eev_idx_rows  # ,  # sectors_idx_rows
+from gui.components.views.setup_components import eev_idx_rows, sectors_idx_rows, sector_energy_idx_rows, renewables_idx_rows
+
 IDX = pd.IndexSlice
 
 
@@ -37,6 +38,8 @@ def create_on_switch_eb_data_section(graph_id: str):
         triggered = ctx.triggered
         states = ctx.states
         inputs = ctx.inputs
+        inputs = list(inputs.keys())[0]
+        print('inputs: ', inputs)
 
         if triggered:
 
@@ -58,9 +61,23 @@ def create_on_switch_eb_data_section(graph_id: str):
                 elif "graph-B" in triggered_prop_id:
                     return sectors_idx_rows(graph_id="graph-B")
 
+            if "Sektor Energie" in data_section:
+                if "graph-A" in triggered_prop_id:
+                    return sector_energy_idx_rows(graph_id="graph-A")
+
+                elif "graph-B" in triggered_prop_id:
+                    return sector_energy_idx_rows(graph_id="graph-B")
+
+            if "ErnRL" in data_section:
+                if "graph-A" in triggered_prop_id:
+                    return renewables_idx_rows(graph_id="graph-A")
+
+                elif "graph-B" in triggered_prop_id:
+                    return renewables_idx_rows(graph_id="graph-B")
+
         else:
-            if "graph-A" in triggered_prop_id:
+            if "graph-A" in inputs:
                 return eev_idx_rows(graph_id="graph-A")
 
-            elif "graph-B" in triggered_prop_id:
+            elif "graph-B" in inputs:
                 return eev_idx_rows(graph_id="graph-B")

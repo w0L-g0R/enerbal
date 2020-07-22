@@ -3,15 +3,13 @@ import pickle
 import pandas as pd
 from pathlib import Path
 
-from gui.utils import create_eev_indices, get_eb_indices, create_eev_energy_source_options
+from gui.utils import create_row_indices, create_eev_energy_source_options
 from files.energiebilanzen.processing.eb_sheets import eb_sheets
 
-eb_indices = get_eb_indices()
-
-eev_indices = create_eev_indices(eb_indices=eb_indices)
-sectors_indices = eb_indices["IDX_EEV_SECTORS"].iloc[3:]
-sector_energy_indices = eb_indices["IDX_SECTOR_ENERGY"].iloc[3:]
-renewables_indices = eb_indices["IDX_RENEWABLES"]
+eev_indices = create_row_indices(_type="EEV")
+sectors_indices = create_row_indices(_type="Sektoren")
+sector_energy_indices = create_row_indices(_type="Sektor Energie")
+renewables_indices = create_row_indices(_type="ErnRL")
 
 energy_sources_options = create_eev_energy_source_options(
     energy_sources=eb_sheets)
