@@ -47,7 +47,7 @@ checklist = dbc.FormGroup(
 )
 
 layout = dbc.Card(
-    style={"width": "100%", "border": "1px yellow solid"},
+    style={"width": "100%", "border": "1px lightblue solid"},
     children=[
         dbc.CardBody(
             children=[

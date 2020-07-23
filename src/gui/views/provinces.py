@@ -14,7 +14,7 @@ def create_province_input_group(
         no_gutters=True,
         children=[
             dbc.Col(
-                style={"margin-right": 4,},
+                style={"margin-right": 4, },
                 children=[
                     dbc.InputGroup(
                         [
@@ -53,7 +53,7 @@ def create_province_input_group(
                         # "padding-right": 20,
                         # "text-align": "right",
                     },
-                    options=[{"label": "", "value": 1,},],
+                    options=[{"label": "", "value": 1, }, ],
                     value=[1 if checked else 0],
                     inline=True,
                     id="checklist-{}".format(province),
@@ -64,7 +64,7 @@ def create_province_input_group(
 
 
 layout = dbc.Card(
-    style={"width": "100%", "border": "1px yellow solid"},
+    style={"width": "100%", "border": "1px lightblue solid"},
     children=[
         dbc.CardBody(
             children=[

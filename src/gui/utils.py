@@ -28,6 +28,9 @@ def multiplicator(unit: str):
 
     if unit == "GWh":
         multiplicator = 0.27778
+        
+    if unit == "TWh":
+        multiplicator = 0.00027778
 
     if unit == "PJ":
         multiplicator = 0.001

@@ -43,6 +43,9 @@ def callback_on_select_renewables_dropdown(
 def create_on_select_renewables_dropdowns(graph_id: str):
     @app.callback(
         [
+            # Output(f"{graph_id}-unit", "options"),
+            # Output(f"{graph_id}-unit", "value"),
+            # Output(f"{graph_id}-unit", ""),
             Output(f"idx-res-0-{graph_id}", "options"),
             Output(f"idx-res-1-{graph_id}", "options"),
             Output(f"idx-res-2-{graph_id}", "options"),

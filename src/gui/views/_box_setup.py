@@ -11,7 +11,7 @@ import dash_html_components as html
 def create_graph_setup_layout(graph_id: str, title: str):
 
     return dbc.Card(
-        style={"width": "100%", "border": "1px yellow solid"},
+        style={"width": "100%", "border": "1px lightblue solid"},
         children=[
             dbc.CardHeader(
                 children=[

@@ -10,7 +10,7 @@ import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 
-from gui.views.setup_components import data_scale_row  # , get_scale
+from gui.views.setup_components import data_scale_row, chart_type_row
 
 
 def create_plots_dropdown(graph_id: str):
@@ -34,7 +34,7 @@ def create_graph_box_layout(graph_id: str):
         children=[
             dbc.CardHeader(
 
-                style={"height": 120},
+                style={"height": 82},
                 children=[
                     dbc.Row(
 
@@ -67,8 +67,8 @@ def create_graph_box_layout(graph_id: str):
                 id=f"{graph_id}-box",
                 children=[
                     dcc.Graph(
+                        id=f"{graph_id}-figure",
                         style={"width": 516},
-                        id=f"{graph_id}",
                         figure=dict(
                             data=[
                                 dict(
@@ -171,6 +171,32 @@ def create_graph_box_layout(graph_id: str):
                         ),
                     )
                 ],
+            ),
+            dbc.CardFooter(
+
+                style={"height": 80},
+                children=[
+                    dbc.Row(
+
+                        # justify="end",
+                        no_gutters=True,
+                        children=[
+                            # dbc.Col(
+                            #     # width=7,
+                            #     children=[
+                            #         html.H5(graph_id, className="card-title"), ],
+                            # ),
+                            dbc.Col(
+
+                                # width={"offset": 7, "size": 5},
+                                width=12,
+                                children=[
+                                    chart_type_row(graph_id=graph_id),
+                                ],
+                            ),
+                        ],
+                    ),
+                ]
             ),
         ],
     )

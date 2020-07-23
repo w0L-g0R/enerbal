@@ -48,7 +48,7 @@ def create_on_setup(graph_id: str):
         [   # TAB
             State(f"tabs-{graph_id}", "active_tab"),
             # DATA
-            State(f"data-section-{graph_id}", "value"),
+            State(f"{graph_id}-data-section", "value"),
             # TIME
             State(f"active-years", "value"),
             # PROVINCE ACTIVE
@@ -74,23 +74,23 @@ def create_on_setup(graph_id: str):
             State(f"plot-name-Vbg", "value",),
             State(f"plot-name-Wie", "value",),
             # TITLE
-            State(f"title-{graph_id}", "value",),
+            State(f"{graph_id}-title", "value",),
             # SCALE
             State(f"{graph_id}-scale", "value",),
             # INDEX YEAR
             State(f"{graph_id}-index-year", "value",),
             # AGGREGATE
-            State(f"aggregate-{graph_id}", "value",),
+            State(f"{graph_id}-aggregate", "value",),
             # ENERGY SOURCE
-            State(f"energy-sources-{graph_id}", "value"),
+            State(f"{graph_id}-energy-sources", "value"),
             # SOURCE INDEX
-            State(f"source-index-{graph_id}", "value"),
+            State(f"{graph_id}-source-index", "value"),
             # UNIT
-            State(f"unit-{graph_id}", "value"),
+            State(f"{graph_id}-unit", "value"),
             # CHART OPTIONS
-            State(f"chart-type-{graph_id}", "value"),
-            State(f"bar-chart-options-1-{graph_id}", "value"),
-            State(f"bar-chart-options-2-{graph_id}", "value"),
+            State(f"{graph_id}-chart-type", "value"),
+            # State(f"bar-chart-options-1-{graph_id}", "value"),
+            # State(f"bar-chart-options-2-{graph_id}", "value"),
             # INDEX EEV
             State(f"idx-eev-0-{graph_id}", "value"),
             State(f"idx-eev-1-{graph_id}", "value"),
@@ -154,8 +154,8 @@ def create_on_setup(graph_id: str):
         unit,
         # CHART OPTIONS
         chart_type,
-        chart_options_1,
-        chart_options_2,
+        # chart_options_1,
+        # chart_options_2,
         # INDEX EEV
         idx_0_EEV,
         idx_1_EEV,
@@ -197,18 +197,21 @@ def create_on_setup(graph_id: str):
             # if "graph-A" in triggered_prop_id:
             # _graph = "graph-A"
 
+            # =========================================================== GENERAL
+
             setup_data["data_section"] = data_section
             setup_data["title"] = title
             setup_data["scale"] = scale
             setup_data["index_year"] = index_year
             setup_data["aggregate"] = aggregate
             setup_data["energy_sources"] = energy_sources
+            print('energy_sources: ', energy_sources)
             setup_data["source_index"] = source_index
             setup_data["data_section"] = data_section
             setup_data["unit"] = unit
             setup_data["chart_type"] = chart_type
-            setup_data["chart_options_1"] = chart_options_1
-            setup_data["chart_options_2"] = chart_options_2
+            # setup_data["chart_options_1"] = chart_options_1
+            # setup_data["chart_options_2"] = chart_options_2
 
             # =========================================================== YEARS
             setup_data["years"] = sorted([1987 + x for x in years])

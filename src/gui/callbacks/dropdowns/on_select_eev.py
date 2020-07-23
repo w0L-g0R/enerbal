@@ -128,9 +128,16 @@ def create_on_select_eev_dropdowns(graph_id: str):
             if "Umwandlungseinsatz" in idx_0_value:
                 print('idx_0_value: ', idx_0_value)
                 print('idx_1_value: ', idx_1_value)
-
+                # if idx_1_value in [
+                #     "Gesamt",
+                #     "davon:  Kokerei",
+                #     "Hochofen",
+                #     "Raffinerie",
+                #     "Holzkohlenproduktion",
+                #     "Gaserzeugung"
+                # ]:
                 if "Kraftwerke" in idx_1_value or "KWK" in idx_1_value or "Heizwerke" in idx_1_value:
-
+                    print('sushi')
                     return callback_on_select_eev_dropdowns(
                         idx_1_disabled=False,
                         idx_2_disabled=False,
@@ -139,7 +146,6 @@ def create_on_select_eev_dropdowns(graph_id: str):
                         idx_3=only_total,
                         idx_4=only_total
                     )
-
                 else:
 
                     return callback_on_select_eev_dropdowns(
@@ -151,6 +157,16 @@ def create_on_select_eev_dropdowns(graph_id: str):
                         idx_3=only_total,
                         idx_4=only_total
                     )
+
+                return callback_on_select_eev_dropdowns(
+                    idx_1_disabled=False,
+                    idx_2_disabled=True,
+                    idx_3_disabled=True,
+                    idx_4_disabled=True,
+                    # idx_2=only_total,
+                    idx_3=only_total,
+                    idx_4=only_total
+                )
 
             if "Umwandlungsausstoß" in idx_0_value:
 
@@ -181,6 +197,7 @@ def create_on_select_eev_dropdowns(graph_id: str):
                     print("CASE 2")
 
                     idx_3_options = eev_indices[3].copy()
+
                     if "Heizwerke" in idx_1_value:
                         idx_3_options = idx_3_options[:-3]
 

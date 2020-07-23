@@ -19,18 +19,56 @@ import pickle
 from pathlib import Path
 
 
-def multiplicator(unit: str):
+def get_graph_layout(unit: str, title: str):
 
-    if unit == "GWh":
-        multiplicator = 0.27778
+    top_margin_factor = title.count(" <br> ")
+    print('top_margin_factor: ', top_margin_factor)
 
-    if unit == "PJ":
-        multiplicator = 0.001
+    top_margin = 32 + 24 * top_margin_factor
 
-    if unit == "TJ":
-        multiplicator = 1
+    return go.Layout(
+        title=dict(
+            text=title,
+            y=.97,
+            x=0.5,
+            xanchor="center",
+            yanchor="top",
+            font_size=16,
+            font_family="Quicksand",
+        ),
+        barmode="stack",
+        showlegend=True,
+        legend=dict(x=-0.1, y=-0.15),
+        legend_orientation="h",
+        template="plotly_white",
+        margin=dict(l=12, r=24, t=top_margin, b=0),
+        # margin=dict(pad=24),
+        width=496,
+        height=400,
+        yaxis_title=unit,
+        font=dict(family="Quicksand, sans-serif",
+                  size=12, color="black"),
 
-    return multiplicator
+        xaxis=dict(
+            dtick=1,
+            tickangle=90,
+            showticklabels=True,
+            zeroline=True,
+        ),
+        yaxis=dict(
+            ticks="outside",
+            tickcolor="lightgrey",
+            ticklen=5,
+            zeroline=True,
+            titlefont=dict(
+                family='Oswald, sans-serif',
+                size=14,
+                color='lightgrey'
+            ),
+
+        ),
+    )
+
 # def get_layout_with_datetime(unit: str, title: str, height: int = 360):
 
 #     return go.Layout(
@@ -84,62 +122,3 @@ def multiplicator(unit: str):
 #             # zeroline_color="black",
 #         ),
 #     )
-
-
-def get_graph_layout(unit: str, title: str):
-
-    top_margin_factor = title.count(" <br> ")
-    print('top_margin_factor: ', top_margin_factor)
-
-    top_margin = 32 * top_margin_factor
-
-    return go.Layout(
-        title=dict(
-            text=title,
-            y=.97,
-            x=0.5,
-            xanchor="center",
-            yanchor="top",
-            font_size=16,
-            font_family="Quicksand",
-        ),
-        barmode="stack",
-        showlegend=True,
-        legend=dict(x=-0.1, y=-0.15),
-        legend_orientation="h",
-        template="plotly_white",
-        margin=dict(l=12, r=24, t=top_margin, b=64),
-        # margin=dict(pad=24),
-        width=496,
-        height=400,
-        yaxis_title=unit,
-        font=dict(family="Quicksand, sans-serif",
-                  size=12, color="black"),
-
-        xaxis=dict(
-            dtick=1,
-            tickangle=90,
-            showticklabels=True,
-            # tickcolor="black",
-            # ticklen=10,
-            # ticksuffix=" " + unit,
-            # showticksuffix="all",
-            # domain=[0, 0.7]
-            zeroline=True,
-        ),
-        yaxis=dict(
-            ticks="outside",
-            tickcolor="lightgrey",
-            ticklen=5,
-            # ticksuffix=" " + unit,
-            # showticksuffix="all",
-            # domain=[0, 0.7]
-            zeroline=True,
-            titlefont=dict(
-                family='Oswald, sans-serif',
-                size=14,
-                color='lightgrey'
-            ),
-
-        ),
-    )

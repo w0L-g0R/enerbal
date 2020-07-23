@@ -19,17 +19,8 @@ def create_eb_graph_view(graph_id: str):
         children=[
             title_row(graph_id=graph_id),
             html.Br(),
-            # html.Hr(style={"width": "100%", "margin-bottom": 8}),
-            #
-
-            # html.Hr(style={"width": "100%", "margin-bottom": 8}),
-            #
-            chart_options_row(graph_id=graph_id),
-            # seventh_row(graph_id=graph_id)[0],
-            html.Br(style={"margin-bottom": 12}),
-            # html.Hr(style={"width": "100%", "margin-bottom": 8}),
-            #
             eb_aggregate_row(graph_id=graph_id),
+            html.Br(),
             eb_data_section_row(graph_id=graph_id),
 
             html.Div(
@@ -218,7 +209,7 @@ def eev_idx_rows(graph_id: str):
     )
 
 
-def chart_options_row(graph_id: str):
+def chart_type_row(graph_id: str):
     return dbc.Row(
         # style={"margin-top": 24},
         no_gutters=True,
@@ -226,9 +217,9 @@ def chart_options_row(graph_id: str):
             dbc.Col(
                 width=12,
                 children=[
-                    dbc.Label("Chart type options",
+                    dbc.Label("Chart type",
                               style=label_style),
-                    get_chart_options(graph_id=graph_id)
+                    get_chart_type(graph_id=graph_id)
                 ],
             ),
         ],
@@ -260,7 +251,7 @@ def get_title(graph_id: str):
         [
             dbc.Label(children="Titel", style=label_style),
             dbc.Input(
-                placeholder="Title goes here...", type="text", id=f"title-{graph_id}", value=f"{graph_id}"
+                placeholder="Title goes here...", type="text", id=f"{graph_id}-title", value=f"{graph_id}"
             ),
         ]
     )
@@ -271,13 +262,13 @@ def get_scale(graph_id: str):
         children=[
             dbc.Label("Datenskalierung", style=label_style),
             dbc.RadioItems(
-                style={"margin-top": 24, "margin-right": 4, "font-size": 14},
+                style={"margin-top": 12, "margin-right": 4, "font-size": 14},
                 options=[
-                    {"label": "Absolut", "value": 1, },
-                    {"label": "Normalisiert", "value": 2, },
-                    {"label": "Index Jahr", "value": 3, "disabled": True},
+                    {"label": "Absolut", "value": "Absolut", },
+                    {"label": "Normalisiert", "value": "Normalisiert", },
+                    {"label": "Index", "value": "Index", "disabled": True},
                 ],
-                value=1,
+                value="Absolut",
                 id=f"{graph_id}-scale",
                 inline=True,
             ),
@@ -301,7 +292,7 @@ def get_aggregate(graph_id: str):
         children=[
             dbc.Label("Aggregat", style=label_style),
             dbc.Select(
-                id=f"aggregate-{graph_id}",
+                id=f"{graph_id}-aggregate",
                 options=[
                     {"label": "Option 1", "value": "1"},
                     {"label": "Option 2", "value": "2"},
@@ -323,7 +314,7 @@ def get_energy_source(graph_id: str):
             #     value=[0]
             # ),
             dcc.Dropdown(
-                id=f"energy-sources-{graph_id}",
+                id=f"{graph_id}-energy-sources",
                 options=energy_sources_options,
                 value=["Gesamtenergiebilanz"],
                 multi=True,
@@ -338,7 +329,7 @@ def get_energy_source_index(graph_id: str):
         [
             dbc.Label("Nummer", style=label_style),
             dbc.Input(placeholder="", type="number",
-                      id=f"source-index-{graph_id}",),
+                      id=f"{graph_id}-source-index",),
         ]
     )
 
@@ -349,7 +340,7 @@ def get_data_section(graph_id: str):
         children=[
             dbc.Label("Datenbereich", style=label_style),
             dbc.RadioItems(
-                style={"padding-top": 6, "margin-right": 4},
+                style={"font-size": 14},
                 options=[
                     {"label": "EEV", "value": "EEV", },
                     {"label": "Sektoren", "value": "Sektoren", },
@@ -357,7 +348,7 @@ def get_data_section(graph_id: str):
                     {"label": "ErnRL", "value": "ErnRL", },
                 ],
                 value="EEV",
-                id=f"data-section-{graph_id}",
+                id=f"{graph_id}-data-section",
                 inline=True,
             ),
         ]
@@ -369,13 +360,14 @@ def get_energy_unit(graph_id: str):
     return dbc.FormGroup(
         style={"margin-left": -24},
         children=[
-            dbc.Label("Einheit", style=label_style),
+            dbc.Label("Unit", style=label_style),
             dbc.Select(
-                id=f"unit-{graph_id}",
+                id=f"{graph_id}-unit",
                 options=[
-                    {"label": "GWh", "value": "GWh"},
-                    {"label": "TJ", "value": "TJ"},
+                    {"label": "TJ", "value": "PJ"},
                     {"label": "PJ", "value": "PJ"},
+                    {"label": "GWh", "value": "GWh"},
+                    {"label": "TWh", "value": "TWh"},
                 ],
                 value="TJ"
             ),
@@ -398,83 +390,107 @@ def get_index_select(graph_id: str, name: str, value: str = None, options: List 
     )
 
 
-def get_chart_options(graph_id: str):
+def get_chart_type(graph_id: str):
     return dbc.Row(children=[
 
         dbc.Col(
-            width=3,
+            width=12,
             children=[
                 dcc.RangeSlider(
-                    id=f"chart-type-{graph_id}",
+                    id=f"{graph_id}-chart-type",
                     min=0,
-                    max=1,
+                    max=4,
                     step=1,
                     marks={
-                        0: {"label": "Line", "style": range_slider_style},
-                        1: {"label": "Bar", "style": range_slider_style},
+                        0: {"label": "Bar", "style": range_slider_style},
+                        1: {"label": "Line", "style": range_slider_style},
+                        2: {"label": "Scatter", "style": range_slider_style},
+                        3: {"label": "Pie", "style": range_slider_style},
+                        4: {"label": "Map", "style": range_slider_style},
                     },
-                    value=[1],
-                    vertical=True,
-                    verticalHeight=100,
+                    value=[0],
                 ),
             ]),
-
-
-        dbc.Col(
-            width=3,
-            children=[
-                dcc.RangeSlider(
-                    id=f"xaxis-type-{graph_id}",
-                    min=0,
-                    max=1,
-                    step=1,
-                    marks={
-                        0: {"label": "x=Länder", "style": range_slider_style},
-                        1: {"label": "x=Jahre", "style": range_slider_style},
-                    },
-                    value=[1],
-                    vertical=True,
-                    verticalHeight=100,
-                ),
-            ]),
-        dbc.Col(
-            width=3,
-            children=[
-                dcc.RangeSlider(
-                    id=f"bar-chart-options-1-{graph_id}",
-                    min=0,
-                    max=1,
-                    step=1,
-                    marks={
-                        0: {"label": "Horizontal", "style": range_slider_style},
-                        1: {"label": "Vertikal", "style": range_slider_style},
-                    },
-                    value=[1],
-                    vertical=True,
-                    verticalHeight=100,
-                ),
-            ]),
-        dbc.Col(
-            width=3,
-
-            children=[
-                dcc.RangeSlider(
-                    id=f"bar-chart-options-2-{graph_id}",
-                    min=0,
-                    max=1,
-                    step=1,
-                    marks={
-                        0: {"label": "Gruppiert", "style": range_slider_style},
-                        1: {"label": "Gestapelt", "style": range_slider_style},
-                    },
-                    value=[1],
-                    vertical=True,
-                    verticalHeight=100,
-                )
-            ])
 
     ])
 
+
+# def get_chart_options(graph_id: str):
+#     return dbc.Row(children=[
+
+#         dbc.Col(
+#             width=3,
+#             children=[
+#                 dcc.RangeSlider(
+#                     id=f"chart-type-{graph_id}",
+#                     min=0,
+#                     max=1,
+#                     step=1,
+#                     marks={
+#                         0: {"label": "Line", "style": range_slider_style},
+#                         1: {"label": "Bar", "style": range_slider_style},
+#                     },
+#                     value=[1],
+#                     vertical=True,
+#                     verticalHeight=100,
+#                 ),
+#             ]),
+
+
+#         dbc.Col(
+#             width=3,
+#             children=[
+#                 dcc.RangeSlider(
+#                     id=f"xaxis-type-{graph_id}",
+#                     min=0,
+#                     max=1,
+#                     step=1,
+#                     marks={
+#                         0: {"label": "x=Länder", "style": range_slider_style},
+#                         1: {"label": "x=Jahre", "style": range_slider_style},
+#                     },
+#                     value=[1],
+#                     vertical=True,
+#                     verticalHeight=100,
+#                 ),
+#             ]),
+#         dbc.Col(
+#             width=3,
+#             children=[
+#                 dcc.RangeSlider(
+#                     id=f"bar-chart-options-1-{graph_id}",
+#                     min=0,
+#                     max=1,
+#                     step=1,
+#                     marks={
+#                         0: {"label": "Horizontal", "style": range_slider_style},
+#                         1: {"label": "Vertikal", "style": range_slider_style},
+#                     },
+#                     value=[1],
+#                     vertical=True,
+#                     verticalHeight=100,
+#                 ),
+#             ]),
+#         dbc.Col(
+#             width=3,
+
+#             children=[
+#                 dcc.RangeSlider(
+#                     id=f"bar-chart-options-2-{graph_id}",
+#                     min=0,
+#                     max=1,
+#                     step=1,
+#                     marks={
+#                         0: {"label": "Gruppiert", "style": range_slider_style},
+#                         1: {"label": "Gestapelt", "style": range_slider_style},
+#                     },
+#                     value=[1],
+#                     vertical=True,
+#                     verticalHeight=100,
+#                 )
+#             ])
+
+#     ])
 
 energy_balances_views = {}
 energy_balances_views["graph-A"] = create_eb_graph_view(graph_id="graph-A")

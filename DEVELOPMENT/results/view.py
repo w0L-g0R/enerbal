@@ -12,7 +12,7 @@ import dash_html_components as html
 def create_graph_layout(graph_id: str):
 
     return dbc.Card(
-        style={"width": "100%", "border": "1px yellow solid"},
+        style={"width": "100%", "border": "1px lightblue solid"},
         children=[
             dbc.CardHeader(
                 children=[
@@ -21,7 +21,8 @@ def create_graph_layout(graph_id: str):
                         children=[
                             dbc.Col(
                                 width=7,
-                                children=[html.H5("Plot B", className="card-title"),],
+                                children=[
+                                    html.H5("Plot B", className="card-title"), ],
                             ),
                             dbc.Col(
                                 width=4,
@@ -34,7 +35,8 @@ def create_graph_layout(graph_id: str):
                                                 color="success",
                                                 id=f"update-{graph_id}",
                                             ),
-                                            dbc.Button("Excel", color="success"),
+                                            dbc.Button(
+                                                "Excel", color="success"),
                                         ],
                                     ),
                                 ],

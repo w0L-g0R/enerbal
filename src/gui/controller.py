@@ -28,7 +28,11 @@ from gui.callbacks.dropdowns.on_plot import create_on_plot
 from gui.callbacks.dropdowns.on_select_renewables import create_on_select_renewables_dropdowns
 
 from gui.callbacks.dropdowns.on_reset import create_on_reset_dropdowns
-from gui.callbacks.on_index_year import create_on_index_year
+from gui.callbacks.on_change_index_year import create_on_change_index_year
+
+# from gui.callbacks.on_change_scale import create_on_change_scale
+# from gui.callbacks.on_update_graph import create_on_update_graph
+
 
 views = {
     "years": years,
@@ -48,12 +52,13 @@ def register_callbacks():
 
         create_on_graph_tab_change(graph_id=graph)
         create_on_setup(graph_id=graph)
-        # create_on_click_update(graph_id=graph)
         create_on_select_eev_dropdowns(graph_id=graph)
         create_on_plot(graph_id=graph)
         create_on_switch_eb_data_section(graph_id=graph)
         create_on_select_renewables_dropdowns(graph_id=graph)
         create_on_reset_dropdowns(graph_id=graph)
-        create_on_index_year(graph_id=graph)
+        create_on_change_index_year(graph_id=graph)
+        # create_on_change_scale(graph_id=graph)
+        # create_on_update_graph(graph_id=graph)
 
     # create_on_update_data_table(graph_id=graph)

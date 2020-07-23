@@ -63,7 +63,7 @@ def create_on_reset_dropdowns(graph_id: str):
         ]
     )
     def on_reset_dropdowns(
-        n_clicks: List,
+        n_clicks: int,
         *args
         # idx_1_options: List,
         # idx_2_options: List,

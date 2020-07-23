@@ -39,7 +39,7 @@ def create_on_switch_eb_data_section(graph_id: str):
          Output(f"idx-sector-energy-{graph_id}", "style"),
          Output(f"idx-renewables-{graph_id}", "style"), ],
         [
-            Input(f"data-section-{graph_id}", "value"),
+            Input(f"{graph_id}-data-section", "value"),
         ],
     )
     def on_switch_eb_data_section(data_section):
