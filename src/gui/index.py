@@ -6,8 +6,8 @@ from dash.dependencies import Output
 
 from gui.app import app
 
-from gui.components.view import layout
-from gui.components.storages import stores
+from gui.view import layout
+from gui.storages import stores
 
 # //////////////////////////////////////////////////////////////////// LAYOUT
 

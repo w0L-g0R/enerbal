@@ -7,15 +7,11 @@ from typing import List
 
 from gui.utils import run_server
 from gui.index import layout
-from gui.components.controller import register_callbacks
+from gui.controller import register_callbacks
 
 from gui.app import app
 
 # /////////////////////////////////////////////////////////// PRE-RUNTIME SETUP
-
-# from components.setups.callbacks.on_graph_tab_change import create_on_graph_tab_change
-
-from gui.components.controller import register_callbacks
 
 # Assign layout created in index.py to app object
 app.layout = layout

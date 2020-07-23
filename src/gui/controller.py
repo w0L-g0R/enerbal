@@ -1,0 +1,59 @@
+# /////////////////////////////////////////////////////////////////////// VIEWS
+
+
+from gui.views.graph import graph_A, graph_B
+from gui.views.table import table
+from gui.views.setup import setup_A, setup_B
+from gui.views.header import layout as header
+from gui.views.provinces import layout as provinces
+from gui.views.years import layout as years
+
+# ////////////////////////////////////////////////////////////////// CB UPDATES
+from gui.callbacks.on_setup import create_on_setup
+
+from gui.callbacks.on_update_data_table import create_on_update_data_table
+
+# ////////////////////////////////////////////////////////////////// CB ROUTING
+from gui.callbacks.routing.on_switch_eb_data_section import create_on_switch_eb_data_section
+
+# from gui.callbacks.routing.on_click_update import create_on_click_update
+
+from gui.callbacks.routing.on_graph_tab_change import create_on_graph_tab_change
+
+# //////////////////////////////////////////////////////////////// CB DROPDOWNS
+from gui.callbacks.dropdowns.on_select_eev import create_on_select_eev_dropdowns
+
+from gui.callbacks.dropdowns.on_plot import create_on_plot
+
+from gui.callbacks.dropdowns.on_select_renewables import create_on_select_renewables_dropdowns
+
+from gui.callbacks.dropdowns.on_reset import create_on_reset_dropdowns
+from gui.callbacks.on_index_year import create_on_index_year
+
+views = {
+    "years": years,
+    "header": header,
+    "provinces": provinces,
+    "setup_A": setup_A,
+    "setup_B": setup_B,
+    "graph_A": graph_A,
+    "graph_B": graph_B,
+    "table": table,
+}
+
+
+def register_callbacks():
+
+    for graph in ["graph-A", "graph-B"]:
+
+        create_on_graph_tab_change(graph_id=graph)
+        create_on_setup(graph_id=graph)
+        # create_on_click_update(graph_id=graph)
+        create_on_select_eev_dropdowns(graph_id=graph)
+        create_on_plot(graph_id=graph)
+        create_on_switch_eb_data_section(graph_id=graph)
+        create_on_select_renewables_dropdowns(graph_id=graph)
+        create_on_reset_dropdowns(graph_id=graph)
+        create_on_index_year(graph_id=graph)
+
+    # create_on_update_data_table(graph_id=graph)
