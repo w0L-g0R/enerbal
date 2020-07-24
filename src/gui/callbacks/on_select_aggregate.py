@@ -23,7 +23,7 @@ from dash_table.Format import Format
 IDX = pd.IndexSlice
 
 
-def callback_return_on_change_aggregate(
+def callback_return_on_select_aggregate(
     updates_scale: str = no_update,
     absolute_values: List = no_update,
 ):
@@ -35,7 +35,7 @@ def callback_return_on_change_aggregate(
 # ///////////////////////////////////////////////////////////////// DISPATCH EL
 
 
-def create_on_change_aggregate(graph_id: str):
+def create_on_select_aggregate(graph_id: str):
     @ app.callback(
         Output(f"{graph_id}-energy-sources", "value"),
         [
@@ -45,7 +45,7 @@ def create_on_change_aggregate(graph_id: str):
             State(f"tabs-{graph_id}", "active_tab"),
         ]
     )
-    def on_change_aggregate(
+    def on_select_aggregate(
         aggregate_eb,
         active_tab
     ):

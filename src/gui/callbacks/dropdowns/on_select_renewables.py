@@ -13,7 +13,7 @@ IDX = pd.IndexSlice
 
 
 def callback_on_select_renewables_dropdown(
-    # setup_data: bool = True,
+    # setup: bool = True,
     idx_0: object = no_update,
     idx_1: object = no_update,
     idx_2: object = no_update,

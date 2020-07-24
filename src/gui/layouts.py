@@ -4,7 +4,7 @@
 import plotly.graph_objects as go
 
 
-def get_graph_layout(unit: str, title: str):
+def get_graph_layout(unit: str, title: str, barmode: str = "stacked"):
 
     top_margin_factor = title.count(" <br> ")
     print('top_margin_factor: ', top_margin_factor)
@@ -22,7 +22,7 @@ def get_graph_layout(unit: str, title: str):
             font_family="Quicksand",
         ),
         modebar=dict(orientation="v"),
-        barmode="stack",
+        barmode=barmode,
         showlegend=True,
         legend=dict(x=-0.1, y=-0.15),
         legend_orientation="h",

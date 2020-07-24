@@ -15,14 +15,14 @@ body {
 }
 /* BODY */
 html {
-  background-color: black;
+  /* background-color: black; */
   /* font-size: 1em !important; */
 }
 
 .root-container {
   /* background: url("background.png"); */
   /* background-image: url("background.png"); */
-  /* background-color: #0a0a0a; */
+  background-color: #0a0a0a;
   /* background-position: left top; */
 
   /* font-family: "Arial, sans-serif"; */

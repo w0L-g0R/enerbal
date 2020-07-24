@@ -12,48 +12,8 @@ from settings import (
     sectors_indices,
     units
 )
-
-range_slider_style = {"font-family": "Quicksand, sans-serif",
-                      "font-size": 14, "color": "Grey", }
-label_style = {"font-family": "Roboto, sans-serif",
-               "font-size": 14, "color": "cadetblue"}
-
-
-def create_eb_graph_view(graph_id: str):
-
-    return dbc.Container(
-        # fluid=True,
-        children=[
-            title_row(graph_id=graph_id),
-            html.Br(),
-            eb_aggregate_row(graph_id=graph_id),
-            xaxis_type_row(graph_id=graph_id),
-            html.Br(),
-            eb_data_section_row(graph_id=graph_id),
-
-            html.Div(
-                id=f"idx-eev-{graph_id}",
-                # style={"display": "none"},
-                children=eev_idx_rows(graph_id=graph_id),
-            ),
-            html.Div(
-                id=f"idx-sectors-{graph_id}",
-                style={"display": "none"},
-                children=sectors_idx_rows(graph_id=graph_id),
-            ),
-            html.Div(
-                id=f"idx-sector-energy-{graph_id}",
-                style={"display": "none"},
-                children=sector_energy_idx_rows(graph_id=graph_id),
-            ),
-            html.Div(
-                id=f"idx-renewables-{graph_id}",
-                style={"display": "none"},
-                children=renewables_idx_rows(graph_id=graph_id),
-            ),
-
-        ]
-    )
+from gui.assets.styles import range_slider_style, label_style
+from settings import chart_type_choices
 
 
 # def create_sectors_graph_view(graph_id: str):
@@ -84,12 +44,12 @@ def create_eb_graph_view(graph_id: str):
 # ////////////////////////////////////////////////////////////////////// ROWS
 
 
-def title_row(graph_id: str):
-    return dbc.Row(
-        no_gutters=True,
-        children=[dbc.Col(width=12, children=[
-            get_title(graph_id=graph_id)],), ],
-    )
+# def title_row(graph_id: str):
+#     return dbc.Row(
+#         no_gutters=True,
+#         children=[dbc.Col(width=12, children=[
+#             get_title(graph_id=graph_id)],), ],
+#     )
 
 
 def data_scale_row(graph_id: str):
@@ -122,7 +82,7 @@ def eb_aggregate_row(graph_id: str):
 def eb_data_section_row(graph_id: str):
     return dbc.Row(
         justify="center",
-        align="center",
+        # align="center",
         children=[
                 dbc.Col(width=10, children=[
                         get_data_section(graph_id=graph_id)],),
@@ -237,7 +197,7 @@ def chart_type_row(graph_id: str):
 
 def xaxis_type_row(graph_id: str):
     return dbc.Row(
-        style={"margin-top": 24},
+        # style={"margin-top": 24},
         no_gutters=True,
         children=[
             dbc.Col(
@@ -295,7 +255,7 @@ def get_index_year(graph_id: str):
 
 def get_aggregate_eb(graph_id: str):
     return dbc.FormGroup(
-        style={"margin-right": 4},
+        # style={"margin-right": 4},
         children=[
             dbc.Label("Aggregat", style=label_style),
             dcc.Dropdown(
@@ -458,8 +418,6 @@ def get_xaxis_type(graph_id: str):
                         width=8,
                         children=[
                             dcc.RangeSlider(
-
-
                                 id=f"{graph_id}-xaxis-type",
                                 min=0,
                                 max=1,
@@ -553,7 +511,3 @@ def get_xaxis_type(graph_id: str):
 #             ])
 
 #     ])
-
-energy_balances_views = {}
-energy_balances_views["graph-A"] = create_eb_graph_view(graph_id="graph-A")
-energy_balances_views["graph-B"] = create_eb_graph_view(graph_id="graph-B")

@@ -2,6 +2,55 @@
 import dash_bootstrap_components as dbc
 import dash_html_components as html
 
+from gui.views.setup_components import (
+    eb_aggregate_row,
+    xaxis_type_row,
+    eb_data_section_row,
+    eev_idx_rows,
+    sectors_idx_rows,
+    sector_energy_idx_rows,
+    renewables_idx_rows
+)
+
+
+def create_eb_graph_view(graph_id: str):
+
+    return dbc.Container(
+        # fluid=True,
+        children=[
+
+            html.Br(),
+            eb_aggregate_row(graph_id=graph_id),
+
+            xaxis_type_row(graph_id=graph_id),
+            html.Br(),
+
+            eb_data_section_row(graph_id=graph_id),
+
+            html.Div(
+                id=f"idx-eev-{graph_id}",
+                # style={"display": "none"},
+                children=eev_idx_rows(graph_id=graph_id),
+            ),
+            html.Div(
+                id=f"idx-sectors-{graph_id}",
+                style={"display": "none"},
+                children=sectors_idx_rows(graph_id=graph_id),
+            ),
+            html.Div(
+                id=f"idx-sector-energy-{graph_id}",
+                style={"display": "none"},
+                children=sector_energy_idx_rows(graph_id=graph_id),
+            ),
+            html.Div(
+                id=f"idx-renewables-{graph_id}",
+                style={"display": "none"},
+                children=renewables_idx_rows(graph_id=graph_id),
+            ),
+
+        ]
+    )
+
 
 def create_setup_layout(graph_id: str, title: str):
 
@@ -75,6 +124,11 @@ title_B = html.Img(
     src="https://fontmeme.com/permalink/200718/f155c17403325746f18dfe4eea451281.png",
     # style=navbar_logo_style,
 )
+
+
+eb_views = {}
+eb_views["graph-A"] = create_eb_graph_view(graph_id="graph-A")
+eb_views["graph-B"] = create_eb_graph_view(graph_id="graph-B")
 
 
 setup_A = create_setup_layout(

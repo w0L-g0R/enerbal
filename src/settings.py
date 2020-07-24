@@ -2,6 +2,7 @@
 import pickle
 import pandas as pd
 from pathlib import Path
+from gui.assets.styles import range_slider_style, label_style
 
 from gui.utils import create_row_indices, create_eev_energy_source_options
 from files.energiebilanzen.processing.eb_sheets import eb_sheets
@@ -13,6 +14,14 @@ renewables_indices = create_row_indices(_type="ErnRL")
 
 energy_sources_options = create_eev_energy_source_options(
     energy_sources=eb_sheets)
+
+chart_type_choices = {
+    0: {"label": "Bar", "style": range_slider_style},
+    1: {"label": "Line", "style": range_slider_style},
+    2: {"label": "Scatter", "style": range_slider_style},
+    3: {"label": "Pie", "style": range_slider_style},
+    4: {"label": "Map", "style": range_slider_style},
+}
 
 aggregates_eb = [
     {"label": "Hauptaggregate", "value": "Hauptaggregate"},

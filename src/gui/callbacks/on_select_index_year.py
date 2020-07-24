@@ -13,7 +13,7 @@ from gui.utils import show_callback_context
 IDX = pd.IndexSlice
 
 
-def create_on_change_index_year(graph_id: str):
+def create_on_select_index_year(graph_id: str):
     @app.callback(
         Output(f"{graph_id}-scale", "options"),
         [
@@ -21,7 +21,7 @@ def create_on_change_index_year(graph_id: str):
         ],
         [State(f"active-years", "value"), ]
     )
-    def on_change_index_year(
+    def on_select_index_year(
         index_year: str,
         active_years: List
     ):
