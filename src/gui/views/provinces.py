@@ -1,7 +1,6 @@
 import dash_bootstrap_components as dbc
 import dash_html_components as html
 
-import dash_daq as daq
 from gui.assets.AEA_colors import provinces_color_table
 
 # from settings import *

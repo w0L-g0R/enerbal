@@ -1,16 +1,11 @@
 
 # %%
-import inspect
-import logging
-import os
-from pathlib import Path
-from typing import List
 
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 
-from gui.views.setup_components import data_scale_row, chart_type_row
+from gui.views.setup_components import chart_type_row, data_scale_row
 
 
 def create_plots_dropdown(graph_id: str):

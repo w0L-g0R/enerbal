@@ -1,24 +1,13 @@
 import inspect
 import os
-from typing import List
 
-import dash_bootstrap_components as dbc
-import dash_core_components as dcc
 import pandas as pd
-import plotly.graph_objects as go
-from dash import callback_context
+from dash import callback_context, no_update
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
-import dash_table
 
 from gui.app import app
-from gui.assets.AEA_colors import provinces_color_table
-from gui.utils import get_graph_layout, show_callback_context
-from settings import provinces_names, eev_indices, energy_sources_options
-from dash import no_update
-import pickle
-from pathlib import Path
-from files.energiebilanzen.processing.eb_sheets import eb_sheets
+from gui.utils import show_callback_context
 
 IDX = pd.IndexSlice
 # _________________________________________________________________________

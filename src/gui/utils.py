@@ -1,22 +1,14 @@
-import plotly.graph_objects as go
-import json
 import logging
-import webbrowser
-from pathlib import Path
-from pprint import pformat
-from typing import Type, TypeVar
-
-import dash_bootstrap_components as dbc
-import dash_html_components as html
-from dash import callback_context
-from dash.exceptions import PreventUpdate
-from waitress import serve
-from typing import List, Dict
-from gui.app import app
 import pickle
+import webbrowser
 # from files.energiebilanzen.processing.eb_sheets import eb_sheets
 # from settings import eb_indices
 from pathlib import Path
+from pprint import pformat
+from typing import List, Type, TypeVar
+
+from dash import callback_context
+from waitress import serve
 
 # _____________________________________________________________________________
 # /////////////////////////////////////////////////////////////////////// TYPES
@@ -24,20 +16,32 @@ from pathlib import Path
 dash_component = Type[TypeVar("component")]
 
 
-def multiplicator(unit: str):
+def multiplicator(unit: str, normalized: bool = False):
+    print('unit: ', unit)
 
     if unit == "GWh":
         multiplicator = 0.27778
-        
+
+        if normalized:
+            multiplicator = 1/multiplicator * 100
+
     if unit == "TWh":
         multiplicator = 0.00027778
+
+        if normalized:
+            multiplicator = 1/multiplicator * 100
 
     if unit == "PJ":
         multiplicator = 0.001
 
-    if unit == "TJ":
+        if normalized:
+            multiplicator = multiplicator * 1e8
+
+    if unit in ["TJ", "MW", "h", "%"]:
         multiplicator = 1
 
+        if normalized:
+            multiplicator = multiplicator * 100
     return multiplicator
 
 

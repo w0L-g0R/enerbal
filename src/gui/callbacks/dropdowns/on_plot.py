@@ -20,8 +20,8 @@ from gui.app import app
 from gui.utils import show_callback_context
 from dash import no_update
 import numpy as np
+from settings import DEFAULT_CHART_CONFIG
 IDX = pd.IndexSlice
-
 # def callback_on_plot(
 #     graph: object
 # ):
@@ -46,22 +46,24 @@ def create_on_plot(graph_id: str):
 
         [
             Input(f"{graph_id}-plots", "value"),
-            Input(f"{graph_id}-setup", "data"),
             Input(f"{graph_id}-scale", "value"),
+            Input(f"{graph_id}-setup", "data"),
         ],
-        # [State(f"{graph_id}-setup", "data"),
+        # [
+        # State(f"{graph_id}-setup", "data"),
         #  State(f"idx-eev-0-{graph_id}", "disabled"),
         #  State(f"idx-eev-1-{graph_id}", "disabled"),
         #  State(f"idx-eev-2-{graph_id}", "disabled"),
         #  State(f"idx-eev-3-{graph_id}", "disabled"),
         #  State(f"idx-eev-4-{graph_id}", "disabled"),
 
-        #  ],
+        # ],
     )
     def on_plot(
         plots_dropdown_value: str,
-        setup_data: Dict,
         scale: str,
+        # trigger: Dict,
+        setup_data: str,
     ):
 
         show_callback_context(
@@ -90,7 +92,6 @@ def create_on_plot(graph_id: str):
             data = pickle.load(
                 open(setup_data["data_path"], "rb"))
 
-            print('data: ', data.head())
             # ////////////////////////////////////////////////////// ERN-RL
 
             if "ErnRL" in setup_data["data_section"]:
@@ -106,7 +107,7 @@ def create_on_plot(graph_id: str):
                     if idx != "Gesamt":
                         title = " <br> ".join([title, idx])
 
-                data_slice = rescale(
+                data_slice, unit = rescale(
                     scale=scale, setup_data=setup_data, data=data)
 
                 print('data_slice: ', data_slice)
@@ -117,7 +118,7 @@ def create_on_plot(graph_id: str):
                         go.Bar(
                             x=setup_data["years"],
                             y=np.array(data_slice.loc[
-                                IDX[setup_data["row_index"]],
+                                IDX[tuple(setup_data["row_index"])],
                                 IDX[province,
                                     setup_data["years"],
                                     ],
@@ -131,78 +132,81 @@ def create_on_plot(graph_id: str):
                     )
 
                     fig.layout = get_graph_layout(
-                        title=title, unit=setup_data["unit"])
+                        title=title, unit=unit)
 
                 return html.Div(
                     children=[
-                        dcc.Graph(figure=fig),
+                        dcc.Graph(figure=fig, config=DEFAULT_CHART_CONFIG),
                     ]
                 )
 
             if setup_data["data_section"] in ["EEV", "Sektoren", "Sektor Energie"]:
                 # ////////////////////////////////////////////////////// NOT ERN-RL
-                energy_soure_graphs = []
+                if "Jahre" in setup_data["x_axis_type"]:
 
-                for energy_source in setup_data["energy_sources"]:
+                    energy_soure_graphs = []
 
-                    # Create plot figure
-                    fig = go.Figure()
-                    opacity = 0.8
+                    for energy_source in setup_data["energy_sources"]:
 
-                    # Use energy source as title
-                    title = energy_source
+                        # Create plot figure
+                        fig = go.Figure()
+                        opacity = 0.8
 
-                    # Add more info to title
-                    for idx in setup_data["row_index"]:
-                        if idx != "Gesamt":
-                            title = " <br> ".join([title, idx])
+                        # Use energy source as title
+                        title = energy_source
 
-                    data_slice = rescale(
-                        scale=scale, setup_data=setup_data, data=data, energy_source=energy_source)
+                        # Add more info to title
+                        for idx in setup_data["row_index"]:
+                            if idx != "Gesamt":
+                                title = " <br> ".join([title, idx])
 
-                    print('data_slice: ', data_slice)
-                    for province in setup_data["provinces"]:
-                        print('province: ', province)
+                        data_slice, unit = rescale(
+                            scale=scale, setup_data=setup_data, data=data, energy_source=energy_source)
 
-                        fig.add_trace(
-                            go.Bar(
-                                x=setup_data["years"],
-                                # Values unpacked comes as a list of lists -> flatten
-                                y=np.array(data_slice.loc[
-                                    IDX[setup_data["row_index"]],
-                                    IDX[province,
-                                        energy_source,
-                                        setup_data["years"],
-                                        ],
-                                ].fillna(0).values).flatten() *
-                                multiplicator(unit=setup_data["unit"]),
-                                name=province,
-                                # legendgroup=province,
-                                marker_color=provinces_color_table[province],
-                                opacity=opacity,
+                        for province in setup_data["provinces"]:
+                            print('province: ', province)
+
+                            fig.add_trace(
+                                go.Bar(
+                                    x=setup_data["years"],
+                                    # Values unpacked comes as a list of lists -> flatten
+                                    y=np.array(data_slice.loc[
+                                        IDX[tuple(setup_data["row_index"])],
+                                        IDX[province,
+                                            energy_source,
+                                            setup_data["years"],
+                                            ],
+                                    ].fillna(0).values).flatten() *
+                                    multiplicator(unit=setup_data["unit"]),
+                                    name=province,
+                                    # legendgroup=province,
+                                    marker_color=provinces_color_table[province],
+                                    opacity=opacity,
+                                )
+                            )
+
+                        fig.layout = get_graph_layout(
+                            title=title, unit=unit)
+
+                        energy_soure_graphs.append(
+                            html.Div(
+                                children=[
+                                    dcc.Graph(
+                                        id=f"{graph_id}-figure",
+                                        figure=fig,
+                                        config=DEFAULT_CHART_CONFIG
+                                    ),
+                                ]
                             )
                         )
 
-                    fig.layout = get_graph_layout(
-                        title=title, unit=setup_data["unit"])
+                        if len(setup_data["energy_sources"]) > 1:
+                            energy_soure_graphs.append(html.Hr())
 
-                    energy_soure_graphs.append(
-                        html.Div(
-                            children=[
-                                dcc.Graph(
-                                    id=f"{graph_id}-figure",
-                                    figure=fig
-                                ),
-                            ]
-                        )
-                    )
+                    return energy_soure_graphs
 
-                    if len(setup_data["energy_sources"]) > 1:
-                        energy_soure_graphs.append(html.Hr())
-
-                return energy_soure_graphs
-                # graphs[energy_source] = dcc.Graph(figure=fig)
-                # dataframes[energy_source] = data_slice
+                if "Bundesländer" in setup_data["x_axis_type"]:
+                    for years in setup_data["years"]:
 
         else:
             raise PreventUpdate
@@ -229,6 +233,8 @@ def rescale(scale: str, setup_data: Dict, data: pd.DataFrame, energy_source: str
 
     data_slice = data_slice.apply(pd.to_numeric)
 
+    unit = setup_data["unit"]
+
     if scale == "Normalisiert":
 
         sum_per_year = data_slice.groupby(
@@ -237,7 +243,14 @@ def rescale(scale: str, setup_data: Dict, data: pd.DataFrame, energy_source: str
         data_slice = data_slice.groupby("YEAR").apply(
             lambda x: x / sum_per_year)
 
-    return data_slice.T
+        data_slice *= multiplicator(unit=setup_data["unit"], normalized=True)
+
+        unit = "%"
+
+        # # Change yaxis title
+        # figure["layout"]["yaxis"]["title"] = {'text': '%'}
+
+    return data_slice.T, unit
 
 
 # def rescale_res(scale: str, setup_data: Dict, data: pd.DataFrame):

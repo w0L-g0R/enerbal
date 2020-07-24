@@ -1,22 +1,7 @@
-import plotly.graph_objects as go
-import json
-import logging
-import webbrowser
-from pathlib import Path
-from pprint import pformat
-from typing import Type, TypeVar
-
-import dash_bootstrap_components as dbc
-import dash_html_components as html
-from dash import callback_context
-from dash.exceptions import PreventUpdate
-from waitress import serve
-from typing import List, Dict
-from gui.app import app
-import pickle
 # from files.energiebilanzen.processing.eb_sheets import eb_sheets
 # from settings import eb_indices
-from pathlib import Path
+
+import plotly.graph_objects as go
 
 
 def get_graph_layout(unit: str, title: str):
@@ -36,6 +21,7 @@ def get_graph_layout(unit: str, title: str):
             font_size=16,
             font_family="Quicksand",
         ),
+        modebar=dict(orientation="v"),
         barmode="stack",
         showlegend=True,
         legend=dict(x=-0.1, y=-0.15),

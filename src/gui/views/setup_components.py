@@ -1,13 +1,20 @@
+from typing import List
+from settings import aggregates_eb
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
-from typing import List
-from files.energiebilanzen.processing.eb_sheets import eb_sheets
 
-from settings import energy_sources_options, eev_indices, sectors_indices, sector_energy_indices, renewables_indices
+from settings import (
+    eev_indices,
+    energy_sources_options,
+    renewables_indices,
+    sector_energy_indices,
+    sectors_indices,
+    units
+)
 
-range_slider_style = {"font-family": "Roboto, sans-serif",
-                      "font-size": 12, "color": "black", }
+range_slider_style = {"font-family": "Quicksand, sans-serif",
+                      "font-size": 14, "color": "Grey", }
 label_style = {"font-family": "Roboto, sans-serif",
                "font-size": 14, "color": "cadetblue"}
 
@@ -20,6 +27,7 @@ def create_eb_graph_view(graph_id: str):
             title_row(graph_id=graph_id),
             html.Br(),
             eb_aggregate_row(graph_id=graph_id),
+            xaxis_type_row(graph_id=graph_id),
             html.Br(),
             eb_data_section_row(graph_id=graph_id),
 
@@ -98,14 +106,15 @@ def data_scale_row(graph_id: str):
 
 def eb_aggregate_row(graph_id: str):
     return dbc.Row(
+        style={"font-family": "Quicksand, sans-serif"},
         no_gutters=True,
         children=[
-            dbc.Col(width=2, children=[get_aggregate(graph_id=graph_id)],),
-            dbc.Col(width=8, children=[
+            dbc.Col(width=12, children=[get_aggregate_eb(graph_id=graph_id)],),
+            dbc.Col(width=12, children=[
                 get_energy_source(graph_id=graph_id)],),
-            dbc.Col(
-                width=2, children=[get_energy_source_index(graph_id=graph_id)],
-            ),
+            # dbc.Col(
+            # width=2, children=[get_energy_source_index(graph_id=graph_id)],
+            # ),
         ],
     )
 
@@ -226,21 +235,19 @@ def chart_type_row(graph_id: str):
     )
 
 
-# def seventh_row(graph_id: str):
-#     return (
-#         dbc.Row(
-#             style={"margin-top": 24},
-#             no_gutters=True,
-#             children=[
-#                 dbc.Col(
-#                     width=12,
-#                     children=[
-#                         get_bar_chart_options(graph_id=graph_id)
-#                     ],
-#                 ),
-#             ],
-#         ),
-#     )
+def xaxis_type_row(graph_id: str):
+    return dbc.Row(
+        style={"margin-top": 24},
+        no_gutters=True,
+        children=[
+            dbc.Col(
+                width=12,
+                children=[
+                    get_xaxis_type(graph_id=graph_id)
+                ],
+            ),
+        ],
+    )
 
 
 # ////////////////////////////////////////////////////////////////////// GETTER
@@ -286,20 +293,30 @@ def get_index_year(graph_id: str):
     )
 
 
-def get_aggregate(graph_id: str):
+def get_aggregate_eb(graph_id: str):
     return dbc.FormGroup(
         style={"margin-right": 4},
         children=[
             dbc.Label("Aggregat", style=label_style),
-            dbc.Select(
-                id=f"{graph_id}-aggregate",
-                options=[
-                    {"label": "Option 1", "value": "1"},
-                    {"label": "Option 2", "value": "2"},
-                ],
+            dcc.Dropdown(
+                id=f"{graph_id}-aggregate-eb",
+                options=aggregates_eb
             ),
         ],
     )
+
+
+# def get_aggregate_2(graph_id: str):
+#     return dbc.FormGroup(
+#         style={"margin-right": 4},
+#         children=[
+#             dbc.Label("Aggregat 2", style=label_style),
+#             dcc.Dropdown(
+#                 id=f"{graph_id}-aggregate-2",
+#                 options=aggregates
+#             ),
+#         ],
+#     )
 
 
 def get_energy_source(graph_id: str):
@@ -326,7 +343,7 @@ def get_energy_source(graph_id: str):
 def get_energy_source_index(graph_id: str):
 
     return dbc.FormGroup(
-        [
+        children=[
             dbc.Label("Nummer", style=label_style),
             dbc.Input(placeholder="", type="number",
                       id=f"{graph_id}-source-index",),
@@ -363,12 +380,7 @@ def get_energy_unit(graph_id: str):
             dbc.Label("Unit", style=label_style),
             dbc.Select(
                 id=f"{graph_id}-unit",
-                options=[
-                    {"label": "TJ", "value": "PJ"},
-                    {"label": "PJ", "value": "PJ"},
-                    {"label": "GWh", "value": "GWh"},
-                    {"label": "TWh", "value": "TWh"},
-                ],
+                options=units,
                 value="TJ"
             ),
         ],
@@ -414,6 +426,56 @@ def get_chart_type(graph_id: str):
 
     ])
 
+
+def get_xaxis_type(graph_id: str):
+    return html.Div(
+
+        children=[
+            dbc.Row(children=[
+
+                dbc.Col(
+                    children=dbc.Label("X-Achse", style=label_style),
+                ),
+            ]
+            ),
+
+            dbc.Row(
+                style={
+                    "border": "1px solid lightblue",
+                    "border-radius": 4,
+                    "height": 64
+                },
+                justify="center",
+                align="center",
+                no_gutters=True,
+                children=[
+                    # dbc.Col(
+                    #     children=dbc.Label("X-Achse", style=label_style),
+                    # ),
+                    dbc.Col(
+                        # style={"border": "1px solid lightblue",
+                        #        "margin.top": 12},
+                        width=8,
+                        children=[
+                            dcc.RangeSlider(
+
+
+                                id=f"{graph_id}-xaxis-type",
+                                min=0,
+                                max=1,
+                                step=1,
+                                marks={
+                                    0: {"label": "Jahre", "style": range_slider_style},
+                                    1: {"label": "Bundesländer", "style": range_slider_style},
+                                },
+                                value=[1],
+                            ),
+                        ]),
+
+                ])
+
+        ]
+    )
 
 # def get_chart_options(graph_id: str):
 #     return dbc.Row(children=[

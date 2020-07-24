@@ -1,20 +1,13 @@
 import inspect
 import os
-from typing import List
 
-import dash_bootstrap_components as dbc
-import dash_core_components as dcc
 import pandas as pd
-import plotly.graph_objects as go
 from dash import callback_context
-from dash.dependencies import Input, Output, State
+from dash.dependencies import Input, Output
 from dash.exceptions import PreventUpdate
 
 from gui.app import app
 from gui.utils import show_callback_context
-from dash import no_update
-
-from gui.views.setup_components import eev_idx_rows, sectors_idx_rows, sector_energy_idx_rows, renewables_idx_rows
 
 IDX = pd.IndexSlice
 

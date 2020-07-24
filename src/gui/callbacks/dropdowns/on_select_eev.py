@@ -1,19 +1,14 @@
-from settings import eev_indices
 import inspect
 import os
-from typing import List
 
-import dash_bootstrap_components as dbc
-import dash_core_components as dcc
 import pandas as pd
-import plotly.graph_objects as go
-from dash import callback_context
-from dash.dependencies import Input, Output, State
+from dash import callback_context, no_update
+from dash.dependencies import Input, Output
 from dash.exceptions import PreventUpdate
 
 from gui.app import app
 from gui.utils import show_callback_context
-from dash import no_update
+from settings import eev_indices
 
 IDX = pd.IndexSlice
 
@@ -84,8 +79,6 @@ def create_on_select_eev_dropdowns(graph_id: str):
         # Get callback information to define the triggered input
         ctx = callback_context
         triggered = ctx.triggered
-        states = ctx.states
-        inputs = ctx.inputs
 
         only_total = [
             {"label": "Gesamt", "value": "Gesamt"},
@@ -135,7 +128,20 @@ def create_on_select_eev_dropdowns(graph_id: str):
                 #     "Raffinerie",
                 #     "Holzkohlenproduktion",
                 #     "Gaserzeugung"
-                # ]:
+
+                if idx_1_value == "Gesamt":
+
+                    return callback_on_select_eev_dropdowns(
+                        idx_1_disabled=False,
+                        idx_2_disabled=True,
+                        idx_3_disabled=True,
+                        idx_4_disabled=True,
+                        idx_1=eev_indices[1],
+                        idx_2=only_total,
+                        idx_3=only_total,
+                        idx_4=only_total,
+                    )
+
                 if "Kraftwerke" in idx_1_value or "KWK" in idx_1_value or "Heizwerke" in idx_1_value:
                     print('sushi')
                     return callback_on_select_eev_dropdowns(
@@ -146,6 +152,7 @@ def create_on_select_eev_dropdowns(graph_id: str):
                         idx_3=only_total,
                         idx_4=only_total
                     )
+
                 else:
 
                     return callback_on_select_eev_dropdowns(

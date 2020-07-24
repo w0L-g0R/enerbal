@@ -80,17 +80,16 @@ def create_on_setup(graph_id: str):
             # INDEX YEAR
             State(f"{graph_id}-index-year", "value",),
             # AGGREGATE
-            State(f"{graph_id}-aggregate", "value",),
+            State(f"{graph_id}-aggregate-eb", "value",),
             # ENERGY SOURCE
             State(f"{graph_id}-energy-sources", "value"),
             # SOURCE INDEX
-            State(f"{graph_id}-source-index", "value"),
+            # State(f"{graph_id}-source-index", "value"),
             # UNIT
             State(f"{graph_id}-unit", "value"),
             # CHART OPTIONS
             State(f"{graph_id}-chart-type", "value"),
-            # State(f"bar-chart-options-1-{graph_id}", "value"),
-            # State(f"bar-chart-options-2-{graph_id}", "value"),
+            State(f"{graph_id}-xaxis_type", "value"),
             # INDEX EEV
             State(f"idx-eev-0-{graph_id}", "value"),
             State(f"idx-eev-1-{graph_id}", "value"),
@@ -145,15 +144,16 @@ def create_on_setup(graph_id: str):
         # INDEX YEAR
         index_year,
         # AGGREGATE
-        aggregate,
+        aggregate_eb,
         # ENERGY SOURCE
         energy_sources,
         # SOURCE INDEX
-        source_index,
+        # source_index,
         # UNIT
         unit,
         # CHART OPTIONS
         chart_type,
+        xaxis_type,
         # chart_options_1,
         # chart_options_2,
         # INDEX EEV
@@ -203,14 +203,14 @@ def create_on_setup(graph_id: str):
             setup_data["title"] = title
             setup_data["scale"] = scale
             setup_data["index_year"] = index_year
-            setup_data["aggregate"] = aggregate
+            setup_data["aggregate_eb"] = aggregate_eb
             setup_data["energy_sources"] = energy_sources
             print('energy_sources: ', energy_sources)
-            setup_data["source_index"] = source_index
+            # setup_data["source_index"] = source_index
             setup_data["data_section"] = data_section
             setup_data["unit"] = unit
             setup_data["chart_type"] = chart_type
-            # setup_data["chart_options_1"] = chart_options_1
+            setup_data["xaxis_type"] = xaxis_type
             # setup_data["chart_options_2"] = chart_options_2
 
             # =========================================================== YEARS
@@ -255,11 +255,38 @@ def create_on_setup(graph_id: str):
 
             if data_section == "EEV":
 
-                # ================================================ GET EEV DATA
+                row_index = [idx_0_EEV, idx_1_EEV,
+                             idx_2_EEV, idx_3_EEV, idx_4_EEV]
+                print('row_index: ', row_index)
+                print('idx_0_EEV: ', idx_0_EEV)
+
+                if idx_0_EEV in ["Umwandlungseinsatz", "Umwandlungsausstoß"]:
+                    print('idx_1_EEV: ', idx_1_EEV)
+
+                    for enum, idx in enumerate(row_index[1:]):
+                        print('idx: ', idx)
+                        print('enum: ', enum)
+                        print('row_index[enum+1:]: ', row_index[enum+1:])
+
+                        if idx == "Gesamt":
+                            row_index = row_index[:enum+2] + list(
+                                map(
+                                    lambda x: "Gesamt", row_index[enum+2:]
+                                )
+                            )
+
+                else:
+
+                    row_index = ["Gesamt" for x in row_index[1:]]
+                    row_index.insert(0, idx_0_EEV)
+                    # if idx == "Gesamt":
+                    #     lambda x: x == "Gesamt", row_index[enum+1:]
+
+                    print('row_index: ', row_index)
 
                 # Used to slice eev_data
-                setup_data["row_index"] = (idx_0_EEV, idx_1_EEV,
-                                           idx_2_EEV, idx_3_EEV, idx_4_EEV)
+                setup_data["row_index"] = row_index
+
                 setup_data["data_path"] = Path(
                     "src/files/energiebilanzen/pickles/eev_df.p").__str__()
 
@@ -277,6 +304,16 @@ def create_on_setup(graph_id: str):
 
             if data_section == "ErnRL":
 
+                row_index = [idx_0_RES, idx_1_RES, idx_2_RES]
+
+                if idx_1_EEV not in ["Energetischer Endverbrauch Erneuerbare (TJ)", "Elektrische Energie Produktion erneuerbar (TJ)"]:
+                    row_index = list(map(lambda x: "Gesamt", row_index))
+
+                for enum, idx in enumerate(row_index):
+                    if idx == "Gesamt":
+                        row_index = list(
+                            map(lambda x: "Gesamt", row_index[enum+1:]))
+
                 setup_data["row_index"] = (idx_0_RES, idx_1_RES, idx_2_RES)
                 setup_data["data_path"] = Path(
                     "src/files/energiebilanzen/pickles/renewables_df.p").__str__()
@@ -292,7 +329,3 @@ def create_on_setup(graph_id: str):
 
         else:
             PreventUpdate
-            # {"label": "EEV", "value": "EEV", },
-            # {"label": "Sektoren", "value": "Sektoren", },
-            # {"label": "Sektor Energie", "value": "Sektor Energie", },
-            # {"label": "ErnRL", "value": "ErnRL", },

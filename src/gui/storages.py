@@ -4,18 +4,18 @@ import dash_html_components as html
 stores = html.Div(
     children=[
         dcc.Store(id="graph-A-setup", storage_type="memory"),
-        # dcc.Store(id="graph-A", storage_type="memory"),
         dcc.Store(id="graph-B-setup", storage_type="memory"),
-        # dcc.Store(id="graph-B", storage_type="memory"),
+        dcc.Store(id="graph-A-plot", storage_type="memory"),
+        dcc.Store(id="graph-B-plot", storage_type="memory"),
         # dcc.Store(id="eev-indices", storage_type="memory"),
         dcc.Store(id="graph-A-updates-table", storage_type="memory"),
         dcc.Store(id="graph-B-updates-table", storage_type="memory"),
 
-        dcc.Store(id="graph-A-updates-scale", storage_type="memory"),
-        dcc.Store(id="graph-B-updates-scale", storage_type="memory"),
+        # dcc.Store(id="graph-A-updates-scale", storage_type="memory"),
+        # dcc.Store(id="graph-B-updates-scale", storage_type="memory"),
 
-        dcc.Store(id="graph-A-absolute-values", storage_type="memory"),
-        dcc.Store(id="graph-B-absolute-values", storage_type="memory"),
+        # dcc.Store(id="graph-A-absolute-values", storage_type="memory"),
+        # dcc.Store(id="graph-B-absolute-values", storage_type="memory"),
 
         # dcc.Store(id="graph-B-clicked-eev-update", storage_type="memory"),
         # dcc.Store(id="graph-A-clicked-nea-update", storage_type="memory"),

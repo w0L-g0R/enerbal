@@ -1,20 +1,13 @@
-from settings import renewables_indices
-from settings import eev_indices
 import inspect
 import os
-from typing import List
 
-import dash_bootstrap_components as dbc
-import dash_core_components as dcc
 import pandas as pd
-import plotly.graph_objects as go
-from dash import callback_context
-from dash.dependencies import Input, Output, State
+from dash import callback_context, no_update
+from dash.dependencies import Input, Output
 from dash.exceptions import PreventUpdate
 
 from gui.app import app
 from gui.utils import show_callback_context
-from dash import no_update
 
 IDX = pd.IndexSlice
 
@@ -27,31 +20,35 @@ def callback_on_select_renewables_dropdown(
     idx_0_disabled: object = no_update,
     idx_1_disabled: object = no_update,
     idx_2_disabled: object = no_update,
+    units_value: str = no_update,
+    units_options: str = no_update,
+    units_disabled: str = False,
 ):
 
     return [
-        # setup_data,
         idx_0,
         idx_1,
         idx_2,
         idx_0_disabled,
         idx_1_disabled,
         idx_2_disabled,
+        units_value,
+        units_disabled,
     ]
 
 
 def create_on_select_renewables_dropdowns(graph_id: str):
     @app.callback(
         [
-            # Output(f"{graph_id}-unit", "options"),
-            # Output(f"{graph_id}-unit", "value"),
-            # Output(f"{graph_id}-unit", ""),
+
             Output(f"idx-res-0-{graph_id}", "options"),
             Output(f"idx-res-1-{graph_id}", "options"),
             Output(f"idx-res-2-{graph_id}", "options"),
             Output(f"idx-res-0-{graph_id}", "disabled"),
             Output(f"idx-res-1-{graph_id}", "disabled"),
             Output(f"idx-res-2-{graph_id}", "disabled"),
+            Output(f"{graph_id}-unit", "value"),
+            Output(f"{graph_id}-unit", "disabled"),
 
         ],
         [
@@ -64,6 +61,7 @@ def create_on_select_renewables_dropdowns(graph_id: str):
         idx_0_value: str,
         idx_1_value: str,
         idx_2_value: str,
+
     ):
 
         show_callback_context(
@@ -82,6 +80,21 @@ def create_on_select_renewables_dropdowns(graph_id: str):
             # Store the selected dropdown item in a variable
             triggered_prop_id = triggered[0]["prop_id"]
             triggered_value = triggered[0]["value"]
+
+            if "Kapazität" in idx_2_value:
+                units_value = "MW"
+                units_disabled = True
+
+            elif "Ausnutzungsdauer (h)" in idx_2_value:
+                units_value = "h"
+                units_disabled = True
+
+            elif "Anteil" in idx_0_value:
+                units_value = "%"
+                units_disabled = True
+            else:
+                units_value = no_update
+                units_disabled = False
 
             only_total = [
                 {"label": "Gesamt", "value": "Gesamt"},
@@ -139,6 +152,8 @@ def create_on_select_renewables_dropdowns(graph_id: str):
                     idx_2_disabled=True,
                     idx_1=ee_verbrauch,
                     idx_2=only_total,
+                    units_value=units_value,
+                    units_disabled=units_disabled,
                 )
 
             if "Elektrische Energie Produktion erneuerbar (TJ)" == idx_0_value:
@@ -194,6 +209,8 @@ def create_on_select_renewables_dropdowns(graph_id: str):
                         idx_2=[
                             {"label": x, "value": x} for x in categories
                         ],
+                        units_value=units_value,
+                        units_disabled=units_disabled,
                     )
 
                 return callback_on_select_renewables_dropdown(
@@ -203,6 +220,8 @@ def create_on_select_renewables_dropdowns(graph_id: str):
                     idx_2=[
                         {"label": x, "value": x} for x in categories
                     ],
+                    units_value=units_value,
+                    units_disabled=units_disabled,
                 )
 
             if "Fernwärme" in idx_0_value:
@@ -212,6 +231,8 @@ def create_on_select_renewables_dropdowns(graph_id: str):
                     idx_2_disabled=True,
                     idx_1=ee_fernwärme,
                     idx_2=only_total,
+                    units_value=units_value,
+                    units_disabled=units_disabled,
                 )
             else:
 
@@ -220,6 +241,8 @@ def create_on_select_renewables_dropdowns(graph_id: str):
                     idx_2_disabled=True,
                     idx_1=only_total,
                     idx_2=only_total,
+                    units_value=units_value,
+                    units_disabled=units_disabled,
                 )
 
         else:

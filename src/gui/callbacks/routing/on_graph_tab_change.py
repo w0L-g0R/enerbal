@@ -1,10 +1,7 @@
 import inspect
 import os
-from pathlib import Path
-from typing import List
 
-from dash import no_update
-from dash.dependencies import Input, Output, State
+from dash.dependencies import Input, Output
 
 from gui.app import app
 from gui.utils import show_callback_context
