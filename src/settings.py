@@ -15,12 +15,16 @@ renewables_indices = create_row_indices(_type="ErnRL")
 energy_sources_options = create_eev_energy_source_options(
     energy_sources=eb_sheets)
 
-chart_type_choices = {
-    0: {"label": "Bar", "style": range_slider_style},
-    1: {"label": "Line", "style": range_slider_style},
-    2: {"label": "Scatter", "style": range_slider_style},
-    3: {"label": "Pie", "style": range_slider_style},
-    4: {"label": "Map", "style": range_slider_style},
+chart_type_options = {
+    "Bar": {"label": "Bar", "style": range_slider_style},
+    "Bar+": {"label": "Bar+", "style": range_slider_style},
+    "Line": {"label": "Line", "style": range_slider_style},
+    "Area": {"label": "Map", "style": range_slider_style},
+    "Pie": {"label": "Pie", "style": range_slider_style},
+    "Sun": {"label": "Sun", "style": range_slider_style},
+    "Map": {"label": "Map", "style": range_slider_style},
+    "Sankey": {"label": "Sankey", "style": range_slider_style},
+    "Ratio": {"label": "Sankey", "style": range_slider_style},
 }
 
 aggregates_eb = [
@@ -48,6 +52,12 @@ units = [
     {"label": "%", "value": "%", "disabled": True},
 ]
 
+scale_options = {
+    0: {"label": "Absolute", "style": range_slider_style},
+    1: {"label": "Normalized", "style": range_slider_style},
+    2: {"label": "Index", "style": range_slider_style},
+}
+
 conversion_multiplicators = {
     "mwh_2_gwh": 0.001,
     "gwh_2_tj": (1 / 0.27778),
@@ -71,12 +81,16 @@ provinces_names = [
 ]
 
 DEFAULT_CHART_CONFIG = {
+    "edits": {
+        "titleText": True,
+    },
     'modeBarButtons': [
         [
             'toImage',
             'sendDataToCloud',
             'zoom2d',
             'pan2d',
+            # 'lasso',
             'zoomIn2d',
             'zoomOut2d',
             'autoScale2d',
@@ -92,9 +106,10 @@ DEFAULT_CHART_CONFIG = {
             'eraseshape'
         ]
     ],
+    'responsive': True,
     'displaylogo': False,
-    "showLink": True,
-    'editable': True,
+    "showLink": False,
+    # 'editable': True,
     "plotlyServerURL": "https://chart-studio.plotly.com",
     'toImageButtonOptions': {
         'format': 'png',  # one of png, svg, jpeg, webp

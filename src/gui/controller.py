@@ -1,5 +1,5 @@
 # /////////////////////////////////////////////////////////////////////// VIEWS
-from gui.callbacks.dropdowns.on_plot import create_on_plot
+from gui.callbacks.plots.on_plot import create_on_plot
 # from gui.callbacks.dropdowns.on_reset import create_on_reset_dropdowns
 # //////////////////////////////////////////////////////////////// CB DROPDOWNS
 from gui.callbacks.dropdowns.on_select_eev import (
@@ -18,21 +18,43 @@ from gui.callbacks.routing.on_switch_eb_data_section import create_on_switch_eb_
 
 
 # ////////////////////////////////////////////////////////////////// CB SELECTS
-from gui.callbacks.on_select_index_year import create_on_select_index_year
+# from gui.callbacks.on_select_index_year import create_on_select_index_year
 from gui.callbacks.on_select_aggregate import create_on_select_aggregate
+# from gui.callbacks.on_switch_axes import create_on_switch_axes
+# from gui.callbacks.on_update_graph import create_on_update_graph
+
+# ////////////////////////////////////////////////////////////////// CB UPDATES
+from gui.callbacks.on_update import create_on_update
+# from gui.callbacks.on_select_aggregate import create_on_select_aggregate
 # from gui.callbacks.on_select_xaxis import create_on_select_xaxis
 # from gui.callbacks.on_update_graph import create_on_update_graph
 
 
-from gui.views.graph import graph_A, graph_B
+from gui.views.graph import create_graph_box_layout
+from gui.views.setup.view import create_setup_layout
+from gui.views.control import create_control_box_layout
 from gui.views.header import layout as header
 from gui.views.provinces import layout as provinces
-from gui.views.setup import setup_A, setup_B
 from gui.views.table import table
 from gui.views.years import layout as years
 
 # from gui.callbacks.routing.on_click_update import create_on_click_update
 
+from gui.assets.logos import setup_logo_A, setup_logo_B
+
+setup_A = create_setup_layout(
+    graph_id="graph-A", title=setup_logo_A)
+setup_B = create_setup_layout(
+    graph_id="graph-B", title=setup_logo_B)
+# setup_C = create_setup_layout(
+#     graph_id="graph-C", title=logo_B)
+
+graph_A = create_graph_box_layout(graph_id="graph-A")
+graph_B = create_graph_box_layout(graph_id="graph-B")
+# graph_C = create_graph_box_layout(graph_id="graph-C")
+
+control_A = create_control_box_layout(graph_id="graph-A")
+control_B = create_control_box_layout(graph_id="graph-B")
 
 views = {
     "years": years,
@@ -40,8 +62,12 @@ views = {
     "provinces": provinces,
     "setup_A": setup_A,
     "setup_B": setup_B,
+    # "setup_C": setup_C,
     "graph_A": graph_A,
     "graph_B": graph_B,
+    "control_A": control_A,
+    "control_B": control_B,
+    # "graph_C": graph_C,
     "table": table,
 }
 
@@ -54,11 +80,11 @@ def register_callbacks():
         create_on_setup(graph_id=graph)
         create_on_select_eev_dropdowns(graph_id=graph)
         create_on_plot(graph_id=graph)
-        create_on_switch_eb_data_section(graph_id=graph)
+        # create_on_switch_eb_data_section(graph_id=graph)
         create_on_select_renewables_dropdowns(graph_id=graph)
-        # create_on_select_xaxis(graph_id=graph)
-        create_on_select_index_year(graph_id=graph)
+        # create_on_switch_axes(graph_id=graph)
+        # create_on_select_index_year(graph_id=graph)
         create_on_select_aggregate(graph_id=graph)
-        # create_on_update_graph(graph_id=graph)
+        create_on_update(graph_id=graph)
 
     # create_on_update_data_table(graph_id=graph)

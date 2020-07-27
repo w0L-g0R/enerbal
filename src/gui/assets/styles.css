@@ -21,8 +21,9 @@ html {
 
 .root-container {
   /* background: url("background.png"); */
-  /* background-image: url("background.png"); */
-  background-color: #0a0a0a;
+  background-color: #000000;
+  /* background-color: white; */
+  background-image: url("background_image.png");
   /* background-position: left top; */
 
   /* font-family: "Arial, sans-serif"; */
@@ -35,8 +36,9 @@ html {
   /* max-height: 680px; */
   /* min-height: 1252px; */
   width: 100%;
+  background-repeat: no-repeat;
   /* width: 700px; */
-  margin: 0px 0px -22px 0px;
+  margin: 0px 0px 55px 0px;
   /* padding: 0; */
   /* padding-bottom: 1000px; */
 }

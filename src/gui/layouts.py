@@ -4,17 +4,15 @@
 import plotly.graph_objects as go
 
 
-def get_graph_layout(unit: str, title: str, barmode: str = "stacked"):
+def get_graph_layout(y_unit: str, x_unit: str, title: str, barmode: str = "relative"):
 
     top_margin_factor = title.count(" <br> ")
-    print('top_margin_factor: ', top_margin_factor)
-
     top_margin = 32 + 24 * top_margin_factor
 
     return go.Layout(
         title=dict(
             text=title,
-            y=.97,
+            y=.96,
             x=0.5,
             xanchor="center",
             yanchor="top",
@@ -24,36 +22,82 @@ def get_graph_layout(unit: str, title: str, barmode: str = "stacked"):
         modebar=dict(orientation="v"),
         barmode=barmode,
         showlegend=True,
-        legend=dict(x=-0.1, y=-0.15),
+        legend=dict(x=0, y=-0.5, xanchor="center", yanchor="bottom", ),
         legend_orientation="h",
-        template="plotly_white",
-        margin=dict(l=12, r=24, t=top_margin, b=0),
-        # margin=dict(pad=24),
-        width=496,
-        height=400,
-        yaxis_title=unit,
+        # template="plotly_dark",
+        margin=dict(l=0, r=24, t=top_margin, b=12),
+        # margin=dict(l=12, r=24, t=top_margin, b=12),
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        # margin="auto",
+        autosize=True,
+        # width=364,
+        # height=400,
+        xaxis_title=x_unit,
+        yaxis_title=y_unit,
         font=dict(family="Quicksand, sans-serif",
-                  size=12, color="black"),
+                  size=13, color="white"),
 
         xaxis=dict(
             dtick=1,
+            autorange=True,
             tickangle=90,
+            tickmode="auto",
             showticklabels=True,
             zeroline=True,
+            showgrid=True,
+            gridwidth=0.5,
+            gridcolor='#444444',
+            zerolinewidth=3,
+            zerolinecolor='white',
         ),
         yaxis=dict(
+            showgrid=True,
+            gridwidth=0.5,
+            tickmode="auto",
+            gridcolor='#444444',
             ticks="outside",
-            tickcolor="lightgrey",
-            ticklen=5,
+            tickcolor="#444444",
+            ticklen=2,
             zeroline=True,
-            titlefont=dict(
-                family='Oswald, sans-serif',
-                size=14,
-                color='lightgrey'
-            ),
+            zerolinewidth=3,
+            zerolinecolor='white',
+            autorange=True,
+            # titlefont=dict(
+            #     family='Oswald, sans-serif',
+            #     size=14,
+            #     color='lightgrey'
+            # ),
 
         ),
     )
+
+    # fig.update_layout(
+    #     xaxis=dict(
+
+    #     ),
+    #     yaxis=dict(
+    #         title=xaxis_type,
+    #         showgrid=True,
+    #         gridwidth=0.5,
+    #         gridcolor='#444444',
+    #         autorange=True,
+    #         categoryorder="array",
+    #         categoryarray=[x for _, x in sorted(
+    #             zip(trace["y"], trace["x"]))]
+
+    #         # ticks="outside",
+    #         # tickcolor="#444444",
+    #         # ticklen=2,
+    #         # zeroline=True,
+    #         # zerolinewidth=3,
+    #         # zerolinecolor='red',
+    #         # titlefont=dict(
+    #         #     family='Oswald, sans-serif',
+    #         #     size=14,
+    #         #     color='lightgrey'
+    #         # ),
+    #     ),
 
 # def get_layout_with_datetime(unit: str, title: str, height: int = 360):
 

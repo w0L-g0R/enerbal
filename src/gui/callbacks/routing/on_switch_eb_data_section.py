@@ -48,8 +48,6 @@ def create_on_switch_eb_data_section(graph_id: str):
         states = ctx.states
         inputs = ctx.inputs
         inputs = list(inputs.keys())[0]
-        print('inputs: ', inputs)
-
         if triggered:
 
             # Store the selected dropdown item in a variable

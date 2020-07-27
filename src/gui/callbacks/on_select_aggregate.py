@@ -138,7 +138,7 @@ def create_on_select_aggregate(graph_id: str):
                         "Holzabfall",
                         "Holzkohle",
                         "Ablaugen",
-                        "Hausmüll Bioanteil"
+                        "Hausmüll Bioanteil",
                         "Sonst. Biogene fest"
                     ]
 

@@ -314,9 +314,6 @@ def create_on_update_eev_graph(graph_id: str):
             fig = go.Figure()
             opacity = 1
 
-            # hovertemplate = "<b>Power</b>: %{y:.3f}" + \
-            #     "<br> <b>Datetime</b>: %{x}<br>"
-
             multiplicator = 1
 
             if _unit == "GWh":

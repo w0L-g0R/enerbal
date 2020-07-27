@@ -1,3 +1,4 @@
+import dash_html_components as html
 import inspect
 import os
 from typing import List, Dict
@@ -19,32 +20,31 @@ from dash import no_update
 import pickle
 from pathlib import Path
 from files.energiebilanzen.processing.eb_sheets import eb_sheets
-from settings import chart_type_choices
+from settings import chart_type_options, scale_options
 
 IDX = pd.IndexSlice
 # _________________________________________________________________________
 # ///////////////////////////////////////////////////////////////// DISPATCH EL
 
 
-def callback_return_on_setup(
-    options: List,
-    setup: Dict,
-):
+# def callback_return_on_setup(
+#     # options: List,
+#     setup: Dict,
+# ):
 
-    return [
-        options,
-        setup
-    ]
+#     return [
+#         # options,
+#         setup
+#     ]
 
 
 def create_on_setup(graph_id: str):
     @app.callback(
         [
-            Output(f"{graph_id}-plots", "options"),
             Output(f"{graph_id}-setup", "data"),
         ],
         [
-            Input(f"btn-setup-{graph_id}", "n_clicks"),
+            Input(f"{graph_id}-btn-setup", "n_clicks"),
         ],
         [   # TAB
             State(f"tabs-{graph_id}", "active_tab"),
@@ -84,13 +84,13 @@ def create_on_setup(graph_id: str):
             State(f"{graph_id}-aggregate-eb", "value",),
             # ENERGY SOURCE
             State(f"{graph_id}-energy-sources", "value"),
-            # SOURCE INDEX
-            # State(f"{graph_id}-source-index", "value"),
             # UNIT
             State(f"{graph_id}-unit", "value"),
-            # CHART OPTIONS
-            State(f"{graph_id}-chart-type", "value"),
+            # State(f"{graph_id}-chart-type", "value"),
             State(f"{graph_id}-xaxis-type", "value"),
+            # CHART OPTIONS
+            State(f"{graph_id}-options-1", "value"),
+            State(f"{graph_id}-options-2", "value"),
             # INDEX EEV
             State(f"idx-eev-0-{graph_id}", "value"),
             State(f"idx-eev-1-{graph_id}", "value"),
@@ -148,15 +148,13 @@ def create_on_setup(graph_id: str):
         aggregate_eb,
         # ENERGY SOURCE
         energy_sources,
-        # SOURCE INDEX
-        # source_index,
         # UNIT
         unit,
         # CHART OPTIONS
-        chart_type,
+        # chart_type,
         xaxis_type,
-        # chart_options_1,
-        # chart_options_2,
+        chart_options_1,
+        chart_options_2,
         # INDEX EEV
         idx_0_EEV,
         idx_1_EEV,
@@ -194,6 +192,7 @@ def create_on_setup(graph_id: str):
             triggered_value = triggered[0]["value"]
 
             setup = {}
+            setup["figures"] = {}
 
             # =========================================================== GENERAL
 
@@ -203,17 +202,19 @@ def create_on_setup(graph_id: str):
             if "graph-B" in triggered_prop_id:
                 setup["graph_id"] = "graph-B"
 
+            if "graph-C" in triggered_prop_id:
+                setup["graph_id"] = "graph-C"
+
             setup["data_section"] = data_section
             # setup["title"] = title
-            setup["scale"] = scale
+            setup["scale"] = scale_options[scale[0]]["label"]
             setup["index_year"] = index_year
             setup["aggregate_eb"] = aggregate_eb
             setup["energy_sources"] = energy_sources
-            print('energy_sources: ', energy_sources)
-            # setup["source_index"] = source_index
-            setup["data_section"] = data_section
+            setup["rotate"] = chart_options_1 if chart_options_1 == "Rotate" else []
+            setup["for_each"] = chart_options_1 if chart_options_1 == "Foreach" else []
             setup["unit"] = unit
-            setup["chart_type"] = chart_type_choices[chart_type[0]]["label"]
+            setup["chart_type"] = chart_type_options["Bar"]["label"]
             setup["xaxis_type"] = "Jahre" if xaxis_type == [
                 0] else "Bundesländer"
             # setup["chart_options_2"] = chart_options_2
@@ -315,13 +316,18 @@ def create_on_setup(graph_id: str):
                     "src/files/energiebilanzen/pickles/renewables_df.p").__str__()
 
             # Add options
-            options = [{"label": x, "value": x}
-                       for x in energy_sources]
+            # options = [{"label": x, "value": x}
+            #            for x in energy_sources]
 
-            return callback_return_on_setup(
-                options=options,
-                setup=json.dumps(setup)
-            )
+            # with open(setup["graph_id"] + ".p", 'wb') as file:
+            #     pickle.dump(setup, file)
+
+            return [json.dumps(setup)]
+
+            # return callback_return_on_setup(
+            #     # options=options,
+            #     setup=json.dumps(setup)
+            # )
 
         else:
             PreventUpdate

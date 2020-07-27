@@ -55,7 +55,7 @@ def create_graph_setup_layout(graph_id: str, title: str):
                     ),
                 ]
             ),
-            dbc.CardBody(id=f"content-{graph_id}",),
+            dbc.CardBody(id=f"{graph_id}-content",),
         ],
     )
 

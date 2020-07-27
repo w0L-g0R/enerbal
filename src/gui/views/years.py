@@ -39,7 +39,7 @@ checklist = dbc.FormGroup(
                 {"label": "2017", "value": 30},
                 {"label": "2018", "value": 31},
             ],
-            value=list(range(28, 32)),
+            value=list(range(6, 32)),
             inline=True,
             id="active-years",
         ),

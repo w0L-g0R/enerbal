@@ -5,11 +5,17 @@ stores = html.Div(
     children=[
         dcc.Store(id="graph-A-setup", storage_type="memory"),
         dcc.Store(id="graph-B-setup", storage_type="memory"),
-        dcc.Store(id="graph-A-plot", storage_type="memory"),
-        dcc.Store(id="graph-B-plot", storage_type="memory"),
+        # dcc.Store(id="graph-C-setup", storage_type="memory"),
+        dcc.Store(id="graph-A-plots", storage_type="memory"),
+        dcc.Store(id="graph-B-plots", storage_type="memory"),
+        # dcc.Store(id="graph-C-plots", storage_type="memory"),
         # dcc.Store(id="eev-indices", storage_type="memory"),
-        dcc.Store(id="graph-A-updates-table", storage_type="memory"),
-        dcc.Store(id="graph-B-updates-table", storage_type="memory"),
+        dcc.Store(id="graph-A-update", storage_type="memory"),
+        dcc.Store(id="graph-B-update", storage_type="memory"),
+        # dcc.Store(id="graph-C-update", storage_type="memory"),
+
+        dcc.Store(id="graph-B-axes", storage_type="memory"),
+        dcc.Store(id="graph-C-axes", storage_type="memory"),
 
         # dcc.Store(id="graph-A-updates-scale", storage_type="memory"),
         # dcc.Store(id="graph-B-updates-scale", storage_type="memory"),

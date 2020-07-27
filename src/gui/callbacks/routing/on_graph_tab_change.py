@@ -5,12 +5,12 @@ from dash.dependencies import Input, Output
 
 from gui.app import app
 from gui.utils import show_callback_context
-from gui.views.setup import eb_views
+from gui.views.setup.view import eb_setup_views
 
 
 def create_on_graph_tab_change(graph_id: str):
     @app.callback(
-        Output(f"content-{graph_id}", "children"),
+        Output(f"{graph_id}-content", "children"),
         [Input(f"tabs-{graph_id}", "active_tab")],
     )
     def on_graph_tab_change(active_tab):
@@ -26,7 +26,10 @@ def create_on_graph_tab_change(graph_id: str):
             # return "Hi"
 
             if "graph-A" in active_tab:
-                return eb_views["graph-A"]
+                return eb_setup_views["graph-A"]
 
             elif "graph-B" in active_tab:
-                return eb_views["graph-B"]
+                return eb_setup_views["graph-B"]
+
+            elif "graph-C" in active_tab:
+                return eb_setup_views["graph-C"]
