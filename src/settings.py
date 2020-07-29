@@ -1,11 +1,11 @@
 
+from files.energiebilanzen.processing.eb_sheets import eb_sheets
+from gui.utils import create_row_indices, create_eev_energy_source_options
+from gui.assets.styles import range_slider_style, label_style
 import pickle
 import pandas as pd
 from pathlib import Path
-from gui.assets.styles import range_slider_style, label_style
 
-from gui.utils import create_row_indices, create_eev_energy_source_options
-from files.energiebilanzen.processing.eb_sheets import eb_sheets
 
 eev_indices = create_row_indices(_type="EEV")
 sectors_indices = create_row_indices(_type="Sektoren")
@@ -64,6 +64,7 @@ conversion_multiplicators = {
     "tj_2_pj": 0.001,
     "gwh_2_mwh": 1000,
     "tj_2_gwh": 0.27778,
+    "tj_2_twh": 0.27778 / 1000,
     "pj_2_tj": 1000,
 }
 

@@ -45,6 +45,12 @@ def fetch_energy_sources(
     del dfs["Klassifikation"]
     del dfs["Wirkungsgrade"]
 
+    # NOTE: Only appears in "ET_AT_70_18"
+    try:
+        del dfs["Generatorgas"]
+    except:
+        pass
+
     # NOTE: Hidden sheets
     try:
         del dfs["checkFormal"]
@@ -69,18 +75,24 @@ def fetch_energy_sources(
     fetched_sheets = list(dfs.keys())
     unintended_sheets = set(eb_sheets).symmetric_difference(fetched_sheets)
 
+    mismatches = [
+        energy_source for energy_source in fetched_sheets if energy_source not in eb_sheets]
+
+    print('Mismatches: ', mismatches)
     assert (
         len(unintended_sheets) == 0
-    ), "There are some unintended sheets in the xlsx file"
+    ), "There are some unintended sheets in the fetched xlsx file. Delete or rename those sheet_names with the corresponding names from 'eb_sheets.py'!"
 
     # ////////////////////////////// KNOWN ERROR 1: Mischgas ends at year "1995"
 
     # Replace missing years in column index
-    add_on = years_range_data[len(dfs["Mischgas"].columns) - 1 :]
+    add_on = years_range_data[len(dfs["Mischgas"].columns) - 1:]
 
-    df_dummy_columns = pd.DataFrame(index=range(len(dfs["Mischgas"])), columns=add_on)
+    df_dummy_columns = pd.DataFrame(
+        index=range(len(dfs["Mischgas"])), columns=add_on)
 
-    dfs["Mischgas"] = pd.concat([dfs["Mischgas"], df_dummy_columns], axis="columns")
+    dfs["Mischgas"] = pd.concat(
+        [dfs["Mischgas"], df_dummy_columns], axis="columns")
 
     # /////////////////// KNOWN ERROR 2:  Misses name "Gesamt" at row 475
     for source in ["Erdgas", "Elektrische Energie"]:

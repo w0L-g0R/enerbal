@@ -5,17 +5,17 @@ import pickle
 import numpy as np
 import time
 
-from eb_sheets import eb_sheets
-from create_indices import create_eev_col_midx, create_renewables_col_midx
-from create_dfs import create_eb_storage_dfs, create_idx_check_dfs
-from assign_table_data import (
+from files.energiebilanzen.processing.eb_sheets import eb_sheets
+from files.energiebilanzen.processing.create_indices import create_eev_col_midx, create_renewables_col_midx
+from files.energiebilanzen.processing.create_dfs import create_eb_storage_dfs, create_idx_check_dfs
+from files.energiebilanzen.processing.assign_table_data import (
     assign_eev_table,
     assign_renewables_table,
     assign_sectors_consumption_table,
     assign_sector_energy_consumption_table,
 )
 
-from fetch_from_excel import fetch_energy_sources
+from files.energiebilanzen.processing.fetch_from_excel import fetch_energy_sources
 
 pd.set_option("display.max_columns", 10)  # or 1000
 pd.set_option("display.max_rows", None)  # or 1000
@@ -76,7 +76,8 @@ def convert_eb_to_df(
     # Create a row muliindex with 5 levels for the renewable data
 
     renewables_row_midx = pd.MultiIndex.from_tuples(
-        tuples=[tuple(x) for x in row_indices["MIDX_RENEWABLES"].loc[:, :3].values],
+        tuples=[tuple(x)
+                for x in row_indices["MIDX_RENEWABLES"].loc[:, :3].values],
         names=["IDX_0", "IDX_1", "IDX_2", "IDX_3"],
     )
 
@@ -224,13 +225,15 @@ def convert_eb_to_df(
     # ////////////////////////////////////////////////////////////////// PICKLE
 
     pickle.dump(
-        eev_df, open(balances_directory_path.parent / Path("pickles/eev_df.p"), "wb")
+        eev_df, open(balances_directory_path.parent /
+                     Path("pickles/eev_df.p"), "wb")
     )
 
     pickle.dump(
         sector_consumptions_df,
         open(
-            balances_directory_path.parent / Path("pickles/sector_consumptions_df.p"),
+            balances_directory_path.parent /
+            Path("pickles/sector_consumptions_df.p"),
             "wb",
         ),
     )
@@ -246,7 +249,8 @@ def convert_eb_to_df(
 
     pickle.dump(
         renewables_df,
-        open(balances_directory_path.parent / Path("pickles/renewables_df.p"), "wb"),
+        open(balances_directory_path.parent /
+             Path("pickles/renewables_df.p"), "wb"),
     )
 
     return
@@ -254,13 +258,11 @@ def convert_eb_to_df(
 
 # ////////////////////////////////////////////////////////////////////// INPUTS
 
-balances_directory_path = Path(
-    "D:/_WORK/AEA/Projekte/bilanzen_monitor/src/files/energiebilanzen/data"
-)
+balances_directory_path = Path.cwd() / "src/files/energiebilanzen/data"
+print('balances_directory_path: ', balances_directory_path)
 
-row_indices_file_path = Path(
-    "D:/_WORK/AEA/Projekte/bilanzen_monitor/src/files/energiebilanzen/index/row_indices_eb.xlsx"
-)
+row_indices_file_path = Path.cwd() / "src/files/energiebilanzen/index/row_indices_eb.xlsx"
+print('row_indices_file_path: ', row_indices_file_path)
 
 start = time.time()
 print("###########################################################################")

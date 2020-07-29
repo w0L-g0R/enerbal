@@ -99,3 +99,16 @@ provinces_color_table_rgba = {
     "Vbg": (123, 123, 123, 0.5),
     "Wie": (144, 183, 107, 0.5)
 }
+
+provinces_color_table_rgb = {
+    "AT": (0, 0, 0),
+    "Bgd": (0, 125, 190),  # hellblau
+    "Ktn": (82, 0, 0),  # dunkelrot
+    "Noe": (165, 0, 0),  # rot
+    "Ooe": (230, 100, 0),  # orange
+    "Sbg": (190, 200, 0),  # limette
+    "Stk": (84, 130, 53),  # grün
+    "Tir": (10, 70, 25),  # dunkelgrün
+    "Vbg": (100, 65, 50),  # braun
+    "Wie": (205, 16, 118),  # deeppink
+}

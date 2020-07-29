@@ -2,7 +2,6 @@ import logging
 import pickle
 import webbrowser
 # from files.energiebilanzen.processing.eb_sheets import eb_sheets
-# from settings import eb_indices
 from pathlib import Path
 from pprint import pformat
 from typing import List, Type, TypeVar
@@ -46,7 +45,10 @@ def multiplicator(unit: str, normalized: bool = False):
 
 
 def get_eb_indices():
-    eb_indices_path = Path("src/files/energiebilanzen/pickles/indices.p")
+    # eb_indices_path = Path.cwd() / Path("zzzzzzzzfiles/energiebilanzen/pickles/indices.p")
+
+    eb_indices_path = Path.cwd() / Path("src/files/energiebilanzen/pickles/indices.p")
+    print('eb_indices_path: ', eb_indices_path)
     return pickle.load(open(eb_indices_path, "rb"))
 
 
@@ -62,7 +64,6 @@ def create_row_indices(_type: str):
 
     eb_indices = get_eb_indices()
 
-    print('_type: ', _type)
     if _type == "EEV":
         indices = eb_indices["MIDX_EEV"]
 
@@ -74,7 +75,6 @@ def create_row_indices(_type: str):
 
     if _type == "ErnRL":
         indices = eb_indices["MIDX_RENEWABLES"].loc[:, :2]
-        print('indices: ', indices)
 
     midx = []
 
