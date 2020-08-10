@@ -201,6 +201,86 @@ class DataSet:
                     )
                 )
 
+    def add_nea_per_years(
+        self,
+        file: Union[str, Path],
+        provinces: List,
+        years: List,
+        energy_sources: List = None,
+    ):
+        logging.getLogger().error("/" * 80)
+        logging.getLogger().info(f"Adding {file} data per years:\n{years}\n")
+
+        nea_df.loc[IDX[:],
+                   IDX["Ktn",
+                       "Gesamt (ohne E1 - E7)",
+                       "Dampferzeugung",
+                       2000]]
+
+        # Fetch data
+        data = pickle.load(open(self.file_paths[file], "rb"))
+
+        for energy_source in energy_sources:
+
+            logging.getLogger().info(f"Energy source: {energy_source}")
+
+            # Create a searchable name
+            name = "_".join(
+                [
+                    "Energetischer_Endverbrauch",
+                    energy_source,
+                    str(years[0]),
+                    str(years[-1]),
+                ]
+            )
+
+            # Use the aggregate as the row index
+            row_midx_addon = 5 - len(aggregate)
+
+            # Extend the  with "Gesamt" if not specified
+            aggregate.extend(["Gesamt"] * row_midx_addon)
+
+            # Slice data for all given provinces and years
+            df = data.loc[
+                IDX[tuple(aggregate)],
+                IDX[tuple(provinces), energy_source, years],
+            ]
+
+            df = apply_single_index(df=df)
+
+            # Sum column and row
+            df = add_sums(df=df)
+
+            # Share of each year over total years per province
+            df_shares_per_year = get_shares(df=df, years=True)
+
+            # Share of each province over total provinces per year
+            df_shares_per_province = get_shares(df=df, provinces=True)
+
+            logging.getLogger().info(
+                f"Added {name} to {self.name}.data_manager")
+
+            # Create Data object
+            self.data.append(
+                Data(
+                    # title=name,
+                    name=name,
+                    file="eb",
+                    source="Energiebilanzen Bundesländer",
+                    unit="TJ",
+                    frame=df,
+                    aggregate=aggregate[0],
+                    energy_source=energy_source,
+                    shares_over_rows=df_shares_per_year,
+                    shares_over_columns=df_shares_per_province,
+                    provinces=provinces,
+                    years=years,
+                    order="per_years"
+                )
+            )
+
+            return
+
     def add_stats_data_per_years(
         self,
         file: Union[str, Path],
@@ -239,7 +319,7 @@ class DataSet:
         for index, row in df.iterrows():
             try:
                 df.loc[index, :] = data["df"].loc[index, provinces]
-            except:
+            except BaseException:
                 pass
 
         # Compute sums on rows axis (years) and on col axis (provinces)
@@ -335,7 +415,7 @@ class DataSet:
         assert len(df_numerator) == len(
             df_numerator), "Dataframe index length mismatch!"
 
-        df = df_numerator/df_denominator
+        df = df_numerator / df_denominator
 
         df = df.drop("Sum", axis=1)
         df = df.drop("Sum", axis=0)

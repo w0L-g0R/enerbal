@@ -18,23 +18,37 @@ setup_logging(
     console_out_level=logging.DEBUG,
 )
 
-aggregates = ["Bruttoinlandsverbrauch", "Importe"]
+eb_aggregates = ["Bruttoinlandsverbrauch", "Importe"]
 # aggregates = ["Bruttoinlandsverbrauch"]
 
-energy_sources = [
+eb_energy_sources = [
     "Gesamtenergiebilanz",
     # "KOHLE",
     # "GAS",
 ]
+
+nea_energy_sources = [
+    "Steinkohle",
+    "Insgesamt",
+    # "GAS",
+]
+
+nea_sectors = [
+    "Ö Gesamt (ohne E1 - E7)",
+    "Produzierender Bereich Gesamt",
+    "Transport Gesamt ",
+    "Offentliche und Private Dienstleistungen",
+    "Private Haushalte",
+    "Landwirtschaft",
+]
+
 years = list(range(2000, 2019, 1))
 
-# wb_path = "tmp.xlsx"
-
-# graphs = []
-# wb = get_workbook(path=wb_path)
+# /////////////////////////////////////////////////////////////// CREATE DATASET
 
 ds = DataSet(name=f"Set_1", file_paths=file_paths)
 
+# //////////////////////////////////////////////////////////////////////// STATS
 ds.add_stats_data_per_years(
     name="Bevölkerungsstatisik",
     file="pop", years=years, provinces=provinces,
@@ -45,14 +59,15 @@ ds.add_stats_data_per_years(
     file="km_pkw", years=years, provinces=provinces,
 )
 
-for aggregate in aggregates:
+# /////////////////////////////////////////////////////////////////////////// EB
+for aggregate in eb_aggregates:
 
     logging.getLogger().error("/" * 80)
     logging.getLogger().error(f"Aggregate: {aggregate}")
 
     ds.add_eb_data_per_years(
         file="eev",
-        energy_sources=energy_sources,
+        energy_sources=eb_energy_sources,
         aggregate=aggregate,
         years=years,
         provinces=provinces,
@@ -60,7 +75,7 @@ for aggregate in aggregates:
 
     ds.add_eb_data_per_sector(
         file="sec",
-        energy_sources=energy_sources,
+        energy_sources=eb_energy_sources,
         aggregate=aggregate,
         years=[2016, 2017],
         provinces=provinces,
@@ -73,13 +88,14 @@ for aggregate in aggregates:
         ],
     )
 
+    # ////////////////////////////////////////////////////////////////// EB IND
     ds.add_indicator(
 
         aggregate=aggregate,
 
         numerator=[
             data for data in ds.objects.filter(
-                name__contains=aggregate+"_Gesamtenergiebilanz", order="per_years")
+                name__contains=aggregate + "_Gesamtenergiebilanz", order="per_years")
         ],
 
         denominator=[
@@ -88,6 +104,15 @@ for aggregate in aggregates:
         ],
 
     )
+# ////////////////////////////////////////////////////////////////////////// NEA
+
+ds.add_nea_data_per_years(
+    file="nea",
+    energy_sources=nea_energy_sources,
+    years=years,
+    provinces=provinces,
+)
+# ////////////////////////////////////////////////////////////////////// OVERLAY
 
 ds.add_overlay(
     to_data=[
@@ -105,6 +130,7 @@ ds.add_overlay(
     chart_type="line",
 )
 
+# /////////////////////////////////////////////////////////////// FILTER DATASET
 
 g_data = [
     v for v in ds.objects.filter(
@@ -114,6 +140,7 @@ g_data = [
     )
 ]
 
+# /////////////////////////////////////////////////////////////// FILTER DATASET
 
 ov_data = [
     v.name for v in ds.objects.filter(
@@ -131,11 +158,13 @@ g_size = [sys.getsizeof(x) for x in g_data]
 pprint(f'{g_data_names}')
 pprint(f'{g_size}')
 
+print(g_data)
+# //////////////////////////////////////////////////////////////// WRITE TO XLSX
 
 wb = xlsx(name="WB1", path="test.xlsx", sheets=aggregates)
 try:
     wb.close()
-except:
+except BaseException:
     pass
 
 for data in g_data:
@@ -156,8 +185,6 @@ for sheet in wb.book.sheetnames:
     wb.style(ws=wb.book[sheet])
 
 wb.book.save(wb.path)
-
-
 wb.launch()
 
 # print('wb: ', wb.worksheets)

@@ -14,7 +14,7 @@ import dash_table
 from gui.app import app
 from gui.assets.AEA_colors import provinces_color_table
 from gui.utils import get_graph_layout, show_callback_context
-from settings import provinces_names, eev_indices, energy_sources_options
+from settings import provinces
 from dash import no_update
 import pickle
 from pathlib import Path
@@ -276,7 +276,7 @@ def create_on_update_eev_graph(graph_id: str):
                 "Wie": plotname_Wie,
             }
 
-            _provinces = provinces_names.copy()
+            _provinces = provinces.copy()
 
             for province, check in provinces_selection.items():
 

@@ -7,7 +7,6 @@ import dash_html_components as html
 
 from settings import (
     eev_indices,
-    energy_sources_options,
     renewables_indices,
     sector_energy_indices,
     sectors_indices,

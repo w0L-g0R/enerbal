@@ -6,10 +6,12 @@ import dash_core_components as dcc
 import dash_html_components as html
 
 from gui.assets.styles import range_slider_style, label_style
-from settings import chart_type_options, energy_sources_options, units
+from settings import chart_type_options, units
 from utils import create_eev_energy_source_options
+from files.energiebilanzen.processing.get_eb_sheets import eb_sheets
 
-energy_sources_options = create_eev_energy_source_options(energy_sources=eb_sheets)
+energy_sources_options = create_eev_energy_source_options(
+    energy_sources=eb_sheets)
 
 # ////////////////////////////////////////////////////////////////////// GETTER
 
@@ -197,7 +199,8 @@ def get_energy_source_index(graph_id: str):
     return dbc.FormGroup(
         children=[
             dbc.Label("Nummer", style=label_style),
-            dbc.Input(placeholder="", type="number", id=f"{graph_id}-source-index",),
+            dbc.Input(placeholder="", type="number",
+                      id=f"{graph_id}-source-index",),
         ]
     )
 
@@ -210,10 +213,10 @@ def get_data_section(graph_id: str):
             dbc.RadioItems(
                 style={"font-size": 14},
                 options=[
-                    {"label": "EEV", "value": "EEV",},
-                    {"label": "Sektoren", "value": "Sektoren",},
-                    {"label": "Sektor Energie", "value": "Sektor Energie",},
-                    {"label": "ErnRL", "value": "ErnRL",},
+                    {"label": "EEV", "value": "EEV", },
+                    {"label": "Sektoren", "value": "Sektoren", },
+                    {"label": "Sektor Energie", "value": "Sektor Energie", },
+                    {"label": "ErnRL", "value": "ErnRL", },
                 ],
                 value="EEV",
                 id=f"{graph_id}-data-section",
@@ -282,7 +285,8 @@ def get_xaxis_type(graph_id: str):
     return html.Div(
         children=[
             dbc.Row(
-                children=[dbc.Col(children=dbc.Label("X-Achse", style=label_style),),]
+                children=[dbc.Col(children=dbc.Label(
+                    "X-Achse", style=label_style),), ]
             ),
             dbc.Row(
                 style={

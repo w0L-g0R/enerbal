@@ -1,4 +1,4 @@
-from files.energiebilanzen.processing.eb_sheets import eb_sheets
+# from files.energiebilanzen.processing.get_eb_sheets import eb_sheets
 from utils import create_row_indices
 from paths import file_paths
 from gui.assets.styles import range_slider_style, label_style
@@ -72,13 +72,13 @@ provinces = [
     "Bgd",
     # "Ktn",
     # "Noe",
-    "Ooe",
-    "Sbg",
+    # "Ooe",
+    # "Sbg",
     # "Stk",
     # "Tir",
-    "Vbg",
-    "Wie",
-    "AT",
+    # "Vbg",
+    # "Wie",
+    # "AT",
 ]
 
 provinces_hex = {
@@ -95,7 +95,7 @@ provinces_hex = {
 }
 
 DEFAULT_CHART_CONFIG = {
-    "edits": {"titleText": True,},
+    "edits": {"titleText": True, },
     "modeBarButtons": [
         [
             "toImage",

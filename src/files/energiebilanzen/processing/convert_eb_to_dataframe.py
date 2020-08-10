@@ -5,7 +5,7 @@ import pickle
 import numpy as np
 import time
 
-from files.energiebilanzen.processing.eb_sheets import eb_sheets
+from files.energiebilanzen.processing.get_eb_sheets import eb_sheets
 from files.energiebilanzen.processing.create_indices import (
     create_eev_col_midx,
     create_renewables_col_midx,
@@ -70,7 +70,8 @@ def convert_eb_to_df(
     # Create a row muliindex with 5 levels for the renewable data
 
     renewables_row_midx = pd.MultiIndex.from_tuples(
-        tuples=[tuple(x) for x in row_indices["MIDX_RENEWABLES"].loc[:, :3].values],
+        tuples=[tuple(x)
+                for x in row_indices["MIDX_RENEWABLES"].loc[:, :3].values],
         names=["IDX_0", "IDX_1", "IDX_2", "IDX_3"],
     )
 
@@ -98,13 +99,17 @@ def convert_eb_to_df(
     for province in provinces:
 
         print(
-            "//////////////////////////  {}  /////////////////////////".format(province)
+            "//////////////////////////  {}  /////////////////////////".format(
+                province)
         )
 
         # /////////////////////////////////////////////////////////// FIND PATH
         try:
             # Find corresponding excel file for province
-            balances_file_path = list(filter(lambda x: province in x, eb_file_paths))[0]
+            balances_file_path = list(
+                filter(
+                    lambda x: province in x,
+                    eb_file_paths))[0]
 
         # CHECK 1: Xlxs file not found or not existing
         except Exception as e:
@@ -214,13 +219,15 @@ def convert_eb_to_df(
     # ////////////////////////////////////////////////////////////////// PICKLE
 
     pickle.dump(
-        eev_df, open(balances_directory_path.parent / Path("pickles/eev_df.p"), "wb")
+        eev_df, open(balances_directory_path.parent /
+                     Path("pickles/eev_df.p"), "wb")
     )
 
     pickle.dump(
         sector_consumptions_df,
         open(
-            balances_directory_path.parent / Path("pickles/sector_consumptions_df.p"),
+            balances_directory_path.parent /
+            Path("pickles/sector_consumptions_df.p"),
             "wb",
         ),
     )
@@ -236,7 +243,8 @@ def convert_eb_to_df(
 
     pickle.dump(
         renewables_df,
-        open(balances_directory_path.parent / Path("pickles/renewables_df.p"), "wb"),
+        open(balances_directory_path.parent /
+             Path("pickles/renewables_df.p"), "wb"),
     )
 
     return

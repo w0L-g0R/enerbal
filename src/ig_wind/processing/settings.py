@@ -34,7 +34,7 @@ provinces = [
     "Wie",
 ]
 
-provinces_names_new = [
+provinces_new = [
     "AT",
     "BGL",
     "KTN",

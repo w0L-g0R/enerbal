@@ -65,7 +65,7 @@ AEA_electricity_rgb = (165, 0, 0)
 # Industrie
 AEA_industry_rgb = (230, 100, 0)
 # Haushalte
-AEA_households_rgb = (206, 50, 26)
+AEA_households_rgb = (165, 0, 0)
 # Dienstleistungen
 AEA_services_rgb = (255, 192, 0)
 # Landwirtschaft

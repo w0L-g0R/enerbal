@@ -19,7 +19,6 @@ from settings import provinces
 from dash import no_update
 import pickle
 from pathlib import Path
-from files.energiebilanzen.processing.eb_sheets import eb_sheets
 from settings import chart_type_options, scale_options
 
 IDX = pd.IndexSlice
@@ -40,8 +39,8 @@ IDX = pd.IndexSlice
 
 def create_on_setup(graph_id: str):
     @app.callback(
-        [Output(f"{graph_id}-setup", "data"),],
-        [Input(f"{graph_id}-btn-setup", "n_clicks"),],
+        [Output(f"{graph_id}-setup", "data"), ],
+        [Input(f"{graph_id}-btn-setup", "n_clicks"), ],
         [  # TAB
             State(f"tabs-{graph_id}", "active_tab"),
             # DATA
@@ -210,7 +209,8 @@ def create_on_setup(graph_id: str):
             setup["for_each"] = chart_options_1 if chart_options_1 == "Foreach" else []
             setup["unit"] = unit
             setup["chart_type"] = chart_type_options["Bar"]["label"]
-            setup["xaxis_type"] = "Jahre" if xaxis_type == [0] else "Bundesländer"
+            setup["xaxis_type"] = "Jahre" if xaxis_type == [
+                0] else "Bundesländer"
             # setup["chart_options_2"] = chart_options_2
 
             # =========================================================== YEARS
@@ -244,19 +244,20 @@ def create_on_setup(graph_id: str):
                 "Wie": plotname_Wie,
             }
 
-            provinces = provinces.copy()
+            _provinces = provinces.copy()
 
             # Only take the marked provinces
             for province, check in provinces_selection.items():
 
                 if check is None or check == [0] or check == []:
-                    provinces.remove(province)
+                    _provinces.remove(province)
 
-            setup["provinces"] = provinces
+            setup["provinces"] = _provinces
 
             if data_section == "EEV":
 
-                row_index = [idx_0_EEV, idx_1_EEV, idx_2_EEV, idx_3_EEV, idx_4_EEV]
+                row_index = [idx_0_EEV, idx_1_EEV,
+                             idx_2_EEV, idx_3_EEV, idx_4_EEV]
 
                 if idx_0_EEV in ["Umwandlungseinsatz", "Umwandlungsausstoß"]:
 
@@ -264,7 +265,7 @@ def create_on_setup(graph_id: str):
 
                         if idx == "Gesamt":
                             row_index = row_index[: enum + 2] + list(
-                                map(lambda x: "Gesamt", row_index[enum + 2 :])
+                                map(lambda x: "Gesamt", row_index[enum + 2:])
                             )
 
                 else:
@@ -305,7 +306,8 @@ def create_on_setup(graph_id: str):
 
                 for enum, idx in enumerate(row_index):
                     if idx == "Gesamt":
-                        row_index = list(map(lambda x: "Gesamt", row_index[enum + 1 :]))
+                        row_index = list(
+                            map(lambda x: "Gesamt", row_index[enum + 1:]))
 
                 setup["row_index"] = (idx_0_RES, idx_1_RES, idx_2_RES)
                 setup["data_path"] = Path(

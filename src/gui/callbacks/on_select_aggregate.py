@@ -148,18 +148,14 @@ def create_on_select_aggregate(graph_id: str):
                         "Bioethanol",
                         "Biodiesel",
                         "Sonst. Biogene flüssig",
-
                     ]
 
                 if aggregate_eb == "Biogen-gasförmig":
 
                     return [
-                        "Scheitholz",
-                        "Pellets+Holzbriketts",
-                        "Holzabfall",
-                        "Holzkohle",
-                        "Ablaugen",
-                        "Hausmüll Bioanteil"
+                        "Deponiegas",
+                        "Klärgas",
+                        "Biogas"
                     ]
 
                 if aggregate_eb == "Umgebungswärme":

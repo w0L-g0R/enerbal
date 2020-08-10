@@ -5,9 +5,10 @@ from typing import Union, List
 import numpy as np
 import pickle
 
+from settings import provinces
 # import numpy as np
 
-from nea_sheets import (
+from files.nea.processing.get_nea_sheets import (
     sectors,
     energy_usage_types,
     energy_sources_93_98,
@@ -24,27 +25,14 @@ IDX = pd.IndexSlice
 
 
 def create_nea_col_midx(
-    last_year: int, sectors: List, energy_usage_types: List,
+    last_year: int, energy_sources: List, energy_usage_types: List,
 ) -> pd.MultiIndex:
-
-    bundeslaender = [
-        "AT",
-        "Bgd",
-        "Ktn",
-        "Noe",
-        "Ooe",
-        "Sbg",
-        "Stk",
-        "Tir",
-        "Vbg",
-        "Wie",
-    ]
 
     years = [x for x in range(1993, last_year + 1, 1)]
 
     midx = pd.MultiIndex.from_product(
-        [bundeslaender, sectors, energy_usage_types, years],
-        names=["BL", "SECTOR", "USAGE", "YEAR"],
+        [provinces, energy_sources, energy_usage_types, years],
+        names=["BL", "SOURCE", "USAGE", "YEAR"],
     )
 
     return midx
@@ -58,27 +46,16 @@ def convert_nea_to_df(
     last_year: int,
 ):
 
-    bundeslaender = [
-        "AT",
-        "Bgd",
-        "Ktn",
-        "Noe",
-        "Ooe",
-        "Sbg",
-        "Stk",
-        "Tir",
-        "Vbg",
-        "Wie",
-    ]
     # //////////////////////////////////////////////////// CREATE MULTI INDEX
 
     nea_col_midx = create_nea_col_midx(
-        last_year=last_year, sectors=sectors, energy_usage_types=energy_usage_types
+        last_year=last_year,
+        energy_sources=energy_sources[">=1999"], energy_usage_types=energy_usage_types
     )
     # ////////////////////////////////////////////////////// CREATE STORAGE DFS
 
     # Create a dataframe with multiindex to copy the xlsx sheet values to
-    nea_df = pd.DataFrame(index=energy_sources[">=1999"], columns=nea_col_midx)
+    nea_df = pd.DataFrame(index=sectors, columns=nea_col_midx)
 
     # ////////////////////////////////////// COLLECT ENERGY BALANCES FILE PATHS
 
@@ -87,40 +64,40 @@ def convert_nea_to_df(
 
     for _path in balances_directory_path.glob("*.xlsx"):
         nea_file_paths.append(str(Path(_path)))
+        print('nea_file_paths: ', nea_file_paths)
 
-    for bundesland in bundeslaender:
+    for province in provinces:
 
-        f"//////////////////////////  {bundesland}  /////////////////////////"
+        f"//////////////////////////  {province}  /////////////////////////"
 
         # ////////////////////////////////////////////////////// FIND PATH
 
         try:
-            # Find corresponding excel file for bundesland
+            # Find corresponding excel file for province
             balances_file_path = list(
-                filter(lambda x: bundesland in x, nea_file_paths)
+                filter(lambda x: province in x, nea_file_paths)
             )[0]
-
+            print(balances_file_path)
         # CHECK 1: Xlxs file not found or not existing
         except Exception as e:
+
             raise e
 
         # //////////////////////////////////////////////////// FETCH_SHEETS
 
-        # Extract all sheets (=energieträger) from file at once and save them to a dictionary
+        # Extract all sheets (=energieträger) from file at once and save them
+        # to a dictionary
         sheets = pd.read_excel(
             io=str(balances_file_path), sheet_name=None, na_filter=False, usecols="A:I",
         )
-        # sheets = pickle.load(open("sheets.p", "rb"))
 
         # Delete unnecessary sheets
         del sheets["Deckblatt"]
 
         try:
             del sheets["Check"]
-        except:
+        except BaseException:
             pass
-        # NOTE: Helpers to be removed
-        # pickle.dump(sheets, open("sheets.p", "wb"))
 
         # Iter over balance file sheets
         for nea_year in sheets:
@@ -147,7 +124,7 @@ def convert_nea_to_df(
 
                 # Extract sector data from sheet
                 sector_data = sheets[nea_year].iloc[
-                    starting_row + 2 : starting_row + 24, :
+                    starting_row + 2: starting_row + 24, :
                 ]
 
                 # Set first col as index
@@ -171,7 +148,8 @@ def convert_nea_to_df(
                     sector_data.index = pd.Index(energy_sources["<1999"])
                     sources_index = energy_sources["<1999"]
                 else:
-                    # Set to nan (gets overwritten with "Braunkohlebriketts" for df data greater than 1999)
+                    # Set to nan (gets overwritten with "Braunkohlebriketts"
+                    # for df data greater than 1999)
                     sector_data.loc["Sonstige ET", :] = np.nan
 
                 # Iter over usage types
@@ -179,8 +157,10 @@ def convert_nea_to_df(
 
                     # Assign values
                     _usage_type = sheets[nea_year].iloc[starting_row, enum + 1]
+
                     nea_df.loc[
-                        IDX[sources_index], IDX["Ktn", sector, usage_type, year]
+                        IDX[sector], IDX[province,
+                                         sources_index, usage_type, year]
                     ] = sector_data[usage_type]
 
                 # Increase counter variable
@@ -195,21 +175,18 @@ def convert_nea_to_df(
     pickle.dump(nea_df, open("nea_df.p", "wb"))
 
 
-balances_directory_path = Path(
-    "D:/_WORK/AEA/Projekte/bilanzen_monitor/src/files/nea/data"
-)
+# balances_directory_path = Path() / "src/files/nea/data"
 
-energy_sources = {
-    "nea_df": energy_sources_nea_df,
-    "<1999": energy_sources_93_98,
-    ">=1999": energy_sources_99_plus,
-}
+# energy_sources = {
+#     "nea_df": energy_sources_nea_df,
+#     "<1999": energy_sources_93_98,
+#     ">=1999": energy_sources_99_plus,
+# }
 
-
-convert_nea_to_df(
-    balances_directory_path=balances_directory_path,
-    sectors=sectors,
-    energy_usage_types=energy_usage_types,
-    energy_sources=energy_sources,
-    last_year=2018,
-)
+# convert_nea_to_df(
+#     balances_directory_path=balances_directory_path,
+#     sectors=sectors,
+#     energy_usage_types=energy_usage_types,
+#     energy_sources=energy_sources,
+#     last_year=2018,
+# )
