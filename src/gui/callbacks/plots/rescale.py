@@ -16,13 +16,14 @@ import plotly.graph_objects as go
 from dash import callback_context
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
-from gui.utils import multiplicator
+from utils import multiplicator
 import json
 from gui.app import app
 from gui.utils import show_callback_context
 from dash import no_update
 import numpy as np
 from time import time
+
 IDX = pd.IndexSlice
 
 
@@ -38,11 +39,11 @@ def rescale(setup: Dict, new_scale: str):
     if setup["xaxis_type"] == "Jahre":
 
         for title, figure in figures.items():
-            print('figure: ', figure)
+            print("figure: ", figure)
             # print('keys: ', figure.keys())
 
             if new_scale == "Normalized":
-                print('NORMAL: ', figure)
+                print("NORMAL: ", figure)
 
                 # # Assign currrent scale
                 # setup["figures"]["scale"] = "Normalized"
@@ -59,7 +60,8 @@ def rescale(setup: Dict, new_scale: str):
                     # Make a copy for transformation
                     # normalized = figure["graph"]["data"]
                     trace_data = pd.DataFrame(
-                        index=setup["provinces"], columns=setup["years"])
+                        index=setup["provinces"], columns=setup["years"]
+                    )
 
                     # yearly_values = pd.DataFrame(
                     #     index=setup["provinces"], columns=setup["years"])
@@ -68,20 +70,18 @@ def rescale(setup: Dict, new_scale: str):
 
                         # print('trace: ', trace)
                         # print('trace["name"]: ', trace["name"])
-                        trace_data.loc[
-                            trace["name"], :
-                        ] = trace["y"]  # .tolist()
+                        trace_data.loc[trace["name"], :] = trace["y"]  # .tolist()
 
-                    print('trace_data: ', trace_data)
-                    print('trace_data sum per year: ', trace_data.sum(axis=0))
+                    print("trace_data: ", trace_data)
+                    print("trace_data sum per year: ", trace_data.sum(axis=0))
 
                     for trace in figure["graph"]["data"]:
 
                         try:
-                            trace["y"] = trace_data.loc[
-                                trace["name"], :] / \
-                                trace_data.sum(axis=0).T * multiplicator(
-                                unit=setup["unit"], normalized=True
+                            trace["y"] = (
+                                trace_data.loc[trace["name"], :]
+                                / trace_data.sum(axis=0).T
+                                * multiplicator(unit=setup["unit"], normalized=True)
                             )
                         except:
                             pass
@@ -94,8 +94,7 @@ def rescale(setup: Dict, new_scale: str):
                 finally:
 
                     # Store as current ploting data
-                    figure["data_normalized"] = deepcopy(
-                        figure["graph"]["data"])
+                    figure["data_normalized"] = deepcopy(figure["graph"]["data"])
 
                     # Change layout y title == unit
                     figure["graph"]["layout"]["yaxis"]["title"]["text"] = "%"
@@ -166,16 +165,13 @@ def rescale(setup: Dict, new_scale: str):
                 responsive=True,
                 # responsive=False,
                 config=DEFAULT_CHART_CONFIG,
-                style={
-                    "height": "100%",
-                    "width": "100%"},
+                style={"height": "100%", "width": "100%"},
                 figure=figure["graph"],
             )
         )
 
         if len(setup["energy_sources"]) > 1:
-            graphs.append(
-                html.Hr(style={"background-color": "whitesmoke"}))
+            graphs.append(html.Hr(style={"background-color": "whitesmoke"}))
 
         # Overwrite with changes
         setup["figures"] = figures
@@ -183,23 +179,22 @@ def rescale(setup: Dict, new_scale: str):
         # Save new_scale
         setup["figures"]["scale"] = new_scale
 
+    # figure[["data_normalized"] = figure["data"]
 
-# figure[["data_normalized"] = figure["data"]
+    # else:
+    #     figure["graph"]["data"] = figure["data_absolute"]
+    #     figure["graph"]["layout"]["yaxis"]["title"]["text"] = setup["unit"]
 
-# else:
-#     figure["graph"]["data"] = figure["data_absolute"]
-#     figure["graph"]["layout"]["yaxis"]["title"]["text"] = setup["unit"]
+    # figure.update_layout(
+    #     #     xaxis=dict(
+    #     #         title=figure["layout"]["axis"]["title"]["text"],
+    #     #         # tickangle=0,
+    #     #     ),
+    #     yaxis=dict(
+    #         title=figure["layout"]["yaxis"]["title"]["text"],
+    #     ),
 
-# figure.update_layout(
-#     #     xaxis=dict(
-#     #         title=figure["layout"]["axis"]["title"]["text"],
-#     #         # tickangle=0,
-#     #     ),
-#     yaxis=dict(
-#         title=figure["layout"]["yaxis"]["title"]["text"],
-#     ),
-
-# )
+    # )
 
     # if setup["scale"] == "Normalized":
 

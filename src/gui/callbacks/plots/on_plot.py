@@ -18,13 +18,14 @@ import plotly.graph_objects as go
 from dash import callback_context
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
-from gui.utils import multiplicator
+from utils import multiplicator
 import json
 from gui.app import app
 from gui.utils import show_callback_context
 from dash import no_update
 import numpy as np
 from time import time
+
 IDX = pd.IndexSlice
 
 
@@ -34,11 +35,8 @@ def create_on_plot(graph_id: str):
         Output(f"{graph_id}-box", "children"),
         # Output(f"{graph_id}-plots", "data"),
         # ],
+        [Input(f"{graph_id}-update", "data"),],
         [
-            Input(f"{graph_id}-update", "data"),
-        ],
-        [
-
             # ]
             State(f"{graph_id}-setup", "data"),
             State(f"{graph_id}-scale", "value"),
@@ -48,7 +46,6 @@ def create_on_plot(graph_id: str):
             #  State(f"idx-eev-2-{graph_id}", "disabled"),
             #  State(f"idx-eev-3-{graph_id}", "disabled"),
             #  State(f"idx-eev-4-{graph_id}", "disabled"),
-
         ],
     )
     def on_plot(
@@ -56,7 +53,6 @@ def create_on_plot(graph_id: str):
         setup: str,
         scale: str,
         unit: str
-
         # trigger: Dict,
     ):
 
@@ -71,7 +67,7 @@ def create_on_plot(graph_id: str):
         # states = ctx.states
         # update_key = [*ctx.inputs.keys()]
         # print('update_key: ', update_key)
-        print('update: ', update)
+        print("update: ", update)
         # print('setup: ', setup)
         # print('setup: ', type(setup))
         print('update["type"] : ', update["type"])
@@ -81,95 +77,91 @@ def create_on_plot(graph_id: str):
 
         if update["type"] == "rotate_axes":
 
-            with open(setup["graph_id"] + ".p", 'rb') as file:
+            with open(setup["graph_id"] + ".p", "rb") as file:
                 setup = pickle.load(file)
 
-            graphs, setup = rotate_axes(
-                setup=setup,
-            )
+            graphs, setup = rotate_axes(setup=setup,)
 
         if update["type"] == "scale":
 
-            with open(setup["graph_id"] + ".p", 'rb') as file:
+            with open(setup["graph_id"] + ".p", "rb") as file:
                 setup = pickle.load(file)
 
-            graphs, setup = rescale(
-                setup=setup, new_scale=update["scale"]
-            )
+            graphs, setup = rescale(setup=setup, new_scale=update["scale"])
 
         if update["type"] == "setup":
 
             # Store fetched data from data source pickle file
-            setup["data"] = pickle.load(
-                open(Path(setup["data_path"]), "rb"))
+            setup["data"] = pickle.load(open(Path(setup["data_path"]), "rb"))
 
             if setup["data_section"] in ["EEV", "Sektoren", "Sektor Energie"]:
 
                 # Load data from pickle
                 start_time = time()
 
-                graphs, setup = create_eev_figures(
-                    setup=setup)
+                graphs, setup = create_eev_figures(setup=setup)
 
                 end_time = time()
 
                 print(
-                    f"Graph build up time {Path(setup['data_path']).stem}", end_time-start_time)
+                    f"Graph build up time {Path(setup['data_path']).stem}",
+                    end_time - start_time,
+                )
 
             del setup["data"]
 
-        with open(setup["graph_id"] + ".p", 'wb') as file:
+        with open(setup["graph_id"] + ".p", "wb") as file:
             pickle.dump(setup, file)
 
         return graphs
 
     # else:
     #     raise PreventUpdate
-        # if "ErnRL" in setup["data_section"]:
+    # if "ErnRL" in setup["data_section"]:
 
-        #     # Create plot figure
-        #     fig = go.Figure()
-        #     opacity = 0.8
+    #     # Create plot figure
+    #     fig = go.Figure()
+    #     opacity = 0.8
 
-        #     title = "Erneuerbaren-Richtlinie"
+    #     title = "Erneuerbaren-Richtlinie"
 
-        #     # Add more info to title
-        #     for idx in setup["row_index"]:
-        #         if idx != "Gesamt":
-        #             title = " <br> ".join([title, idx])
+    #     # Add more info to title
+    #     for idx in setup["row_index"]:
+    #         if idx != "Gesamt":
+    #             title = " <br> ".join([title, idx])
 
-        #     setup["data"], unit = change_unit(
-        #         scale=setup["scale"], setup=setup, data=data,)
+    #     setup["data"], unit = change_unit(
+    #         scale=setup["scale"], setup=setup, data=data,)
 
-        #     for province in setup["provinces"]:
+    #     for province in setup["provinces"]:
 
-        #         fig.add_trace(
-        #             go.Bar(
-        #                 x=setup["years"],
-        #                 y=np.array(setup["data"].loc[
-        #                     IDX[tuple(setup["row_index"])],
-        #                     IDX[province,
-        #                         setup["years"],
-        #                         ],
-        #                 ].fillna(0).values).flatten() *
-        #                 multiplicator(unit=setup["unit"]),
-        #                 name=province,
-        #                 # legendgroup=province,
-        #                 marker_color=provinces_color_table[province],
-        #                 opacity=opacity,
-        #             )
-        #         )
+    #         fig.add_trace(
+    #             go.Bar(
+    #                 x=setup["years"],
+    #                 y=np.array(setup["data"].loc[
+    #                     IDX[tuple(setup["row_index"])],
+    #                     IDX[province,
+    #                         setup["years"],
+    #                         ],
+    #                 ].fillna(0).values).flatten() *
+    #                 multiplicator(unit=setup["unit"]),
+    #                 name=province,
+    #                 # legendgroup=province,
+    #                 marker_color=provinces_color_table[province],
+    #                 opacity=opacity,
+    #             )
+    #         )
 
-        #         fig.layout = get_graph_layout(
-        #             title=title, unit=unit)
+    #         fig.layout = get_graph_layout(
+    #             title=title, unit=unit)
 
-        #     return html.Div(
-        #         children=[
-        #             dcc.Graph(figure=fig, config=DEFAULT_CHART_CONFIG),
-        #         ]
-        #     )
+    #     return html.Div(
+    #         children=[
+    #             dcc.Graph(figure=fig, config=DEFAULT_CHART_CONFIG),
+    #         ]
+    #     )
 
-        # return graphs  # , figures]
+    # return graphs  # , figures]
 
     # Values unpacked comes as a list of lists -> flatten
     # y=np.array(setup["data"].loc[
@@ -182,6 +174,7 @@ def create_on_plot(graph_id: str):
     # ].fillna(0).values).flatten() *
     # multiplicator(
     #     unit=setup["unit"]),
+
 
 # def rescale_res(scale: str, setup: Dict, data: pd.DataFrame):
 

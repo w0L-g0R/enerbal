@@ -1,5 +1,3 @@
-
-
 from settings import DEFAULT_CHART_CONFIG
 import pickle
 from gui.assets.AEA_colors import provinces_color_table
@@ -17,17 +15,26 @@ import plotly.graph_objects as go
 from dash import callback_context
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
-from gui.utils import multiplicator
+from utils import multiplicator
 import json
 from gui.app import app
 from gui.utils import show_callback_context
 from dash import no_update
 import numpy as np
 from time import time
+
 IDX = pd.IndexSlice
 
 
-def create_traces(fig: Dict, setup: Dict, y_data: np.array, name: str, opacity: float, marker_color: Dict = None, orientation: str = "v"):
+def create_traces(
+    fig: Dict,
+    setup: Dict,
+    y_data: np.array,
+    name: str,
+    opacity: float,
+    marker_color: Dict = None,
+    orientation: str = "v",
+):
 
     hovertemplate = "%{y:.0f}"
 
@@ -45,8 +52,8 @@ def create_traces(fig: Dict, setup: Dict, y_data: np.array, name: str, opacity: 
                 y=y_data,
                 name=name,
                 orientation=orientation,
-                marker_line_color='black',
-                marker_line_width=.25,
+                marker_line_color="black",
+                marker_line_width=0.25,
                 hovertemplate=hovertemplate,
                 legendgroup=name,
                 marker_color=marker_color,
@@ -63,8 +70,8 @@ def create_traces(fig: Dict, setup: Dict, y_data: np.array, name: str, opacity: 
                 y=y_data,
                 name=name,
                 orientation=orientation,
-                marker_line_color='black',
-                marker_line_width=.25,
+                marker_line_color="black",
+                marker_line_width=0.25,
                 hovertemplate=hovertemplate,
                 legendgroup=name,
                 marker_color=marker_color,
@@ -79,8 +86,8 @@ def create_traces(fig: Dict, setup: Dict, y_data: np.array, name: str, opacity: 
                 y=y_data.sum(axis=1),
                 name=name,
                 orientation=orientation,
-                marker_line_color='black',
-                marker_line_width=.25,
+                marker_line_color="black",
+                marker_line_width=0.25,
                 hovertemplate=hovertemplate,
                 legendgroup=name,
                 marker_color=marker_color,
@@ -96,7 +103,6 @@ def create_traces(fig: Dict, setup: Dict, y_data: np.array, name: str, opacity: 
                 y=y_data,
                 name=name,
                 hovertemplate=hovertemplate,
-
                 # legendgroup=province,
                 line_color=provinces_color_table[name],
                 opacity=opacity,

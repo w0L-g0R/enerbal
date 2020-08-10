@@ -1,15 +1,15 @@
 # from ig_wind.process.biv import biv_gesamt_tj
 import xlwings as xw
-from settings import provinces_names
+from settings import provinces
 import pandas as pd
 from IPython.display import display
 from pathlib import Path
 import pickle
-from ig_wind.processing.biv import(
+from ig_wind.processing.biv import (
     get_biv_gesamt_data,
     biv_gesamt_2018_xlsx,
     biv_gesamt_2018_pro_einwohner_xlsx,
-    biv_gesamt_entwicklung_xlsx
+    biv_gesamt_entwicklung_xlsx,
 )
 
 # ///////////////////////////////////////////////////////////// SETTINGS
@@ -22,8 +22,8 @@ chart_height = 300
 
 # ///////////////////////////////////////////////////////////// FILES
 
-results_file = "results.xlsx"
-print('results_file: ', results_file)
+results_file = "src/charts.xlsx"
+print("results_file: ", results_file)
 wb = xw.Book(results_file)
 
 eev_pickle = Path().cwd() / "src/files/energiebilanzen/pickles/eev_df.p"
@@ -53,7 +53,7 @@ biv_gesamt = get_biv_gesamt_data(
     field="Bruttoinlandsverbrauch",
     energy_sources=["Gesamtenergiebilanz"],
     years=list(range(2000, 2019, 1)),
-    provinces=provinces
+    provinces=provinces,
 )
 
 biv_gesamt_2018_xlsx(
@@ -68,31 +68,31 @@ biv_gesamt_2018_xlsx(
     height=chart_height,
 )
 
-biv_gesamt_2018_pro_einwohner_xlsx(
-    wb=wb,
-    sheet_name="BIV_2018_Einwohner",
-    title="BIV gesamt 2018 pro Einwohner*in",
-    biv_gesamt=biv_gesamt,
-    bevölkerung=bevölkerung_df,
-    unit=unit_energy,
-    energy_units=energy_units,
-    provinces=provinces,
-    width=chart_width,
-    height=chart_height,
-)
+# biv_gesamt_2018_pro_einwohner_xlsx(
+#     wb=wb,
+#     sheet_name="BIV_2018_Einwohner",
+#     title="BIV gesamt 2018 pro Einwohner*in",
+#     biv_gesamt=biv_gesamt,
+#     bevölkerung=bevölkerung_df,
+#     unit=unit_energy,
+#     energy_units=energy_units,
+#     provinces=provinces,
+#     width=chart_width,
+#     height=chart_height,
+# )
 
-biv_gesamt_entwicklung_xlsx(
-    wb=wb,
-    sheet_name="BIV_Entwicklung",
-    title="Bruttoinlandsverbrauch Entwicklung",
-    biv_gesamt=biv_gesamt,
-    unit=unit_energy,
-    energy_units=energy_units,
-    provinces=provinces,
-    years=list(range(2000, 2019)),
-    width=chart_width,
-    height=chart_height,
-)
+# biv_gesamt_entwicklung_xlsx(
+#     wb=wb,
+#     sheet_name="BIV_Entwicklung",
+#     title="Bruttoinlandsverbrauch Entwicklung",
+#     biv_gesamt=biv_gesamt,
+#     unit=unit_energy,
+#     energy_units=energy_units,
+#     provinces=provinces,
+#     years=list(range(2000, 2019)),
+#     width=chart_width,
+#     height=chart_height,
+# )
 
 # biv_gesamt_2000_2018_to_xlsx(
 #     wb=wb,

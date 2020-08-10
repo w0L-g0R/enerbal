@@ -1,12 +1,12 @@
-
 import pickle
 import pandas as pd
 from pathlib import Path
+
 # from files.energiebilanzen.processing.eb_sheets import eb_sheets
 
-pd.set_option('display.max_rows', 500)
-pd.set_option('display.max_columns', 500)
-pd.set_option('display.width', 1000)
+pd.set_option("display.max_rows", 500)
+pd.set_option("display.max_columns", 500)
+pd.set_option("display.width", 1000)
 
 # ////////////////////////////////////////////////////////////////// CONVERSION
 
@@ -21,7 +21,7 @@ conversion = {
 }
 # /////////////////////////////////////////////////////////////////// PROVINCES
 
-provinces_names = [
+provinces = [
     "AT",
     "Bgd",
     "Ktn",
@@ -48,7 +48,6 @@ provinces_names_new = [
 ]
 
 provinces_rgb = {
-
     "AT": (0, 0, 0),
     "Bgd": (230, 25, 75),
     "Ktn": (210, 245, 60),
@@ -63,9 +62,8 @@ provinces_rgb = {
 # //////////////////////////////////////////////////////////////////////// EEV
 
 eev_file = Path.cwd().parent / "files/energiebilanzen/pickles/eev_df.p"
-print('eev_file: ', eev_file)
-eev_df = pickle.load(
-    open(eev_file, "rb"))
+print("eev_file: ", eev_file)
+eev_df = pickle.load(open(eev_file, "rb"))
 
 eev_source = "Energiebilanzen Österreich"
 

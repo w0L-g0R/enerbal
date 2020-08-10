@@ -73,7 +73,7 @@ def setup_logging(
             "null_out": {"class": "logging.NullHandler"},
             "console_out": {
                 "class": "logger.colorstreamhandler.ColorStreamHandler",
-                "stream": "ext://sys.stderr",
+                "stream": "ext://sys.stdout",
                 # 'filters': ["last_part"],
                 # "stream": "ext://sys.stdout",
                 "level": console_out_level,

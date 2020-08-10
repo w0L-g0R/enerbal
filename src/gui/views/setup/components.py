@@ -7,7 +7,9 @@ import dash_html_components as html
 
 from gui.assets.styles import range_slider_style, label_style
 from settings import chart_type_options, energy_sources_options, units
+from utils import create_eev_energy_source_options
 
+energy_sources_options = create_eev_energy_source_options(energy_sources=eb_sheets)
 
 # ////////////////////////////////////////////////////////////////////// GETTER
 
@@ -26,70 +28,58 @@ def get_chart_options(graph_id: str):
 
     return html.Div(
         children=[
-
             dbc.Row(
                 justify="center",
                 align="center",
                 no_gutters=True,
-
                 children=[
                     dbc.Col(
-
                         width=6,
                         children=[
-
-                            dbc.Label("Stack",
-                                      style={
-                                          # "margin-top": 12,
-                                          "margin-left": 12,
-                                          "font-family": "Quicksand, sans-serif",
-                                          "font-size": 16, "color": "cadetblue"
-                                      }
-                                      ),
+                            dbc.Label(
+                                "Stack",
+                                style={
+                                    # "margin-top": 12,
+                                    "margin-left": 12,
+                                    "font-family": "Quicksand, sans-serif",
+                                    "font-size": 16,
+                                    "color": "cadetblue",
+                                },
+                            ),
                             daq.ToggleSwitch(
                                 id=f"{graph_id}-switch-stack",
-                                style={
-                                    "margin-top": 12,
-                                    "margin-left": 24
-
-                                },
+                                style={"margin-top": 12, "margin-left": 24},
                                 theme="dark",
                                 color="deepskyblue",
                                 size=32,
                                 vertical=True,
-                            )
-                        ]
-
+                            ),
+                        ],
                     ),
                     dbc.Col(
-
                         width=6,
                         children=[
-
-                            dbc.Label("Flip",
-                                      style={
-                                          # "margin-top": 12,
-                                          "margin-left": 22,
-                                          "font-family": "Quicksand, sans-serif",
-                                          "font-size": 16, "color": "cadetblue"
-                                      }
-                                      ),
+                            dbc.Label(
+                                "Flip",
+                                style={
+                                    # "margin-top": 12,
+                                    "margin-left": 22,
+                                    "font-family": "Quicksand, sans-serif",
+                                    "font-size": 16,
+                                    "color": "cadetblue",
+                                },
+                            ),
                             daq.ToggleSwitch(
                                 id=f"{graph_id}-switch-axes",
-                                style={
-                                    "margin-top": 12,
-                                    "margin-left": 24
-
-                                },
+                                style={"margin-top": 12, "margin-left": 24},
                                 theme="dark",
                                 color="deepskyblue",
                                 size=32,
                                 vertical=True,
-                            )
-                        ]
-
-                    )
-                ]
+                            ),
+                        ],
+                    ),
+                ],
             ),
         ]
     )
@@ -104,10 +94,11 @@ def get_scale(graph_id: str):
                     "margin-left": -12,
                     "margin-bottom": 12,
                     "font-family": "Quicksand, sans-serif",
-                    "font-size": 16, "color": "lightblue"}
+                    "font-size": 16,
+                    "color": "lightblue",
+                },
             ),
             dcc.RangeSlider(
-
                 id=f"{graph_id}-scale",
                 min=0,
                 max=2,
@@ -120,7 +111,6 @@ def get_scale(graph_id: str):
                 value=[0],
                 # vertical=True,
                 # verticalHeight=100,
-
             ),
         ]
     )
@@ -129,19 +119,26 @@ def get_scale(graph_id: str):
 def get_index_year(graph_id: str):
     return dbc.FormGroup(
         [
-            dbc.Label("Year",
-                      style={
-                          "margin-left": 4,
-                          "margin-bottom": 12,
-                          "font-family": "Quicksand, sans-serif",
-                          "font-size": 16, "color": "lightblue"}
-                      ),
-            dbc.Input(placeholder="",
-                      style={"text-align": "center",
-                             "font-family": "Quicksand, sans-serif",
-                             "font-size": 14, },  # type="text"
-                      value=2000,
-                      id=f"{graph_id}-index-year",),
+            dbc.Label(
+                "Year",
+                style={
+                    "margin-left": 4,
+                    "margin-bottom": 12,
+                    "font-family": "Quicksand, sans-serif",
+                    "font-size": 16,
+                    "color": "lightblue",
+                },
+            ),
+            dbc.Input(
+                placeholder="",
+                style={
+                    "text-align": "center",
+                    "font-family": "Quicksand, sans-serif",
+                    "font-size": 14,
+                },  # type="text"
+                value=2000,
+                id=f"{graph_id}-index-year",
+            ),
         ]
     )
 
@@ -154,7 +151,7 @@ def get_aggregate_eb(graph_id: str):
             dcc.Dropdown(
                 style={"color": "black"},
                 id=f"{graph_id}-aggregate-eb",
-                options=aggregates_eb
+                options=aggregates_eb,
             ),
         ],
     )
@@ -200,8 +197,7 @@ def get_energy_source_index(graph_id: str):
     return dbc.FormGroup(
         children=[
             dbc.Label("Nummer", style=label_style),
-            dbc.Input(placeholder="", type="number",
-                      id=f"{graph_id}-source-index",),
+            dbc.Input(placeholder="", type="number", id=f"{graph_id}-source-index",),
         ]
     )
 
@@ -214,10 +210,10 @@ def get_data_section(graph_id: str):
             dbc.RadioItems(
                 style={"font-size": 14},
                 options=[
-                    {"label": "EEV", "value": "EEV", },
-                    {"label": "Sektoren", "value": "Sektoren", },
-                    {"label": "Sektor Energie", "value": "Sektor Energie", },
-                    {"label": "ErnRL", "value": "ErnRL", },
+                    {"label": "EEV", "value": "EEV",},
+                    {"label": "Sektoren", "value": "Sektoren",},
+                    {"label": "Sektor Energie", "value": "Sektor Energie",},
+                    {"label": "ErnRL", "value": "ErnRL",},
                 ],
                 value="EEV",
                 id=f"{graph_id}-data-section",
@@ -233,24 +229,23 @@ def get_energy_unit(graph_id: str):
         style={"margin-left": -24},
         children=[
             dbc.Label("Unit", style=label_style),
-            dbc.Select(
-                id=f"{graph_id}-unit",
-                options=units,
-                value="TJ"
-            ),
+            dbc.Select(id=f"{graph_id}-unit", options=units, value="TJ"),
         ],
     )
 
 
-def get_index_select(graph_id: str, name: str, value: str = None, options: List = None, disabled: bool = True):
+def get_index_select(
+    graph_id: str,
+    name: str,
+    value: str = None,
+    options: List = None,
+    disabled: bool = True,
+):
     return dbc.InputGroup(
         [
             dbc.InputGroupAddon(name, addon_type="prepend", style=label_style),
             dbc.Select(
-                id=f"idx-{graph_id}",
-                options=options,
-                value=value,
-                disabled=disabled
+                id=f"idx-{graph_id}", options=options, value=value, disabled=disabled
             ),
         ],
         className="mb-3",
@@ -258,42 +253,37 @@ def get_index_select(graph_id: str, name: str, value: str = None, options: List 
 
 
 def get_chart_type(graph_id: str):
-    return dbc.Row(children=[
-
-        dbc.Col(
-            width=12,
-            children=[
-                dcc.RangeSlider(
-                    id=f"{graph_id}-chart-type",
-                    min=0,
-                    max=4,
-                    step=1,
-                    marks={
-                        0: {"label": "Bar", "style": range_slider_style},
-                        1: {"label": "Line", "style": range_slider_style},
-                        2: {"label": "Scatter", "style": range_slider_style},
-                        3: {"label": "Pie", "style": range_slider_style},
-                        4: {"label": "Map", "style": range_slider_style},
-                    },
-                    value=[0],
-                ),
-            ]),
-
-    ])
+    return dbc.Row(
+        children=[
+            dbc.Col(
+                width=12,
+                children=[
+                    dcc.RangeSlider(
+                        id=f"{graph_id}-chart-type",
+                        min=0,
+                        max=4,
+                        step=1,
+                        marks={
+                            0: {"label": "Bar", "style": range_slider_style},
+                            1: {"label": "Line", "style": range_slider_style},
+                            2: {"label": "Scatter", "style": range_slider_style},
+                            3: {"label": "Pie", "style": range_slider_style},
+                            4: {"label": "Map", "style": range_slider_style},
+                        },
+                        value=[0],
+                    ),
+                ],
+            ),
+        ]
+    )
 
 
 def get_xaxis_type(graph_id: str):
     return html.Div(
-
         children=[
-            dbc.Row(children=[
-
-                dbc.Col(
-                    children=dbc.Label("X-Achse", style=label_style),
-                ),
-            ]
+            dbc.Row(
+                children=[dbc.Col(children=dbc.Label("X-Achse", style=label_style),),]
             ),
-
             dbc.Row(
                 style={
                     "border": "1px solid lightblue",
@@ -308,7 +298,6 @@ def get_xaxis_type(graph_id: str):
                     #     children=dbc.Label("X-Achse", style=label_style),
                     # ),
                     dbc.Col(
-
                         width=8,
                         children=html.Div(
                             style={
@@ -322,18 +311,22 @@ def get_xaxis_type(graph_id: str):
                                     max=1,
                                     step=1,
                                     marks={
-                                        0: {"label": "Jahre", "style": range_slider_style},
-                                        1: {"label": "Bundesländer", "style": range_slider_style},
-
+                                        0: {
+                                            "label": "Jahre",
+                                            "style": range_slider_style,
+                                        },
+                                        1: {
+                                            "label": "Bundesländer",
+                                            "style": range_slider_style,
+                                        },
                                     },
                                     value=[0],
                                 ),
-                            ]
-                        )
+                            ],
+                        ),
                     ),
-
-                ])
-
+                ],
+            ),
         ]
     )
 
@@ -347,6 +340,7 @@ def get_xaxis_type(graph_id: str):
     #         )
     #     ]
     # )
+
 
 # def get_chart_options(graph_id: str):
 #     return dbc.Row(children=[

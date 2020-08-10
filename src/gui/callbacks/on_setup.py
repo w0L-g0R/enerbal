@@ -15,7 +15,7 @@ import json
 
 from gui.app import app
 from gui.utils import show_callback_context
-from settings import provinces_names
+from settings import provinces
 from dash import no_update
 import pickle
 from pathlib import Path
@@ -40,13 +40,9 @@ IDX = pd.IndexSlice
 
 def create_on_setup(graph_id: str):
     @app.callback(
-        [
-            Output(f"{graph_id}-setup", "data"),
-        ],
-        [
-            Input(f"{graph_id}-btn-setup", "n_clicks"),
-        ],
-        [   # TAB
+        [Output(f"{graph_id}-setup", "data"),],
+        [Input(f"{graph_id}-btn-setup", "n_clicks"),],
+        [  # TAB
             State(f"tabs-{graph_id}", "active_tab"),
             # DATA
             State(f"{graph_id}-data-section", "value"),
@@ -169,7 +165,6 @@ def create_on_setup(graph_id: str):
         idx_0_RES,
         idx_1_RES,
         idx_2_RES,
-
     ):
 
         # Log callback information
@@ -187,7 +182,7 @@ def create_on_setup(graph_id: str):
 
         if triggered:
 
-           # Store the selected dropdown item in a variable
+            # Store the selected dropdown item in a variable
             triggered_prop_id = triggered[0]["prop_id"]
             triggered_value = triggered[0]["value"]
 
@@ -215,8 +210,7 @@ def create_on_setup(graph_id: str):
             setup["for_each"] = chart_options_1 if chart_options_1 == "Foreach" else []
             setup["unit"] = unit
             setup["chart_type"] = chart_type_options["Bar"]["label"]
-            setup["xaxis_type"] = "Jahre" if xaxis_type == [
-                0] else "Bundesländer"
+            setup["xaxis_type"] = "Jahre" if xaxis_type == [0] else "Bundesländer"
             # setup["chart_options_2"] = chart_options_2
 
             # =========================================================== YEARS
@@ -250,7 +244,7 @@ def create_on_setup(graph_id: str):
                 "Wie": plotname_Wie,
             }
 
-            provinces = provinces_names.copy()
+            provinces = provinces.copy()
 
             # Only take the marked provinces
             for province, check in provinces_selection.items():
@@ -262,18 +256,15 @@ def create_on_setup(graph_id: str):
 
             if data_section == "EEV":
 
-                row_index = [idx_0_EEV, idx_1_EEV,
-                             idx_2_EEV, idx_3_EEV, idx_4_EEV]
+                row_index = [idx_0_EEV, idx_1_EEV, idx_2_EEV, idx_3_EEV, idx_4_EEV]
 
                 if idx_0_EEV in ["Umwandlungseinsatz", "Umwandlungsausstoß"]:
 
                     for enum, idx in enumerate(row_index[1:]):
 
                         if idx == "Gesamt":
-                            row_index = row_index[:enum+2] + list(
-                                map(
-                                    lambda x: "Gesamt", row_index[enum+2:]
-                                )
+                            row_index = row_index[: enum + 2] + list(
+                                map(lambda x: "Gesamt", row_index[enum + 2 :])
                             )
 
                 else:
@@ -285,35 +276,41 @@ def create_on_setup(graph_id: str):
                 setup["row_index"] = row_index
 
                 setup["data_path"] = Path(
-                    "src/files/energiebilanzen/pickles/eev_df.p").__str__()
+                    "src/files/energiebilanzen/pickles/eev_df.p"
+                ).__str__()
 
             if data_section == "Sektoren":
 
                 setup["row_index"] = [idx_0_SECTORS]
                 setup["data_path"] = Path(
-                    "src/files/energiebilanzen/pickles/sectors_df.p").__str__()
+                    "src/files/energiebilanzen/pickles/sectors_df.p"
+                ).__str__()
 
             if data_section == "Sektor Energie":
 
                 setup["row_index"] = [idx_0_SECTOR_ENERGY]
                 setup["data_path"] = Path(
-                    "src/files/energiebilanzen/pickles/sector_energy_df.p").__str__()
+                    "src/files/energiebilanzen/pickles/sector_energy_df.p"
+                ).__str__()
 
             if data_section == "ErnRL":
 
                 row_index = [idx_0_RES, idx_1_RES, idx_2_RES]
 
-                if idx_1_EEV not in ["Energetischer Endverbrauch Erneuerbare (TJ)", "Elektrische Energie Produktion erneuerbar (TJ)"]:
+                if idx_1_EEV not in [
+                    "Energetischer Endverbrauch Erneuerbare (TJ)",
+                    "Elektrische Energie Produktion erneuerbar (TJ)",
+                ]:
                     row_index = list(map(lambda x: "Gesamt", row_index))
 
                 for enum, idx in enumerate(row_index):
                     if idx == "Gesamt":
-                        row_index = list(
-                            map(lambda x: "Gesamt", row_index[enum+1:]))
+                        row_index = list(map(lambda x: "Gesamt", row_index[enum + 1 :]))
 
                 setup["row_index"] = (idx_0_RES, idx_1_RES, idx_2_RES)
                 setup["data_path"] = Path(
-                    "src/files/energiebilanzen/pickles/renewables_df.p").__str__()
+                    "src/files/energiebilanzen/pickles/renewables_df.p"
+                ).__str__()
 
             # Add options
             # options = [{"label": x, "value": x}

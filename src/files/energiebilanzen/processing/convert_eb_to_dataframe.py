@@ -6,8 +6,14 @@ import numpy as np
 import time
 
 from files.energiebilanzen.processing.eb_sheets import eb_sheets
-from files.energiebilanzen.processing.create_indices import create_eev_col_midx, create_renewables_col_midx
-from files.energiebilanzen.processing.create_dfs import create_eb_storage_dfs, create_idx_check_dfs
+from files.energiebilanzen.processing.create_indices import (
+    create_eev_col_midx,
+    create_renewables_col_midx,
+)
+from files.energiebilanzen.processing.create_dfs import (
+    create_eb_storage_dfs,
+    create_idx_check_dfs,
+)
 from files.energiebilanzen.processing.assign_table_data import (
     assign_eev_table,
     assign_renewables_table,
@@ -16,6 +22,8 @@ from files.energiebilanzen.processing.assign_table_data import (
 )
 
 from files.energiebilanzen.processing.fetch_from_excel import fetch_energy_sources
+
+from settings import provinces
 
 pd.set_option("display.max_columns", 10)  # or 1000
 pd.set_option("display.max_rows", None)  # or 1000
@@ -29,22 +37,8 @@ IDX = pd.IndexSlice
 def convert_eb_to_df(
     balances_directory_path: Union[str, Path],
     row_indices_file_path: Union[str, Path],
-    eb_sheets: List,
     last_year: int,
 ):
-
-    bundeslaender = [
-        "AT",
-        "Bgd",
-        "Ktn",
-        "Noe",
-        "Ooe",
-        "Sbg",
-        "Stk",
-        "Tir",
-        "Vbg",
-        "Wie",
-    ]
 
     # ///////////////////////////////////////////////////////////// GET INDICES
 
@@ -56,10 +50,10 @@ def convert_eb_to_df(
 
     # _________________________________________________________ COL MULTI INDEX
 
-    # Create a column muliindex with levels [Bundesland, Energieträger, Jahre]
+    # Create a column muliindex with levels [province, Energieträger, Jahre]
     eev_col_midx = create_eev_col_midx(last_year=last_year, sheets=eb_sheets)
 
-    # Create a column muliindex with levels [Bundesland, Jahre]
+    # Create a column muliindex with levels [province, Jahre]
     renewables_col_midx = create_renewables_col_midx(last_year=last_year)
 
     # _____________________________________________________ EEV ROW MULTI INDEX
@@ -76,8 +70,7 @@ def convert_eb_to_df(
     # Create a row muliindex with 5 levels for the renewable data
 
     renewables_row_midx = pd.MultiIndex.from_tuples(
-        tuples=[tuple(x)
-                for x in row_indices["MIDX_RENEWABLES"].loc[:, :3].values],
+        tuples=[tuple(x) for x in row_indices["MIDX_RENEWABLES"].loc[:, :3].values],
         names=["IDX_0", "IDX_1", "IDX_2", "IDX_3"],
     )
 
@@ -102,20 +95,16 @@ def convert_eb_to_df(
     for _path in balances_directory_path.glob("*.xlsx"):
         eb_file_paths.append(str(Path(_path)))
 
-    for bundesland in bundeslaender:
+    for province in provinces:
 
         print(
-            "//////////////////////////  {}  /////////////////////////".format(
-                bundesland
-            )
+            "//////////////////////////  {}  /////////////////////////".format(province)
         )
 
         # /////////////////////////////////////////////////////////// FIND PATH
         try:
-            # Find corresponding excel file for bundesland
-            balances_file_path = list(filter(lambda x: bundesland in x, eb_file_paths))[
-                0
-            ]
+            # Find corresponding excel file for province
+            balances_file_path = list(filter(lambda x: province in x, eb_file_paths))[0]
 
         # CHECK 1: Xlxs file not found or not existing
         except Exception as e:
@@ -141,14 +130,14 @@ def convert_eb_to_df(
             sector_energy_consumption_idx_check_df,
         ) = create_idx_check_dfs(row_indices=row_indices)
 
-        if bundesland != "AT":
+        if province != "AT":
 
             # ////////////////////////////////////////////////////// RENEWABLES
             assign_renewables_table(
                 renewables_df=renewables_df,
                 renewables_sheet=renewables_sheet,
                 row_indices=row_indices,
-                bundesland=bundesland,
+                province=province,
                 renewables_idx_check_df=renewables_idx_check_df,
                 years_range_data=years_range_data,
             )
@@ -162,7 +151,7 @@ def convert_eb_to_df(
                 eev_df=eev_df,
                 dfs=dfs,
                 row_indices=row_indices,
-                bundesland=bundesland,
+                province=province,
                 energy_source=energy_source,
                 eev_idx_check_df=eev_idx_check_df,
                 years_range_data=years_range_data,
@@ -172,7 +161,7 @@ def convert_eb_to_df(
             assign_sectors_consumption_table(
                 sector_consumptions_df=sector_consumptions_df,
                 dfs=dfs,
-                bundesland=bundesland,
+                province=province,
                 energy_source=energy_source,
                 sector_consumptions_idx_check_df=sector_consumptions_idx_check_df,
                 years_range_data=years_range_data,
@@ -182,7 +171,7 @@ def convert_eb_to_df(
             assign_sector_energy_consumption_table(
                 sector_energy_consumption_df=sector_energy_consumption_df,
                 dfs=dfs,
-                bundesland=bundesland,
+                province=province,
                 energy_source=energy_source,
                 sector_energy_consumption_idx_check_df=sector_energy_consumption_idx_check_df,
                 years_range_data=years_range_data,
@@ -193,25 +182,25 @@ def convert_eb_to_df(
         renewables_idx_check_df.to_excel(
             balances_directory_path.parent
             / "checks"
-            / "_".join([bundesland, "renewables_idx_check_df.xlsx"])
+            / "_".join([province, "renewables_idx_check_df.xlsx"])
         )
 
         eev_idx_check_df.to_excel(
             balances_directory_path.parent
             / Path("checks")
-            / "_".join([bundesland, "eev_idx_check_df.xlsx"])
+            / "_".join([province, "eev_idx_check_df.xlsx"])
         )
 
         sector_consumptions_idx_check_df.to_excel(
             balances_directory_path.parent
             / "checks"
-            / "_".join([bundesland, "sector_consumptions_idx_check_df.xlsx"])
+            / "_".join([province, "sector_consumptions_idx_check_df.xlsx"])
         )
 
         sector_energy_consumption_idx_check_df.to_excel(
             balances_directory_path.parent
             / "checks"
-            / "_".join([bundesland, "sector_energy_consumption_idx_check_df.xlsx"])
+            / "_".join([province, "sector_energy_consumption_idx_check_df.xlsx"])
         )
 
     # //////////////////////////////////////////////////// ADD MIDX ROW INDICES
@@ -225,15 +214,13 @@ def convert_eb_to_df(
     # ////////////////////////////////////////////////////////////////// PICKLE
 
     pickle.dump(
-        eev_df, open(balances_directory_path.parent /
-                     Path("pickles/eev_df.p"), "wb")
+        eev_df, open(balances_directory_path.parent / Path("pickles/eev_df.p"), "wb")
     )
 
     pickle.dump(
         sector_consumptions_df,
         open(
-            balances_directory_path.parent /
-            Path("pickles/sector_consumptions_df.p"),
+            balances_directory_path.parent / Path("pickles/sector_consumptions_df.p"),
             "wb",
         ),
     )
@@ -249,30 +236,7 @@ def convert_eb_to_df(
 
     pickle.dump(
         renewables_df,
-        open(balances_directory_path.parent /
-             Path("pickles/renewables_df.p"), "wb"),
+        open(balances_directory_path.parent / Path("pickles/renewables_df.p"), "wb"),
     )
 
     return
-
-
-# ////////////////////////////////////////////////////////////////////// INPUTS
-
-balances_directory_path = Path.cwd() / "src/files/energiebilanzen/data"
-print('balances_directory_path: ', balances_directory_path)
-
-row_indices_file_path = Path.cwd() / "src/files/energiebilanzen/index/row_indices_eb.xlsx"
-print('row_indices_file_path: ', row_indices_file_path)
-
-start = time.time()
-print("###########################################################################")
-print("start: ", start)
-convert_eb_to_df(
-    balances_directory_path=balances_directory_path,
-    eb_sheets=eb_sheets,
-    row_indices_file_path=row_indices_file_path,
-    last_year=2018,
-)
-end = time.time()
-print("end: ", end)
-print(end - start)

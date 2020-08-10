@@ -19,7 +19,7 @@ import plotly.graph_objects as go
 from dash import callback_context
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
-from gui.utils import multiplicator
+from utils import multiplicator
 import json
 from gui.app import app
 from gui.utils import show_callback_context

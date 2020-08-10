@@ -1,19 +1,19 @@
-
 from files.energiebilanzen.processing.eb_sheets import eb_sheets
-from gui.utils import create_row_indices, create_eev_energy_source_options
+from utils import create_row_indices
+from paths import file_paths
 from gui.assets.styles import range_slider_style, label_style
 import pickle
 import pandas as pd
 from pathlib import Path
 
+eb_indices = pickle.load(open(file_paths["eb_indices"], "rb"))
+eev_indices = create_row_indices(_type="EEV", eb_indices=eb_indices)
+sectors_indices = create_row_indices(_type="Sektoren", eb_indices=eb_indices)
+sector_energy_indices = create_row_indices(
+    _type="Sektor Energie", eb_indices=eb_indices
+)
+renewables_indices = create_row_indices(_type="ErnRL", eb_indices=eb_indices)
 
-eev_indices = create_row_indices(_type="EEV")
-sectors_indices = create_row_indices(_type="Sektoren")
-sector_energy_indices = create_row_indices(_type="Sektor Energie")
-renewables_indices = create_row_indices(_type="ErnRL")
-
-energy_sources_options = create_eev_energy_source_options(
-    energy_sources=eb_sheets)
 
 chart_type_options = {
     "Bar": {"label": "Bar", "style": range_slider_style},
@@ -68,55 +68,66 @@ conversion_multiplicators = {
     "pj_2_tj": 1000,
 }
 
-provinces_names = [
-    "AT",
+provinces = [
     "Bgd",
-    "Ktn",
-    "Noe",
+    # "Ktn",
+    # "Noe",
     "Ooe",
     "Sbg",
-    "Stk",
-    "Tir",
+    # "Stk",
+    # "Tir",
     "Vbg",
     "Wie",
+    "AT",
 ]
 
+provinces_hex = {
+    "AT": "161716",
+    "Bgd": "64BDF5",  # hellblau
+    "Ktn": "DCE374",  # dunkelrot
+    "Noe": "AB5554",  # rot
+    "Ooe": "D19F5A",  # orange
+    "Sbg": "435694",  # limette
+    "Stk": "32A852",  # grün
+    "Tir": "9A5FBA",  # dunkelgrün
+    "Vbg": "59C7CF",  # braun
+    "Wie": "2A6E3B",  # deeppink
+}
+
 DEFAULT_CHART_CONFIG = {
-    "edits": {
-        "titleText": True,
-    },
-    'modeBarButtons': [
+    "edits": {"titleText": True,},
+    "modeBarButtons": [
         [
-            'toImage',
-            'sendDataToCloud',
-            'zoom2d',
-            'pan2d',
+            "toImage",
+            "sendDataToCloud",
+            "zoom2d",
+            "pan2d",
             # 'lasso',
-            'zoomIn2d',
-            'zoomOut2d',
-            'autoScale2d',
-            'resetScale2d',
-            'toggleSpikelines',
-            'hoverClosestCartesian',
-            'hoverCompareCartesian',
-            'drawline',
-            'drawopenpath',
-            'drawclosedpath',
-            'drawcircle',
-            'drawrect',
-            'eraseshape'
+            "zoomIn2d",
+            "zoomOut2d",
+            "autoScale2d",
+            "resetScale2d",
+            "toggleSpikelines",
+            "hoverClosestCartesian",
+            "hoverCompareCartesian",
+            "drawline",
+            "drawopenpath",
+            "drawclosedpath",
+            "drawcircle",
+            "drawrect",
+            "eraseshape",
         ]
     ],
-    'responsive': True,
-    'displaylogo': False,
+    "responsive": True,
+    "displaylogo": False,
     "showLink": False,
     # 'editable': True,
     "plotlyServerURL": "https://chart-studio.plotly.com",
-    'toImageButtonOptions': {
-        'format': 'png',  # one of png, svg, jpeg, webp
-        'filename': 'custom_image',
-        'height': 500,
-        'width': 700,
-        'scale': 1  # Multiply title/legend/axis/canvas sizes by this factor
-    }
+    "toImageButtonOptions": {
+        "format": "png",  # one of png, svg, jpeg, webp
+        "filename": "custom_image",
+        "height": 500,
+        "width": 700,
+        "scale": 1,  # Multiply title/legend/axis/canvas sizes by this factor
+    },
 }

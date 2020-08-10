@@ -1,3 +1,0 @@
-gui
-ig_wind
-logger
