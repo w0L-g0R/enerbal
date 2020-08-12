@@ -48,7 +48,6 @@ data = {
     "name": "AT_THG",
     "df": df,
     "source": df.index.name
-
 }
 
 pickle.dump(data, open("AT_THG" + ".pkl", "wb"))

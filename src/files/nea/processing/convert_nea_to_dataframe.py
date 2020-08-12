@@ -5,8 +5,7 @@ from typing import Union, List
 import numpy as np
 import pickle
 
-from settings import provinces
-# import numpy as np
+# from settings import provinces
 
 from files.nea.processing.get_nea_sheets import (
     sectors,
@@ -25,14 +24,27 @@ IDX = pd.IndexSlice
 
 
 def create_nea_col_midx(
-    last_year: int, energy_sources: List, energy_usage_types: List,
+    last_year: int, sectors: List, energy_usage_types: List,
 ) -> pd.MultiIndex:
+
+    provinces = [
+        "Bgd",
+        "Ktn",
+        "Noe",
+        "Ooe",
+        "Sbg",
+        "Stk",
+        "Tir",
+        "Vbg",
+        "Wie",
+        "AT",
+    ]
 
     years = [x for x in range(1993, last_year + 1, 1)]
 
     midx = pd.MultiIndex.from_product(
-        [provinces, energy_sources, energy_usage_types, years],
-        names=["BL", "SOURCE", "USAGE", "YEAR"],
+        [provinces, sectors, energy_usage_types, years],
+        names=["BL", "SECTOR", "USAGE", "YEAR"],
     )
 
     return midx
@@ -49,13 +61,12 @@ def convert_nea_to_df(
     # //////////////////////////////////////////////////// CREATE MULTI INDEX
 
     nea_col_midx = create_nea_col_midx(
-        last_year=last_year,
-        energy_sources=energy_sources[">=1999"], energy_usage_types=energy_usage_types
+        last_year=last_year, sectors=sectors, energy_usage_types=energy_usage_types
     )
     # ////////////////////////////////////////////////////// CREATE STORAGE DFS
 
     # Create a dataframe with multiindex to copy the xlsx sheet values to
-    nea_df = pd.DataFrame(index=sectors, columns=nea_col_midx)
+    nea_df = pd.DataFrame(index=energy_sources[">=1999"], columns=nea_col_midx)
 
     # ////////////////////////////////////// COLLECT ENERGY BALANCES FILE PATHS
 
@@ -64,7 +75,6 @@ def convert_nea_to_df(
 
     for _path in balances_directory_path.glob("*.xlsx"):
         nea_file_paths.append(str(Path(_path)))
-        print('nea_file_paths: ', nea_file_paths)
 
     for province in provinces:
 
@@ -77,10 +87,9 @@ def convert_nea_to_df(
             balances_file_path = list(
                 filter(lambda x: province in x, nea_file_paths)
             )[0]
-            print(balances_file_path)
+
         # CHECK 1: Xlxs file not found or not existing
         except Exception as e:
-
             raise e
 
         # //////////////////////////////////////////////////// FETCH_SHEETS
@@ -157,10 +166,9 @@ def convert_nea_to_df(
 
                     # Assign values
                     _usage_type = sheets[nea_year].iloc[starting_row, enum + 1]
-
                     nea_df.loc[
-                        IDX[sector], IDX[province,
-                                         sources_index, usage_type, year]
+                        IDX[sources_index], IDX[province,
+                                                sector, usage_type, year]
                     ] = sector_data[usage_type]
 
                 # Increase counter variable
@@ -173,20 +181,3 @@ def convert_nea_to_df(
     nea_df = nea_df.reindex(pd.Index(energy_sources_nea_df_reindex), axis=0)
 
     pickle.dump(nea_df, open("nea_df.p", "wb"))
-
-
-# balances_directory_path = Path() / "src/files/nea/data"
-
-# energy_sources = {
-#     "nea_df": energy_sources_nea_df,
-#     "<1999": energy_sources_93_98,
-#     ">=1999": energy_sources_99_plus,
-# }
-
-# convert_nea_to_df(
-#     balances_directory_path=balances_directory_path,
-#     sectors=sectors,
-#     energy_usage_types=energy_usage_types,
-#     energy_sources=energy_sources,
-#     last_year=2018,
-# )

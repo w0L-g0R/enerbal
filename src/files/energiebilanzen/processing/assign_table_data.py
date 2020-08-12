@@ -29,7 +29,8 @@ def assign_eev_table(
     df = df.apply(pd.to_numeric, errors="coerce").round(2)
 
     # Extract row and col index for testing purposes
-    energy_source_index = dfs[energy_source].iloc[3:193, 0].reset_index(drop=True)
+    energy_source_index = dfs[energy_source].iloc[3:193, 0].reset_index(
+        drop=True)
 
     eev_template_index = pd.Series(data=row_indices["IDX_EEV"][0], name=0)
 
@@ -40,7 +41,7 @@ def assign_eev_table(
             left=energy_source_index, right=eev_template_index, check_names=False,
         )
 
-    except:
+    except BaseException:
 
         eev_idx_check_df[energy_source] = energy_source_index
 
@@ -78,7 +79,8 @@ def assign_renewables_table(
     province: str,
     years_range_data: pd.Series,
 ):
-
+    # Converts all energy related data to TJ (conversion factors are
+    # precalculated in excel index file!)
     conversion_multiplicator = row_indices["MIDX_RENEWABLES"].iloc[:, -1]
 
     renewables_sheet, renewables_sheet_index = preprocess_renewables_sheet(
@@ -86,7 +88,8 @@ def assign_renewables_table(
         conversion_multiplicator=conversion_multiplicator,
     )
 
-    renewables_template_index = pd.Series(data=row_indices["IDX_RENEWABLES"][0], name=0)
+    renewables_template_index = pd.Series(
+        data=row_indices["IDX_RENEWABLES"][0], name=0)
 
     try:
 
@@ -97,7 +100,7 @@ def assign_renewables_table(
             check_names=False,
         )
 
-    except:
+    except BaseException:
 
         renewables_idx_check_df["Erneuerbare RL"] = renewables_sheet.index
 
@@ -109,7 +112,8 @@ def assign_renewables_table(
         print("Index name mismatch")
 
     # Assign column multindex to current df
-    renewables_sheet.columns = renewables_df.loc[IDX[:], IDX[province, :]].columns
+    renewables_sheet.columns = renewables_df.loc[IDX[:],
+                                                 IDX[province, :]].columns
 
     # Copy values from current energy source df to eev_df
     renewables_df.loc[IDX[:], IDX[province, :]] = renewables_sheet
@@ -140,18 +144,20 @@ def assign_sectors_consumption_table(
     df.set_index(df.iloc[:, 0], inplace=True)
     df.drop(df.columns[[0]], axis=1, inplace=True)
 
-    start_index = df.index.get_indexer_for(["Sektoraler Energetischer Endverbrauch"])[0]
+    start_index = df.index.get_indexer_for(
+        ["Sektoraler Energetischer Endverbrauch"])[0]
 
     print("SEC_Consump start_index: ", start_index)
 
     if start_index == [-1]:
-        sector_consumptions_df.loc[:, IDX[province, energy_source, :]] = float("NaN")
+        sector_consumptions_df.loc[:, IDX[province,
+                                          energy_source, :]] = float("NaN")
 
         sector_consumptions_idx_check_df[energy_source] = False
 
         return
 
-    df = df.iloc[start_index : start_index + 27, :31]
+    df = df.iloc[start_index: start_index + 27, :31]
 
     if df.index[1] == "in Tonnen":
         return
@@ -197,7 +203,7 @@ def assign_sector_energy_consumption_table(
         sector_energy_consumption_idx_check_df[energy_source] = False
         return
 
-    df = df.iloc[start_index : start_index + 10, :31]
+    df = df.iloc[start_index: start_index + 10, :31]
 
     df = df.apply(pd.to_numeric, args=("coerce",))
     print("df: ", df.iloc[2:, :])

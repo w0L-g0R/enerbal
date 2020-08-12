@@ -18,13 +18,42 @@ setup_logging(
     console_out_level=logging.DEBUG,
 )
 
-eb_aggregates = ["Bruttoinlandsverbrauch", "Importe"]
+eb_aggregates = [
+    "Energetischer Endverbrauch",
+]
+
+eb_sectors = [
+    # "Produzierender Bereich",
+    "Verkehr",
+    # "Öffentliche und Private Dienstleistungen",
+    # "Private Haushalte",
+    # "Landwirtschaft",
+]
 # aggregates = ["Bruttoinlandsverbrauch"]
 
 eb_energy_sources = [
-    "Gesamtenergiebilanz",
-    # "KOHLE",
-    # "GAS",
+    "Wasserkraft",
+    "Wind",
+    "Photovoltaik",
+    "KOHLE",
+    "ÖL",
+    "GAS",
+
+    "Sonst. Biogene fest",
+    "Hausmüll Bioanteil",
+    "Scheitholz",
+    "Pellets+Holzbriketts",
+    "Holzabfall",
+    "Holzkohle",
+    "Ablaugen",
+
+    "Bioethanol",
+    "Biodiesel",
+    "Sonst. Biogene flüssig",
+
+    "Deponiegas",
+    "Klärgas",
+    "Biogas"
 ]
 
 nea_energy_sources = [
@@ -42,22 +71,23 @@ nea_sectors = [
     "Landwirtschaft",
 ]
 
-years = list(range(2000, 2019, 1))
+years = list(range(2005, 2019, 1))
+years = [2018]
 
 # /////////////////////////////////////////////////////////////// CREATE DATASET
 
 ds = DataSet(name=f"Set_1", file_paths=file_paths)
 
 # //////////////////////////////////////////////////////////////////////// STATS
-ds.add_stats_data_per_years(
-    name="Bevölkerungsstatisik",
-    file="pop", years=years, provinces=provinces,
-)
+# ds.add_stats_data_per_years(
+#     name="Bevölkerungsstatisik",
+#     file="pop", years=years, provinces=provinces,
+# )
 
-ds.add_stats_data_per_years(
-    name="Fahrleistung_PKW",
-    file="km_pkw", years=years, provinces=provinces,
-)
+# ds.add_stats_data_per_years(
+#     name="Fahrleistung_PKW",
+#     file="km_pkw", years=years, provinces=provinces,
+# )
 
 # /////////////////////////////////////////////////////////////////////////// EB
 for aggregate in eb_aggregates:
@@ -65,77 +95,75 @@ for aggregate in eb_aggregates:
     logging.getLogger().error("/" * 80)
     logging.getLogger().error(f"Aggregate: {aggregate}")
 
-    ds.add_eb_data_per_years(
-        file="eev",
-        energy_sources=eb_energy_sources,
-        aggregate=aggregate,
-        years=years,
-        provinces=provinces,
-    )
+    # ds.add_eb_data_per_years(
+    #     file="eev",
+    #     energy_sources=eb_energy_sources,
+    #     aggregate=aggregate,
+    #     years=years,
+    #     provinces=provinces,
+    #     conversion="TJ_2_TWh",
+    # )
 
     ds.add_eb_data_per_sector(
         file="sec",
         energy_sources=eb_energy_sources,
         aggregate=aggregate,
-        years=[2016, 2017],
+        # years=[2016, 2017],
+        years=years,
         provinces=provinces,
-        sectors=[
-            "Produzierender Bereich",
-            "Verkehr",
-            "Öffentliche und Private Dienstleistungen",
-            "Private Haushalte",
-            "Landwirtschaft",
-        ],
+        conversion="TJ_2_TWh",
+        sectors=eb_sectors
     )
 
-    # ////////////////////////////////////////////////////////////////// EB IND
-    ds.add_indicator(
+# for sector in sectors:
+#     # ////////////////////////////////////////////////////////////////// EB IND
+#     ds.add_indicator(
 
-        aggregate=aggregate,
+#         aggregate=aggregate,
 
-        numerator=[
-            data for data in ds.objects.filter(
-                name__contains=aggregate + "_Gesamtenergiebilanz", order="per_years")
-        ],
+#         numerator=[
+#             data for data in ds.objects.filter(
+#                 name__contains=aggregate + "_Gesamtenergiebilanz", order="per_years")
+#         ],
 
-        denominator=[
-            data for data in ds.objects.filter(
-                file="pop")
-        ],
+#         denominator=[
+#             data for data in ds.objects.filter(
+#                 file="pop")
+#         ],
 
-    )
+#     )
 # ////////////////////////////////////////////////////////////////////////// NEA
 
-ds.add_nea_data_per_years(
-    file="nea",
-    energy_sources=nea_energy_sources,
-    years=years,
-    provinces=provinces,
-)
+# ds.add_nea_data_per_years(
+#     file="nea",
+#     energy_sources=nea_energy_sources,
+#     years=years,
+#     provinces=provinces,
+# )
 # ////////////////////////////////////////////////////////////////////// OVERLAY
 
-ds.add_overlay(
-    to_data=[
-        data for data in ds.objects.filter(
-            name__startswith="Bruttoinlandsverbrauch",
-            order="per_years",
-            is_KPI=False
-        )
-    ],
-    overlays=[
-        data for data in ds.objects.filter(
-            file="km_pkw")
-    ],
-    scalings="absolute",
-    chart_type="line",
-)
+# ds.add_overlay(
+#     to_data=[
+#         data for data in ds.objects.filter(
+#             name__startswith="Bruttoinlandsverbrauch",
+#             order="per_years",
+#             is_KPI=False
+#         )
+#     ],
+#     overlays=[
+#         data for data in ds.objects.filter(
+#             file="km_pkw")
+#     ],
+#     scalings="absolute",
+#     chart_type="line",
+# )
 
 # /////////////////////////////////////////////////////////////// FILTER DATASET
 
 g_data = [
     v for v in ds.objects.filter(
         # order="per_sector",
-        aggregate__in=["Bruttoinlandsverbrauch", "Importe"],
+        # aggregate__in=["Bruttoinlandsverbrauch", "Importe"],
         # is_KPI=False
     )
 ]
@@ -143,25 +171,25 @@ g_data = [
 # /////////////////////////////////////////////////////////////// FILTER DATASET
 
 ov_data = [
-    v.name for v in ds.objects.filter(
+    v.unit for v in ds.objects.filter(
         # order="per_years",
-        # aggregate__in=["Bruttoinlandsverbrauch", "Importe"],
+        aggregate__in=["Energetischer Endverbrauch"],
         # is_KPI=False
         # has_overlay=True
     )
 ]
 
-# print('ov_data: ', ov_data)
-g_data_names = [x.name for x in g_data]
-g_size = [sys.getsizeof(x) for x in g_data]
+print('ov_data: ', ov_data)
+# g_data_names = [x.name for x in g_data]
+# g_size = [sys.getsizeof(x) for x in g_data]
 
-pprint(f'{g_data_names}')
-pprint(f'{g_size}')
+# pprint(f'{g_data_names}')
+# pprint(f'{g_size}')
 
-print(g_data)
+# print(g_data)
 # //////////////////////////////////////////////////////////////// WRITE TO XLSX
 
-wb = xlsx(name="WB1", path="test.xlsx", sheets=aggregates)
+wb = xlsx(name="WB1", path="test.xlsx", sheets=eb_aggregates)
 try:
     wb.close()
 except BaseException:
@@ -171,9 +199,9 @@ for data in g_data:
 
     if data.order == "per_sector":
 
-        wb.write(data=data, sheet=data.aggregate, shares="over_columns")
-    else:
-        wb.write(data=data, sheet=data.aggregate,)
+        wb.write(data=data, sheet=data.aggregate)
+    # else:
+    #     wb.write(data=data, sheet=data.aggregate)
 
 
 for sheet in wb.book.sheetnames:

@@ -1,4 +1,4 @@
-eb_sheets=[
+eb_sheets = [
     "Kokskohle",
     "Anthrazit",
     "Steinkohlen-Briketts",
@@ -64,7 +64,7 @@ eb_sheets=[
     "Umgebungswärme",
     "Solarwärme",
     "Reaktionswärme",
-    "Umgebungswärme etc.", 
+    "Umgebungswärme etc.",
     "WK<=1MW",
     "WK<=10MW",
     "WK>10MW",
@@ -81,3 +81,39 @@ eb_sheets=[
     "ABFÄLLE",
     "Gesamtenergiebilanz"
 ]
+
+# Steinkohle	Fossil - fest
+# Braunkohle	Fossil - fest
+# Braunkohlen - Briketts	Fossil - fest
+# Brenntorf	Fossil - fest
+# Koks	Fossil - fest
+# Erdöl	Fossil - flüssig
+# Sonstiger Raffinerieeinsatz	Fossil - flüssig
+# Benzin	Fossil - flüssig
+# Petroleum	Fossil - flüssig
+# Diesel	Fossil - flüssig
+# Gasöl für Heizzwecke	Fossil - flüssig
+# Heizöl	Fossil - flüssig
+# Flüssiggas	Fossil - flüssig
+# Sonstige Prod. d. Erdölverarb.	Fossil - flüssig
+# Raffinerie - Restgas	Fossil - flüssig
+# Mischgas	Fossil - gasformig
+# Erdgas	Fossil - gasformig
+# Gichtgas	Fossil - fest
+# Kokereigas	Fossil - fest
+# Industrieabfall	Fossil - fest
+# Hausmüll nicht erneuerbar	Fossil - fest
+# Hausmüll Bioanteil	Biogen - fest
+# Brennbare Abfälle
+# Scheitholz	Biogen - fest
+# Pellets + Holzbriketts	Biogen - fest
+# Holzabfall	Biogen - fest
+# Holzkohle	Biogen - fest
+# Ablaugen	Biogen - fest
+# Deponiegas	Biogen - gasformig
+# Klärgas	Biogen - gasformig
+# Biogas	Biogen - gasformig
+# Bioethanol	Biogen - flüssig
+# Biodiesel	Biogen - flüssig
+# Sonst. Biogene flüssig	Biogen - flüssig
+# Sonst. Biogene fest	Biogen - fest

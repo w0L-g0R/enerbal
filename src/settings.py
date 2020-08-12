@@ -59,26 +59,26 @@ scale_options = {
 }
 
 conversion_multiplicators = {
-    "mwh_2_gwh": 0.001,
-    "gwh_2_tj": (1 / 0.27778),
-    "tj_2_pj": 0.001,
-    "gwh_2_mwh": 1000,
-    "tj_2_gwh": 0.27778,
-    "tj_2_twh": 0.27778 / 1000,
-    "pj_2_tj": 1000,
+    "MWh_2_GWh": 0.001,
+    "GWh_2_TJ": (1 / 0.27778),
+    "TJ_2_PJ": 0.001,
+    "GWh_2_MWh": 1000,
+    "TJ_2_GWh": 0.27778,
+    "TJ_2_TWh": 0.27778 / 1000,
+    "PJ_2_TJ": 1000,
 }
 
 provinces = [
     "Bgd",
-    # "Ktn",
-    # "Noe",
-    # "Ooe",
-    # "Sbg",
-    # "Stk",
-    # "Tir",
-    # "Vbg",
-    # "Wie",
-    # "AT",
+    "Ktn",
+    "Noe",
+    "Ooe",
+    "Sbg",
+    "Stk",
+    "Tir",
+    "Vbg",
+    "Wie",
+    "AT",
 ]
 
 provinces_hex = {

@@ -1,7 +1,7 @@
 import os
 import logging
 import pickle
-from typing import List, Union
+from typing import List, Union, Optional
 from copy import deepcopy
 from time import gmtime, strftime
 
@@ -9,12 +9,13 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 
-from settings import file_paths, provinces_hex, provinces
+from settings import file_paths, provinces_hex, provinces, conversion_multiplicators
 
 from data_structures.utils import (add_sums,
                                    add_means,
                                    get_shares,
-                                   apply_single_index)
+                                   apply_single_index,
+                                   convert)
 
 from data_structures.classes.data import Data, FilterData
 
@@ -44,6 +45,7 @@ class DataSet:
         provinces: List,
         years: List,
         energy_sources: List = None,
+        conversion: str = None,
     ):
         logging.getLogger().error("/" * 80)
         logging.getLogger().info(f"Adding {file} data per years:\n{years}\n")
@@ -90,16 +92,19 @@ class DataSet:
 
                 df = apply_single_index(df=df)
 
-            else:
+            # else:
 
-                # Slice data for all given provinces and years
-                df = data.loc[
-                    IDX[tuple(aggregate)],
-                    IDX[tuple(provinces), energy_source, years],
-                ]
+            #     # Slice data for all given provinces and years
+            #     df = data.loc[
+            #         IDX[tuple(aggregate)],
+            #         IDX[tuple(provinces), energy_source, years],
+            #     ]
 
             # Sum column and row
             df = add_sums(df=df)
+
+            # Transform data values to new unit scale
+            df = convert(df=df)
 
             # Share of each year over total years per province
             df_shares_per_year = get_shares(df=df, years=True)
@@ -117,7 +122,7 @@ class DataSet:
                     name=name,
                     file="eb",
                     source="Energiebilanzen Bundesländer",
-                    unit="TJ",
+                    unit=unit if conversion is not None else "TJ",
                     frame=df,
                     aggregate=aggregate[0],
                     energy_source=energy_source,
@@ -129,7 +134,7 @@ class DataSet:
                 )
             )
 
-            return
+        return
 
     def add_eb_data_per_sector(
         self,
@@ -137,8 +142,9 @@ class DataSet:
         aggregate: List,
         provinces: List,
         years: List,
-        energy_sources: List = None,
-        sectors: List = None,
+        conversion: Optional[str] = None,
+        energy_sources: Optional[List] = None,
+        sectors: Optional[List] = None,
     ):
         logging.getLogger().error("/" * 80)
         logging.getLogger().info(
@@ -146,6 +152,7 @@ class DataSet:
 
         # Fetch data
         data = pickle.load(open(self.file_paths[file], "rb"))
+        unit = "TJ"
 
         for year in years:
 
@@ -153,7 +160,7 @@ class DataSet:
 
             for energy_source in energy_sources:
 
-                # Helper structure
+                # Output df which holds sector series
                 df = pd.DataFrame(index=sectors, columns=provinces)
 
                 # Extend with energy source
@@ -161,7 +168,7 @@ class DataSet:
                                  energy_source,
                                  str(year),
                                  ])
-
+                # Iter over sectors (= actually list of aggregates)
                 for sector in sectors:
 
                     # Slice data for all given provinces and years
@@ -170,15 +177,25 @@ class DataSet:
                             provinces), energy_source, year],
                     ]
 
+                    # Copy series to output df
                     df.loc[sector, provinces] = s.droplevel(
                         (1, 2), axis=0).T
 
-                # dfs.append(df)
+                # Add sum row and column
                 df = add_sums(df=df)
 
-                # Share of each province over total provinces per year
-                df_shares_per_province = get_shares(
-                    df=df, provinces=True)
+                # If all sum of sum column == 0, than all values are NaN
+                if df["Sum"].sum() != 0:
+
+                    if conversion is not None:
+                        df, unit = convert(df=df, conversion=conversion)
+
+                    # Share of each province over total provinces per year
+                    df_shares_per_province = get_shares(
+                        df=df, provinces=True)
+                else:
+                    # Write NaN df to shares
+                    df_shares_per_province = df
 
                 logging.getLogger().info(
                     f"Added {name} to {self.name}.data_manager")
@@ -188,8 +205,8 @@ class DataSet:
                     Data(
                         name=name,
                         file="sec",
-                        source="Energiebilanzen Bundesländer, Verbrauch nach Sektoren",
-                        unit="TJ",
+                        source="Energiebilanzen Bundesländer, EEV nach Sektoren",
+                        unit=unit,
                         frame=df,
                         aggregate=aggregate,
                         energy_source=energy_source,
@@ -200,86 +217,6 @@ class DataSet:
                         order="per_sector"
                     )
                 )
-
-    def add_nea_per_years(
-        self,
-        file: Union[str, Path],
-        provinces: List,
-        years: List,
-        energy_sources: List = None,
-    ):
-        logging.getLogger().error("/" * 80)
-        logging.getLogger().info(f"Adding {file} data per years:\n{years}\n")
-
-        nea_df.loc[IDX[:],
-                   IDX["Ktn",
-                       "Gesamt (ohne E1 - E7)",
-                       "Dampferzeugung",
-                       2000]]
-
-        # Fetch data
-        data = pickle.load(open(self.file_paths[file], "rb"))
-
-        for energy_source in energy_sources:
-
-            logging.getLogger().info(f"Energy source: {energy_source}")
-
-            # Create a searchable name
-            name = "_".join(
-                [
-                    "Energetischer_Endverbrauch",
-                    energy_source,
-                    str(years[0]),
-                    str(years[-1]),
-                ]
-            )
-
-            # Use the aggregate as the row index
-            row_midx_addon = 5 - len(aggregate)
-
-            # Extend the  with "Gesamt" if not specified
-            aggregate.extend(["Gesamt"] * row_midx_addon)
-
-            # Slice data for all given provinces and years
-            df = data.loc[
-                IDX[tuple(aggregate)],
-                IDX[tuple(provinces), energy_source, years],
-            ]
-
-            df = apply_single_index(df=df)
-
-            # Sum column and row
-            df = add_sums(df=df)
-
-            # Share of each year over total years per province
-            df_shares_per_year = get_shares(df=df, years=True)
-
-            # Share of each province over total provinces per year
-            df_shares_per_province = get_shares(df=df, provinces=True)
-
-            logging.getLogger().info(
-                f"Added {name} to {self.name}.data_manager")
-
-            # Create Data object
-            self.data.append(
-                Data(
-                    # title=name,
-                    name=name,
-                    file="eb",
-                    source="Energiebilanzen Bundesländer",
-                    unit="TJ",
-                    frame=df,
-                    aggregate=aggregate[0],
-                    energy_source=energy_source,
-                    shares_over_rows=df_shares_per_year,
-                    shares_over_columns=df_shares_per_province,
-                    provinces=provinces,
-                    years=years,
-                    order="per_years"
-                )
-            )
-
-            return
 
     def add_stats_data_per_years(
         self,
@@ -453,144 +390,92 @@ class DataSet:
         )
         return
 
-    # def compute_KPI():
-    #     return
-
-    # if provinces:
-
-    #     for col in df_shares.columns:
-
-    #         # NOTE: Cumbersome, but the sum gets computed as 1
-
-    #         # Province value as a share of "AT"
-    #         if "AT" in df_shares.columns:
-    #             AT = df_shares[col].iloc[:-2].sum(axis=0) / df_shares.loc["AT", col]
-
-    #         # Province share with respect to selected provinces
-    #         df_shares[col] = df_shares[col] / df_shares[col].iloc[:-2].sum(axis=0)
-
-    #         if "AT" in df_shares.columns:
-    #             df_shares.loc["AT", col] = AT
-
-    #         return df_shares
-
-    # if file == "pop":
+    # def add_nea_per_years(
+    #     self,
+    #     file: Union[str, Path],
+    #     provinces: List,
+    #     years: List,
+    #     energy_sources: List = None,
+    #     usage_categories: List = None,
+    #     sectors: List = None,
+    #     conversion: str = None,
+    # ):
+    #     logging.getLogger().error("/" * 80)
+    #     logging.getLogger().info(f"Adding {file} data per years:\n{years}\n")
 
     #     # Fetch data
-    #     data = pickle.load(open(self.file_paths["pop"], "rb"))
+    #     data = pickle.load(open(self.file_paths[file], "rb"))
 
-    #     df = data["df"].loc[years, provinces]
+    #     for year in years:
 
-    #     # Compute sums on rows axis (years) and on col axis (provinces)
-    #     df = add_sums(df=df)
-    #     # df = df.T
-    #     print("df: ", df)
+    #         logging.getLogger().info(f"Year: {year}")
 
-    # df_shares = deepcopy(df)
-    # df_row_perc = deepcopy(df.T)
+    #         # Create a searchable name
+    #         name = "_".join(
+    #             [
+    #                 "Energetischer_Endverbrauch",
+    #                 energy_source,
+    #                 usage_category,
+    #                 sectors,
+    #                 str(years[0]),
+    #                 str(years[-1]),
+    #             ]
+    #         )
 
-    # for col in df_shares.columns:
-    #     df_shares = df_shares[col].value_counts(normalize=True) * 100
+    #         # # IDX rows = ENERGY SOURCE
+    #         # # IDX columns PROV, AGGREGATE, USAGE CAT, YEARS
+    #         # nea_df.loc[IDX[:], IDX["Ktn", "Gesamt (ohne E1 - E7)", "Dampferzeugung", 2000]]
 
-    # for col in df_row_perc.columns:
-    #     df_shares = df_shares[col].value_counts(normalize=True) * 100
+    #         # Slice data for all given provinces and years
+    #         df = data.loc[
+    #             # Energy Source
+    #             IDX[tuple(aggregate)],
+    #             # Provinde, Sector, Usage Cat, Year
+    #             IDX[tuple(provinces), tuple(sectors), tuple(usage_categories), tuple(years)
+    #                 ],
+    #         ]
 
-    # print("df_shares: ", df_shares)
+    #         # Transform data values to new unit scale
+    #         if conversion is not None:
 
-    # self.data["Bevölkerung"] = Data(
-    #     values=df,
-    #     percentage_cols=df_shares,
-    #     percentage_rows=df_row_perc,
-    #     unit=df.iloc[1, -1],
-    #     file=data["df"].iloc[0, 0],
-    #     provinces=provinces,
-    #     years=years,
-    # )
+    #             # Convert to other units
+    #             df *= conversion_multiplicators[conversion]
 
-    # if file == "brp":
+    #             # Assign new unit
+    #             unit = conversion.split("_")[-1]
+    #             print('unit: ', unit)
 
-    #     # Fetch data
-    #     data = pickle.load(open(self.file_paths["brp"], "rb"))
+    #         df = apply_single_index(df=df)
 
-    # if years[0] < data["df"].index[0]:
-    #     idx = years.index(data["df"].index[0])
-    #     years = years[idx:]
-    # if years[-1] > data["df"].index[-1]:
-    #     idx = years.index(data["df"].index[-1])
-    #     years = years[:idx]
+    #         # Sum column and row
+    #         df = add_sums(df=df)
 
-    # df = data["df"].loc[years, provinces]
-    # # df = data["df"].iloc[:10, :]
-    # df_shares = deepcopy(df)
+    #         # # Share of each year over total years per province
+    #         # df_shares_per_year = get_shares(df=df, years=True)
 
-    # for col in df_shares.columns:
-    #     df_shares[col].value_counts(normalize=True) * 100
+    #         # # Share of each province over total provinces per year
+    #         # df_shares_per_province = get_shares(df=df, provinces=True)
 
-    # self.kpi["BRP"] = Data(
-    #     values=df,
-    #     unit="Millionen Euro",
-    #     file=data["df"].iloc[0, 0],
-    #     provinces=provinces,
-    #     years=years,
-    # )
+    #         logging.getLogger().info(
+    #             f"Added {name} to {self.name}.data_manager")
 
-        # Select first year
-        # years_start = max(data["df"].index[0], years[0])
-        # # Select last year
-        # years_end = min(data["df"].index[-1], years[-1])
-        # years = tuple(range(years_start, years_end + 1, 1))
-        # print("years: ", years)
-        # return
+    #         # Create Data object
+    #         self.data.append(
+    #             Data(
+    #                 # title=name,
+    #                 name=name,
+    #                 file="nea",
+    #                 source="Nutzenergieanalysen Bundesländer",
+    #                 unit="TJ",
+    #                 frame=df,
+    #                 aggregate=aggregate[0],
+    #                 energy_source=energy_source,
+    #                 shares_over_rows=df_shares_per_year,
+    #                 shares_over_columns=df_shares_per_province,
+    #                 provinces=provinces,
+    #                 years=years,
+    #                 order="per_years"
+    #             )
+    #         )
 
-        # else:
-        #     # Iter over energy sources
-        #     for energy_source in energy_sources:
-        #         print("energy_source: ", energy_source)
-
-        #         # Extend with energy source
-        #         title = " - ".join([title, energy_source])
-
-        #         # Slice data for all given provinces and years
-        #         df = data.loc[
-        #             IDX[tuple(aggregate)],
-        #             IDX[tuple(provinces), energy_source, years],
-        #         ]
-
-        #         df = apply_single_index(df=df)
-        #         # print("df: ", df)
-
-        #         # Compute sums on rows axis (years) and on col axis (provinces)
-        #         df = add_sums(df=df)
-
-        #         # Create shares
-        #         # Share of each year over total years per province
-        #         df_shares_per_year = get_shares(df=df, years=True)
-        #         # print("df_shares_years: ", df_shares_per_year)
-
-        #         # Share of each province over total provinces per year
-        #         df_shares_per_province = get_shares(df=df, provinces=True)
-        #         # print("df_shares_provinces: ", df_shares_per_province)
-
-        #         # Prepare data storage structure
-        #         try:
-        #             storage = self.data[file][aggregate[0]]
-        #             # storage[aggregate] = {}
-        #             # storage[aggregate][energy_source]
-        #         except:
-        #             storage = self.data[file]
-        #             storage[aggregate[0]] = {}
-
-        #         # Create a Data object
-        #         storage[energy_source] = Data(
-        #             title=title,
-        #             values=df,
-        #             aggregate=aggregate[0],
-        #             energy_source=energy_source,
-        #             shares_over_rows=df_shares_per_year,
-        #             shares_over_columns=df_shares_per_province,
-        #             unit=unit,
-        #             file=file,
-        #             provinces=provinces,
-        #             years=years,
-        #         )
-        #     return
+    #         return

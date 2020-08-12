@@ -23,7 +23,7 @@ from files.energiebilanzen.processing.assign_table_data import (
 
 from files.energiebilanzen.processing.fetch_from_excel import fetch_energy_sources
 
-from settings import provinces
+# from settings import provinces
 
 pd.set_option("display.max_columns", 10)  # or 1000
 pd.set_option("display.max_rows", None)  # or 1000
@@ -39,6 +39,19 @@ def convert_eb_to_df(
     row_indices_file_path: Union[str, Path],
     last_year: int,
 ):
+
+    provinces = [
+        "Bgd",
+        "Ktn",
+        "Noe",
+        "Ooe",
+        "Sbg",
+        "Stk",
+        "Tir",
+        "Vbg",
+        "Wie",
+        "AT",
+    ]
 
     # ///////////////////////////////////////////////////////////// GET INDICES
 

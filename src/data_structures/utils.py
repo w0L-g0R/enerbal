@@ -2,6 +2,7 @@
 import pandas as pd
 import numpy as np
 from copy import deepcopy
+from settings import conversion_multiplicators
 
 
 def add_sums(df: pd.DataFrame):
@@ -37,29 +38,30 @@ def get_shares(
     # NOTE:
     # Percentage values years
     df_shares = deepcopy(df.iloc[:-1, :])
-    # print("df_shares: ", df_shares)
 
     if provinces:
         df_shares = df_shares.T
 
-        provinces_sums_per_year = df_shares.iloc[:-2, :].sum(axis=0)
+        provinces_sums_per_year = df_shares.iloc[:-
+                                                 2, :].sum(axis=0).replace(0, np.nan)
+
         # print("provinces_sums_per_year: ", provinces_sums_per_year)
-        AT_sums_per_year = df_shares.iloc[-2, :]
+        AT_sums_per_year = df_shares.iloc[-2, :].replace(0, np.nan)
 
         # Province share over sum of provinces, per year
-        try:
-            df_shares.iloc[:-2, :] /= provinces_sums_per_year
-        except:
-            pass
+        df_shares.iloc[:-
+                       2, :].replace(0, np.nan).divide(provinces_sums_per_year)
 
-        try:
-            # Percentage sum over provinces per year (== 1)
-            df_shares.iloc[-1, :] /= provinces_sums_per_year
-        except:
-            pass
+        # try:
+        # Percentage sum over provinces per year (== 1)
+        df_shares.iloc[-1, :].replace(0,
+                                      np.nan).divide(provinces_sums_per_year)
+        # except BaseException:
+        #     pass
 
         # Sum of selected province as a share of "AT", per year
-        df_shares.loc["AT", :] = provinces_sums_per_year / AT_sums_per_year
+        df_shares.loc["AT", :] = provinces_sums_per_year.divide(
+            AT_sums_per_year)
 
         # print("df_shares: ", df_shares)
         # Check if row values sum up to 1
@@ -79,7 +81,6 @@ def get_shares(
 
     elif years:
 
-        # for col in df_shares.columns:
         df_shares = df_shares / df_shares.sum(axis=0)
 
         # Check if all necessary sum values are given
@@ -120,3 +121,15 @@ def apply_single_index(df: pd.DataFrame):
         df = df.reindex(columns=list(df.columns[1:]) + ["AT"])
 
     return df
+
+
+def convert(df: pd.DataFrame, conversion: str):
+
+    # Transform data values to new unit scale
+    df *= conversion_multiplicators[conversion]
+
+    # Assign new unit
+    unit = conversion.split("_")[-1]
+    print('unit: ', unit)
+
+    return df, unit

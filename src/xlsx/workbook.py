@@ -28,7 +28,10 @@ class xlsx:
         self.width_df = 0
         for sheet in sheets:
 
-            self.book.remove(self.book[sheet])
+            try:
+                self.book.remove(self.book[sheet])
+            except BaseException:
+                pass
 
             if sheet not in self.book.sheetnames:
 
@@ -39,7 +42,13 @@ class xlsx:
                 self.book[sheet].coordinates = []
         try:
             self.book.remove(self.book["Sheet1"])
-        except:
+
+        except BaseException:
+            pass
+
+        try:
+            self.book.remove(self.book["Tabelle1"])
+        except BaseException:
             pass
 
     def launch(self):
@@ -110,8 +119,9 @@ class xlsx:
 
         return
 
-    def insert(self, data: Data, ws: Worksheet, scale: str, shares: str = None):
-        print("\n"+("-"*80))
+    def insert(self, data: Data, ws: Worksheet,
+               scale: str, shares: str = None):
+        print("\n" + ("-" * 80))
         print('data.name: ', data.name)
 
         #  Main plot data
@@ -180,7 +190,7 @@ class xlsx:
 
                 ws.next_col_start += len(df.columns) + 2
 
-        ws.delete_rows(ws.row_start_info+self.height_info+2)
+        ws.delete_rows(ws.row_start_info + self.height_info + 2)
 
         ws.row_start_info += len(data.frame) + self.height_info + 2
         ws.col_start_info = 1
@@ -190,7 +200,8 @@ class xlsx:
 
         return
 
-    def add(self, data: Data, ws: Worksheet, scale: str = "Absolute", shares: str = None, info: bool = False, ):
+    def add(self, data: Data, ws: Worksheet, scale: str = "Absolute",
+            shares: str = None, info: bool = False, ):
 
         if info:
             print('info.name: ', data.name)
@@ -264,7 +275,7 @@ class xlsx:
         for col in ws.iter_cols(ws.min_column):
             for cell in col:
                 if cell.value == "Title":
-                    ws.coordinates.append((cell.column, cell.row))
+                    # ws.coordinates.append((cell.column, cell.row))
 
                     style_info(ws=ws, cell=cell, width=self.width_df,
                                height=self.height_info)

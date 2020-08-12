@@ -8,7 +8,7 @@ pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
-file = Path("C:/Code/balplot/enerbal/src/files/stats/processing/gefahrene_kilometer_private_pkw_2000_2018/fahrleistungen_privater_pkw.xlsx")
+file = Path("C:/Code/enerbal/src/files/stats/processing/gefahrene_kilometer_private_pkw_2000_2018/fahrleistungen_privater_pkw.xlsx")
 sheet_names = [
     "Österreich",
     "Burgenland",
@@ -52,7 +52,7 @@ for enum, sheet_name in enumerate(sheet_names):
         col_idx = 3
         row_idx_offset = 4
 
-        g = df.iloc[idx-row_idx_offset:idx, -1]
+        g = df.iloc[idx - row_idx_offset:idx, -1]
         g.name = sheet_name
         if g.index[-1] == "Zusammen":
             p.append(g)
@@ -66,6 +66,22 @@ for enum, sheet_name in enumerate(sheet_names):
     #     pass
     last_column = "A2"
 
+    df_fuel_liter = pd.DataFrame(
+        columns=index, index=[
+            "Benzin", "Diesel", "Zusammen"])
+
+    df_fuel_TWh = pd.DataFrame(
+        columns=index,
+        index=[
+            "Benzin",
+            "Diesel",
+            "Zusammen"])
+
+    df_conversions = pd.DataFrame(
+        columns=["Faktor", "Einheit"],
+        index=[
+            "Benzin", "Diesel"], data=[[8.777777778, "kWh/L"], [9.95, "kWh/L"]])
+
     for v, idx in zip(p, index):
         print(v)
         ws = wb.sheets[sheet_name]
@@ -73,21 +89,39 @@ for enum, sheet_name in enumerate(sheet_names):
         ws.range(last_column).value = "Liter"
         try:
             v.drop("Sonstiger", inplace=True)
-        except:
+        except BaseException:
             pass
 
         try:
             v.drop("Insgesamt", inplace=True)
-        except:
+        except BaseException:
             pass
-        v.iloc[:2] *= np.array([8.4, 9.8])
-        v["Zusammen"] = v.iloc[:2].sum(axis=0)
         v.index.name = idx
+        v["Zusammen"] = v.iloc[:2].sum(axis=0)
+        print('v: ', v)
 
-        ws.range(last_column).value = v / 1e9  # kWh -> TWh
-        ws.range(last_column).end('up').offset(0, 1).value = "TWh"
+        df_fuel_liter.loc[:, idx] = v
 
-        last_column = ws.range(last_column).end(
-            'right').offset(0, 1).get_address(0, 0)
+        df_fuel_TWh.iloc[0, :] = df_fuel_liter.iloc[0, :] * 8.777777778
+        df_fuel_TWh.iloc[1, :] = df_fuel_liter.iloc[1, :] * 9.95
+        df_fuel_TWh.iloc[2, :] = \
+            df_fuel_TWh.iloc[0, :] \
+            + df_fuel_TWh.iloc[1, :]
+        # \
+        #   np.array([8.777777778, 9.95]) / 1e9  # kWh -> TWh
+        # v["Zusammen"] = v.iloc[:2].sum(axis=0)
+        # df_fuel.loc[:, idx] = v
 
-        print(last_column)
+        df_fuel_TWh.index.name = "TWh"
+        df_fuel_liter.index.name = "Liter"
+        print(df_fuel_TWh)
+
+    ws.range(last_column).value = np.around(df_fuel_TWh / 1e9, 2)
+    ws.range(last_column).end('up').offset(
+        0, 1).value = "Treibstoffverbrauch"
+
+    ws.range(last_column).end('down').offset(2, 0).value = df_fuel_liter
+
+    ws.range(last_column).end('down').offset(7, 0).value = df_conversions
+
+    print(last_column)

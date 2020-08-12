@@ -21,45 +21,45 @@ from files.nea.processing.get_nea_sheets import (
 
 # ////////////////////////////////////////////////////////////////////// EB
 
-# balances_directory_path = file_paths["eb_data_dir"]
-# print("balances_directory_path: ", balances_directory_path)
-
-# row_indices_file_path = file_paths["eb_row_indices"]
-# print("row_indices_file_path: ", row_indices_file_path)
-
-# start = time.time()
-# print("###########################################################################")
-# print("start: ", start)
-# convert_eb_to_df(
-#     balances_directory_path=balances_directory_path,
-#     row_indices_file_path=row_indices_file_path,
-#     last_year=2018,
-# )
-# end = time.time()
-# print("end: ", end)
-# print(end - start)
-# ////////////////////////////////////////////////////////////////////// NEA
-
-balances_directory_path = file_paths["nea_data_dir"]
+balances_directory_path = file_paths["eb_data_dir"]
 print("balances_directory_path: ", balances_directory_path)
 
-energy_sources = {
-    "nea_df": energy_sources_nea_df,
-    "<1999": energy_sources_93_98,
-    ">=1999": energy_sources_99_plus,
-}
-
+row_indices_file_path = file_paths["eb_row_indices"]
+print("row_indices_file_path: ", row_indices_file_path)
 
 start = time.time()
 print("###########################################################################")
 print("start: ", start)
-convert_nea_to_df(
+convert_eb_to_df(
     balances_directory_path=balances_directory_path,
-    sectors=sectors,
-    energy_usage_types=energy_usage_types,
-    energy_sources=energy_sources,
+    row_indices_file_path=row_indices_file_path,
     last_year=2018,
 )
 end = time.time()
 print("end: ", end)
 print(end - start)
+# ////////////////////////////////////////////////////////////////////// NEA
+
+# balances_directory_path = file_paths["nea_data_dir"]
+# print("balances_directory_path: ", balances_directory_path)
+
+# energy_sources = {
+#     "nea_df": energy_sources_nea_df,
+#     "<1999": energy_sources_93_98,
+#     ">=1999": energy_sources_99_plus,
+# }
+
+
+# start = time.time()
+# print("###########################################################################")
+# print("start: ", start)
+# convert_nea_to_df(
+#     balances_directory_path=balances_directory_path,
+#     sectors=sectors,
+#     energy_usage_types=energy_usage_types,
+#     energy_sources=energy_sources,
+#     last_year=2018,
+# )
+# end = time.time()
+# print("end: ", end)
+# print(end - start)
