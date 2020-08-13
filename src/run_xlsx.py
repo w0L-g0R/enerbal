@@ -4,12 +4,12 @@ from pathlib import Path
 from pprint import pprint
 
 from settings import file_paths, provinces
-from data_structures.classes.dataset import DataSet
+from models.dataset import DataSet
 from logger.setup import setup_logging
 from xlsx.utils import get_workbook, write_to_sheet
 
 from xlsx.workbook import xlsx
-
+from files.energiebilanzen.processing.get_energy_sources_aggregates import energy_sources_aggregates
 # ////////////////////////////////////////////////////////////////////// INPUTS
 
 setup_logging(
@@ -19,42 +19,54 @@ setup_logging(
 )
 
 eb_aggregates = [
-    "Energetischer Endverbrauch",
+    "Bruttoinlandsverbrauch",
 ]
 
-eb_sectors = [
-    # "Produzierender Bereich",
-    "Verkehr",
-    # "Öffentliche und Private Dienstleistungen",
-    # "Private Haushalte",
-    # "Landwirtschaft",
-]
+# eb_sectors = [
+#     "Energetischer Endverbrauch",
+#     # "Produzierender Bereich",
+#     # "Verkehr",
+#     # "Öffentliche und Private Dienstleistungen",
+#     # "Private Haushalte",
+#     # "Landwirtschaft",
+# ]
 # aggregates = ["Bruttoinlandsverbrauch"]
 
-eb_energy_sources = [
-    "Wasserkraft",
-    "Wind",
-    "Photovoltaik",
-    "KOHLE",
-    "ÖL",
-    "GAS",
+# eb_energy_sources = [
+#     "Elektrische Energie"
+# ]
+#     "Wasserkraft",
+#     "Wind",
+#     "Photovoltaik",
+#     "KOHLE",
+#     "ÖL",
+#     "GAS",
 
-    "Sonst. Biogene fest",
-    "Hausmüll Bioanteil",
-    "Scheitholz",
-    "Pellets+Holzbriketts",
-    "Holzabfall",
-    "Holzkohle",
-    "Ablaugen",
+#     "Sonst. Biogene fest",
+#     "Hausmüll Bioanteil",
+#     "Scheitholz",
+#     "Pellets+Holzbriketts",
+#     "Holzabfall",
+#     "Holzkohle",
+#     "Ablaugen",
 
-    "Bioethanol",
-    "Biodiesel",
-    "Sonst. Biogene flüssig",
+#     "Bioethanol",
+#     "Biodiesel",
+#     "Sonst. Biogene flüssig",
 
-    "Deponiegas",
-    "Klärgas",
-    "Biogas"
-]
+#     "Deponiegas",
+#     "Klärgas",
+#     "Biogas"
+# ]
+
+eb_energy_sources = \
+    energy_sources_aggregates["Fossil-fest"] \
+    + energy_sources_aggregates["Fossil-flüssig"] \
+    + energy_sources_aggregates["Fossil-gasförmig"] \
+    + ["Elektrische Energie", "Fernwärme", "Umgebungswärme"]\
+    + energy_sources_aggregates["Biogen-fest"] \
+    + energy_sources_aggregates["Biogen-flüssig"] \
+    + energy_sources_aggregates["Biogen-gasförmig"] \
 
 nea_energy_sources = [
     "Steinkohle",
@@ -95,25 +107,25 @@ for aggregate in eb_aggregates:
     logging.getLogger().error("/" * 80)
     logging.getLogger().error(f"Aggregate: {aggregate}")
 
-    # ds.add_eb_data_per_years(
-    #     file="eev",
+    ds.add_eb_data_per_years(
+        file="eev",
+        energy_sources=eb_energy_sources,
+        aggregate=eb_aggregates,
+        years=years,
+        provinces=provinces,
+        conversion="TJ_2_TWh"
+    )
+
+    # ds.add_eb_data_per_sector(
+    #     file="sec",
     #     energy_sources=eb_energy_sources,
     #     aggregate=aggregate,
+    #     # years=[2016, 2017],
     #     years=years,
     #     provinces=provinces,
     #     conversion="TJ_2_TWh",
+    #     sectors=eb_sectors
     # )
-
-    ds.add_eb_data_per_sector(
-        file="sec",
-        energy_sources=eb_energy_sources,
-        aggregate=aggregate,
-        # years=[2016, 2017],
-        years=years,
-        provinces=provinces,
-        conversion="TJ_2_TWh",
-        sectors=eb_sectors
-    )
 
 # for sector in sectors:
 #     # ////////////////////////////////////////////////////////////////// EB IND
@@ -197,9 +209,9 @@ except BaseException:
 
 for data in g_data:
 
-    if data.order == "per_sector":
+    # if data.order == "per_sector":
 
-        wb.write(data=data, sheet=data.aggregate)
+    wb.write(data=data, sheet=data.aggregate)
     # else:
     #     wb.write(data=data, sheet=data.aggregate)
 

@@ -7,7 +7,7 @@ from typing import Union, List
 import re
 from pathlib import Path
 import pandas as pd
-from data_structures.classes.data import Data
+from models.data import Data
 
 
 def excel_tuple(address):

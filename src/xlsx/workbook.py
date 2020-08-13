@@ -11,7 +11,7 @@ import os
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl import load_workbook
 from openpyxl.styles import Border, Side, Font, Alignment, PatternFill, Fill, Color
-from data_structures.classes.data import Data
+from models.data import Data
 import datetime
 
 

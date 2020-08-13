@@ -19,6 +19,8 @@ import pickle
 import dash_table.FormatTemplate as FormatTemplate
 from gui.assets.AEA_colors import provinces_color_table, provinces_color_table_rgba
 
+from files.energiebilanzen.processing.get_energy_source_aggregates import energy_source_aggregates
+
 from dash_table.Format import Format
 IDX = pd.IndexSlice
 
@@ -61,129 +63,12 @@ def create_on_select_aggregate(graph_id: str):
         ctx = callback_context
         triggered = ctx.triggered
 
-        if triggered:
+    if triggered:
 
-            if "eb" in active_tab:
+        if "eb" in active_tab:
+            return energy_source_aggregates[aggregate_eb]
 
-                if aggregate_eb == "Hauptaggregate":
-
-                    return [
-                        "Gesamtenergiebilanz",
-                        "ERNEUERBARE",
-                        "Elektrische Energie",
-                        "Brennbare Abfälle",
-                        "KOHLE",
-                        "ÖL",
-                        "GAS",
-                        "Fernwärme",
-                    ]
-
-                if aggregate_eb == "Elektrische Energie":
-
-                    return [
-                        "Elektrische Energie"
-                    ]
-
-                if aggregate_eb == "Erneuerbare":
-
-                    return[
-                        "ERNEUERBARE",
-                        "Wasserkraft",
-                        "Wind",
-                        "Photovoltaik",
-                        "Wind und Photovoltaik",
-                        "Geothermie",
-                        "Solarwärme",
-                    ]
-
-                if aggregate_eb == "Fossil-fest":
-
-                    return [
-                        "Steinkohle",
-                        "Braunkohle",
-                        "Braunkohlen-Briketts",
-                        "Brenntorf",
-                        "Koks",
-                    ]
-
-                if aggregate_eb == "Fossil-flüssig":
-
-                    return [
-                        "Erdöl",
-                        "Sonstiger Raffinerieeinsatz",
-                        "Benzin",
-                        "Petroleum",
-                        "Diesel",
-                        "Gasöl für Heizzwecke",
-                        "Heizöl",
-                        "Flüssiggas",
-                        "Sonstige Prod. d. Erdölverarb.",
-
-                    ]
-                if aggregate_eb == "Fossil-gasförmig":
-
-                    return [
-                        "Mischgas",
-                        "Erdgas",
-                        "Gichtgas",
-                        "Kokereigas",
-                        "Kokereigas",
-
-                    ]
-                if aggregate_eb == "Biogen-fest":
-
-                    return [
-                        "Scheitholz",
-                        "Pellets+Holzbriketts",
-                        "Holzabfall",
-                        "Holzkohle",
-                        "Ablaugen",
-                        "Hausmüll Bioanteil",
-                        "Sonst. Biogene fest"
-                    ]
-
-                if aggregate_eb == "Biogen-flüssig":
-
-                    return [
-                        "Bioethanol",
-                        "Biodiesel",
-                        "Sonst. Biogene flüssig",
-                    ]
-
-                if aggregate_eb == "Biogen-gasförmig":
-
-                    return [
-                        "Deponiegas",
-                        "Klärgas",
-                        "Biogas"
-                    ]
-
-                if aggregate_eb == "Umgebungswärme":
-
-                    return [
-                        "Geothermie",
-                        "Umgebungswärme",
-                        "Solarwärme",
-                        "Reaktionswärme",
-                    ]
-
-                if aggregate_eb == "Wasserkraft":
-
-                    return [
-                        "WK<=1MW",
-                        "WK<=10MW",
-                        "WK>10MW",
-                    ]
-
-                if aggregate_eb == "Abfall":
-
-                    return [
-                        "Brennbare Abfälle",
-                        "Industrieabfall",
-                        "Hausmüll Bioanteil",
-                        "Hausmüll nicht erneuerbar",
-                    ]
-            else:
-                raise PreventUpdate
         else:
             raise PreventUpdate
+    else:
+        raise PreventUpdate

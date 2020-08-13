@@ -11,13 +11,13 @@ from pathlib import Path
 
 from settings import file_paths, provinces_hex, provinces, conversion_multiplicators
 
-from data_structures.utils import (add_sums,
-                                   add_means,
-                                   get_shares,
-                                   apply_single_index,
-                                   convert)
+from models.utils import (add_sums,
+                          add_means,
+                          get_shares,
+                          apply_single_index,
+                          convert)
 
-from data_structures.classes.data import Data, FilterData
+from models.data import Data, FilterData
 
 
 IDX = pd.IndexSlice
@@ -38,7 +38,7 @@ class DataSet:
     def __repr__(self):
         return self.name
 
-    def add_eb_data_per_years(
+    def add_eb_data(
         self,
         file: Union[str, Path],
         aggregate: List,
@@ -52,87 +52,105 @@ class DataSet:
 
         # Fetch data
         data = pickle.load(open(self.file_paths[file], "rb"))
+        unit = "TJ"
+
+        # Change str to list with string element
+        if not isinstance(aggregate, list):
+            aggregate = [aggregate]
 
         # Aggregate name without "Gesamt"
         aggregate_cleaned = "_".join(
-            [x for x in [aggregate] if x != "Gesamt"])
+            [x for x in aggregate if x != "Gesamt"])
 
-        for energy_source in energy_sources:
+        logging.getLogger().info(f"Energy source: {energy_source}")
 
-            logging.getLogger().info(f"Energy source: {energy_source}")
+        # Create a searchable name
+        name = "_".join(
+            [
+                aggregate_cleaned,
+                energy_source,
+                str(years[0]),
+                str(years[-1]),
+            ]
+        )
 
-            # Create a searchable name
-            name = "_".join(
-                [
-                    aggregate_cleaned,
-                    energy_source,
-                    str(years[0]),
-                    str(years[-1]),
-                ]
-            )
+        # Multi row index
+        # if file == "eev":
 
-            # Multi row index
-            if file == "eev":
+        # Use the aggregate as the row index
+        row_midx_addon = 5 - len(aggregate)
 
-                # Change str to list with string element
-                if not isinstance(aggregate, list):
-                    aggregate = [aggregate]
+        # Extend the  with "Gesamt" if not specified
+        aggregate.extend(["Gesamt"] * row_midx_addon)
 
-                # Use the aggregate as the row index
-                row_midx_addon = 5 - len(aggregate)
+        # Slice data for all given provinces and years
+        df = data.loc[
+            IDX[tuple(aggregate)],
+            IDX[tuple(provinces), energy_source, years],
+        ]
 
-                # Extend the  with "Gesamt" if not specified
-                aggregate.extend(["Gesamt"] * row_midx_addon)
+        df = apply_single_index(df=df)
 
-                # Slice data for all given provinces and years
-                df = data.loc[
-                    IDX[tuple(aggregate)],
-                    IDX[tuple(provinces), energy_source, years],
-                ]
+        # else:
 
-                df = apply_single_index(df=df)
+        #     # Slice data for all given provinces and years
+        #     df = data.loc[
+        #         IDX[tuple(aggregate)],
+        #         IDX[tuple(provinces), energy_source, years],
+        #     ]
 
-            # else:
+        # Sum column and row
+        df = add_sums(df=df)
 
-            #     # Slice data for all given provinces and years
-            #     df = data.loc[
-            #         IDX[tuple(aggregate)],
-            #         IDX[tuple(provinces), energy_source, years],
-            #     ]
+        # If all sum of sum column == 0, than all values are # NaN
+        if df["Sum"].sum() != 0:
 
-            # Sum column and row
-            df = add_sums(df=df)
-
-            # Transform data values to new unit scale
-            df = convert(df=df)
+            if conversion is not None:
+                df, unit = convert(df=df, conversion=conversion)
 
             # Share of each year over total years per province
-            df_shares_per_year = get_shares(df=df, years=True)
+            # df_shares_per_year = get_shares(df=df, years=True)
 
             # Share of each province over total provinces per year
-            df_shares_per_province = get_shares(df=df, provinces=True)
+            df_shares_per_province = get_shares(
+                df=df, provinces=True)
 
-            logging.getLogger().info(
-                f"Added {name} to {self.name}.data_manager")
+        else:
+            # Write NaN df to shares
+            df_shares_per_province = df
 
-            # Create Data object
-            self.data.append(
-                Data(
-                    # title=name,
-                    name=name,
-                    file="eb",
-                    source="Energiebilanzen Bundesländer",
-                    unit=unit if conversion is not None else "TJ",
-                    frame=df,
-                    aggregate=aggregate[0],
-                    energy_source=energy_source,
-                    shares_over_rows=df_shares_per_year,
-                    shares_over_columns=df_shares_per_province,
-                    provinces=provinces,
-                    years=years,
-                    order="per_years"
-                )
+        df_shares_per_year = df
+
+        # # Transform data values to new unit scale
+        # df, unit = convert(df=df, conversion=conversion)
+
+        # # Share of each year over total years per province
+        # df_shares_per_year = get_shares(df=df, years=True)
+
+        # # Share of each province over total provinces per year
+        # df_shares_per_province = get_shares(df=df, provinces=True)
+
+        logging.getLogger().info(
+            f"Added {name} to {self.name}.data_manager")
+
+        # Create Data object
+        self.data.append(
+            Data(
+                # title=name,
+                name=name,
+                file="eb",
+                source="Energiebilanzen Bundesländer",
+                unit=unit,
+                frame=df,
+                aggregate=aggregate[0],
+                energy_source=energy_source,
+                shares_over_rows=df_shares_per_year,
+                shares_over_columns=df_shares_per_province,
+                provinces=provinces,
+                years=years,
+                order="per_years"
             )
+        )
 
         return
 
@@ -163,13 +181,14 @@ class DataSet:
                 # Output df which holds sector series
                 df = pd.DataFrame(index=sectors, columns=provinces)
 
-                # Extend with energy source
-                name = "_".join([aggregate,
-                                 energy_source,
-                                 str(year),
-                                 ])
                 # Iter over sectors (= actually list of aggregates)
                 for sector in sectors:
+
+                    # Extend with energy source
+                    name = "_".join([sector,
+                                     energy_source,
+                                     str(year),
+                                     ])
 
                     # Slice data for all given provinces and years
                     s = data.loc[

@@ -40,14 +40,6 @@ def multiplicator(unit: str, normalized: bool = False):
     return multiplicator
 
 
-# def get_eb_indices(eb_indices_path: Path):
-#     # eb_indices_path = Path.cwd() / Path(
-#     #     "zzzzzzzzfiles/energiebilanzen/pickles/indices.p"
-#     # )
-
-#     return pickle.load(open(eb_indices_path, "rb"))
-
-
 def create_eev_energy_source_options(energy_sources: List):
 
     # energy_sources = list(reversed(energy_sources[69:])) + energy_sources[:69]
@@ -76,7 +68,8 @@ def create_row_indices(_type: str, eb_indices: pd.DataFrame):
 
     for enum, col in enumerate(indices.columns):
         _indices = list(indices[col].unique())
-        _indices = [{"label": x, "value": x} for enum, x in enumerate(_indices)]
+        _indices = [{"label": x, "value": x}
+                    for enum, x in enumerate(_indices)]
         midx.append(_indices)
 
     return midx

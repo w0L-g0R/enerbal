@@ -6,9 +6,14 @@ import pickle
 import pandas as pd
 from pathlib import Path
 
+
+# Row indices for eev, sec and sec_energy saved in file "indices.p"
 eb_indices = pickle.load(open(file_paths["eb_indices"], "rb"))
+# Get the multiindex for eev data from "indices.p"
 eev_indices = create_row_indices(_type="EEV", eb_indices=eb_indices)
+# Get the single index for sector eev consumption data from "indices.p"
 sectors_indices = create_row_indices(_type="Sektoren", eb_indices=eb_indices)
+# Get the single index for sector energy data from "indices.p"
 sector_energy_indices = create_row_indices(
     _type="Sektor Energie", eb_indices=eb_indices
 )
