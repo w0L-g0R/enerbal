@@ -1,5 +1,3 @@
-from files.energiebilanzen.processing.convert_eb_to_dataframe import convert_eb_to_df
-from files.energiebilanzen.processing.get_eb_sheets import eb_sheets
 from settings import file_paths
 from pathlib import Path
 from typing import Union, List, Dict
@@ -7,6 +5,10 @@ import pandas as pd
 import pickle
 import numpy as np
 import time
+
+
+from files.energiebilanzen.convert.balances_to_dataframe import eb_to_df
+from files.energiebilanzen.convert.get_eb_data_structures import eb_sheets
 
 from files.nea.processing.convert_nea_to_dataframe import convert_nea_to_df
 

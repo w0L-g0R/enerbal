@@ -1,3 +1,4 @@
+from typing import NewType
 import os
 import logging
 import pickle
@@ -18,9 +19,48 @@ from models.utils import (add_sums,
                           convert)
 
 from models.data import Data, FilterData
-
+from files.energiebilanzen.convert.get_eb_data_structures import (
+    eev_aggregates,
+    sectors_aggregates,
+    sector_energy,
+)
 
 IDX = pd.IndexSlice
+
+EnergySourceAggregate = NewType("EnergySourceAggregate", int)
+Sku = NewType("Sku", str)
+Reference = NewType("Reference", str)
+
+
+def get_eb_data_by_aggregate(aggregate: str):
+    '''
+    Takes an aggregate and gives back the data from the according pickle file.
+    Used to differentiate "eev", "sectors_consumption" and "sector_energy_consumption" data (dfs with different indices).
+    '''
+
+    if aggregate in eev_aggregates:
+
+        data = pickle.load(open(self.file_paths["eev"], "rb"))
+
+    elif aggregate in sectors_aggregates:
+
+        data = pickle.load(open(self.file_paths["sec"], "rb"))
+
+    elif aggregate in sector_energy:
+
+        data = pickle.load(open(self.file_paths["sec_nrg"], "rb"))
+
+    return data
+
+    # Create a searchable name
+    # name = "_".join(
+    #     [
+    #         aggregate,
+    #         energy_source,
+    #         str(years[0]),
+    #         str(years[-1]),
+    #     ]
+    # )
 
 
 class DataSet:
@@ -40,10 +80,9 @@ class DataSet:
 
     def add_eb_data(
         self,
-        file: Union[str, Path],
-        aggregate: List,
         provinces: List,
         years: List,
+        balance_aggregates: List,
         energy_sources: List = None,
         conversion: str = None,
     ):
@@ -51,33 +90,23 @@ class DataSet:
         logging.getLogger().info(f"Adding {file} data per years:\n{years}\n")
 
         # Fetch data
-        data = pickle.load(open(self.file_paths[file], "rb"))
+        data = get_eb_data
         unit = "TJ"
+        # data_type = None
 
-        # Change str to list with string element
-        if not isinstance(aggregate, list):
-            aggregate = [aggregate]
-
-        # Aggregate name without "Gesamt"
-        aggregate_cleaned = "_".join(
-            [x for x in aggregate if x != "Gesamt"])
+        data = get_eb_data_by_aggregate
 
         logging.getLogger().info(f"Energy source: {energy_source}")
 
-        # Create a searchable name
-        name = "_".join(
-            [
-                aggregate_cleaned,
-                energy_source,
-                str(years[0]),
-                str(years[-1]),
-            ]
-        )
+        # Change str to list with string element
+        if not isinstance(aggregate, (list, tuple)):
+            aggregate = [aggregate]
 
-        # Multi row index
-        # if file == "eev":
+        # Aggregate name without "Gesamt"
+        aggregate = "_".join(
+            [x for x in aggregate if x != "Gesamt"])
 
-        # Use the aggregate as the row index
+        # Extend eev data index -> multi index
         row_midx_addon = 5 - len(aggregate)
 
         # Extend the  with "Gesamt" if not specified
@@ -89,6 +118,7 @@ class DataSet:
             IDX[tuple(provinces), energy_source, years],
         ]
 
+        # _______________________________________ EEV ONLY
         df = apply_single_index(df=df)
 
         # else:

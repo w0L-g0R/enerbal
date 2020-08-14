@@ -3,20 +3,26 @@ from pathlib import Path
 CWD = Path.cwd()
 
 file_paths = {
-    "eb_indices": CWD / Path(
+
+    "eb_indices_pickled": CWD / Path(
         "files/energiebilanzen/pickles/indices.p"
     ),
-    "eb_row_indices": CWD / Path(
-        "files/energiebilanzen/index/row_indices_eb.xlsx"
+
+    "eb_midx_xlsx": CWD / Path(
+        "files/energiebilanzen/indices/midx_.xlsx"
     ),
-    "eb_data_dir": CWD / Path(
-        "files/energiebilanzen/data"
+
+    "eb_xlsx_dir": CWD / Path(
+        "files/energiebilanzen/xlsx"
     ),
-    "eev": CWD / Path(
-        "files/energiebilanzen/pickles/eev_df.p"
-    ),
-    "sec": CWD / Path(
-        "files/energiebilanzen/pickles/sector_consumptions_df.p"
+    # "eev": CWD / Path(
+    #     "files/energiebilanzen/pickles/eev_df.p"
+    # ),
+    # "sec": CWD / Path(
+    #     "files/energiebilanzen/pickles/sectors_df.p"
+    # ),
+    # "sec_nrg": CWD / Path(
+    #     "files/energiebilanzen/pickles/sectors_energy_df.p"
     ),
     "nea": CWD / Path(
         "files/nea/pickles/nea_df.p"

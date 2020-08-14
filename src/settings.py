@@ -1,4 +1,4 @@
-# from files.energiebilanzen.processing.get_eb_sheets import eb_sheets
+# from files.energiebilanzen.convert.get_eb_data_structures import eb_sheets
 from utils import create_row_indices
 from paths import file_paths
 from gui.assets.styles import range_slider_style, label_style

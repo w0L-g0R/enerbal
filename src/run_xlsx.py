@@ -9,7 +9,7 @@ from logger.setup import setup_logging
 from xlsx.utils import get_workbook, write_to_sheet
 
 from xlsx.workbook import xlsx
-from files.energiebilanzen.processing.get_energy_sources_aggregates import energy_sources_aggregates
+from files.energiebilanzen.convert.get_energy_sources_aggregates import energy_sources_aggregates
 # ////////////////////////////////////////////////////////////////////// INPUTS
 
 setup_logging(

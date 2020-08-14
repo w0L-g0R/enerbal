@@ -12,37 +12,46 @@ class Data:
     # Shown as chart name
     title: str = "Ein toller plot"
     name: str = None
+
     # Pickle file name
     file: str = None
+
     # Origin of the data
     source: str = None
     created: datetime = datetime.now().strftime("%d_%m_%y_%Hh%Mm")
-    unit: str = None
+
     # Values
     frame: pd.DataFrame = None
     shares_over_rows: pd.DataFrame = None
     shares_over_columns: pd.DataFrame = None
     indexed: Dict = None
-    # Data sub categories
-    aggregate: str = None
-    energy_source: str = None
-    provinces: List = None
-    years: List = None
+    unit: str = None
+
+    # Data classification
+    balance_aggregates: str = None  # Balance aggregate e.g. "Importe"
+    energy_sources: str = None  # e.g. "Steinkohle"
+    energy_source_aggregates: str = None  # e.g. "Fossil-Fest"
     usage_categories: List = None
     emittents: List = None
-    sectors: List = None
+    years: List = None
+    provinces: List = None
+
     # Chart specific
     has_overlay: bool = False
     overlays: List = field(default_factory=lambda: [])
+
     # KPI
     is_KPI: bool = False
     denominator: pd.DataFrame = None
     numerator: pd.DataFrame = None
+
     # Search pattern
     order: str = None
+
     # @ order:
     # per_years: str
-    # per_sectors: str
+    # per_energy_sources: str
+    # per_energy_aggregates: str
     # per_usage_categories: str
     # per_emittents: str
 
@@ -98,7 +107,8 @@ class FilterData:
             elif operator == "lt":  # less than
                 return (entry for entry in data if getattr(entry, key) < value)
             elif operator == "startswith":  # starts with
-                return (entry for entry in data if getattr(entry, key).startswith(value))
+                return (entry for entry in data if getattr(
+                    entry, key).startswith(value))
             elif operator == "in":  # is in
                 return (entry for entry in data if getattr(entry, key) in value)
             elif operator == "contains":  # contains
@@ -116,11 +126,14 @@ class FilterData:
             elif operator == "lt":  # less than
                 return (entry for entry in data if getattr(entry, key) >= value)
             elif operator == "startswith":  # starts with
-                return (entry for entry in data if not getattr(entry, key).startswith(value))
+                return (entry for entry in data if not getattr(
+                    entry, key).startswith(value))
             elif operator == "in":  # starts with
-                return (entry for entry in data if getattr(entry, key) not in value)
+                return (entry for entry in data if getattr(
+                    entry, key) not in value)
             elif operator == "is_kpi":  # starts with
-                return (entry for entry in data if getattr(entry, key) not in value)
+                return (entry for entry in data if getattr(
+                    entry, key) not in value)
             else:
                 raise UnknownOperator("operator %s is unknown" % operator)
 
