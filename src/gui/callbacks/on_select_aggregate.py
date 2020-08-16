@@ -19,38 +19,32 @@ import pickle
 import dash_table.FormatTemplate as FormatTemplate
 from gui.assets.AEA_colors import provinces_color_table, provinces_color_table_rgba
 
-from files.energiebilanzen.convert.get_energy_source_aggregates import energy_source_aggregates
+from converter.energiebilanzen.convert.get_energy_source_aggregates import (
+    energy_source_aggregates,
+)
 
 from dash_table.Format import Format
+
 IDX = pd.IndexSlice
 
 
 def callback_return_on_select_aggregate(
-    updates_scale: str = no_update,
-    absolute_values: List = no_update,
+    updates_scale: str = no_update, absolute_values: List = no_update,
 ):
-    return [
-        updates_scale,
-        absolute_values
-    ]
+    return [updates_scale, absolute_values]
+
+
 # _________________________________________________________________________
 # ///////////////////////////////////////////////////////////////// DISPATCH EL
 
 
 def create_on_select_aggregate(graph_id: str):
-    @ app.callback(
+    @app.callback(
         Output(f"{graph_id}-energy-sources", "value"),
-        [
-            Input(f"{graph_id}-aggregate-eb", "value"),
-        ],
-        [
-            State(f"tabs-{graph_id}", "active_tab"),
-        ]
+        [Input(f"{graph_id}-aggregate-eb", "value"),],
+        [State(f"tabs-{graph_id}", "active_tab"),],
     )
-    def on_select_aggregate(
-        aggregate_eb,
-        active_tab
-    ):
+    def on_select_aggregate(aggregate_eb, active_tab):
 
         # Log callback information
         show_callback_context(

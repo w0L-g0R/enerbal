@@ -1,7 +1,7 @@
 import logging
 import logging.config
 from typing import Optional
-
+from pathlib import Path
 from .filters import (
     DebugFilter,
     InfoFilter,
@@ -14,6 +14,7 @@ from .utils import (
     change_logger_state,
 )
 
+import datetime
 
 # /////////////////////////////////////////////////////////////////// CONSTANTS
 
@@ -26,6 +27,8 @@ LOG_OUTPUT_STANDARD = "TIME: %(asctime)s | LOGGER: %(name)s [%(levelname)-s] {} 
 LOG_OUTPUT_STANDARD_NO_TIME = "| LOGGER: %(name)s [%(levelname)-s] {} @ %(filename)s -> def %(funcName)s:\n\n>>> %(message)s\n".format(
     "_" * 24
 )
+
+LOG_FILE = "%(message)s"
 
 LOG_DATE_FORMAT = "% y/%m/%d %H:%M:%S"
 
@@ -40,6 +43,7 @@ def setup_logging(
     console_log_filter: bool = False,
     console_log_actived: bool = True,
     console_out_level: str = logging.DEBUG,
+    log_file: str = None,
     # dash_log_actived: bool = True,
     # built_logs_activated: bool = True,
     # GAMS_logs_activated: bool = True,
@@ -51,16 +55,21 @@ def setup_logging(
     Creates a logging configuration and sets up different loggers and handlers
     """
 
+    # conversion_file_name = "_".join(["conversion", now])
+    # conversion_file_name = "_".join(["conversion"])
+
+    logfile = str(Path.cwd() / "converter/logs" / log_file) + ".log"
+
     # ------------------------------------------------------------------- DICT
 
     _LOGCONFIG = {
         "version": 1,
         "disable_existing_loggers": False,
         "filters": {
-            "debug_only": {"()": DebugFilter, },
-            "info_only": {"()": InfoFilter, },
-            "warning_only": {"()": WarningFilter, },
-            "critical_only": {"()": CriticalFilter, },
+            "debug_only": {"()": DebugFilter,},
+            "info_only": {"()": InfoFilter,},
+            "warning_only": {"()": WarningFilter,},
+            "critical_only": {"()": CriticalFilter,},
         },
         "formatters": {
             "standard": {"format": LOG_OUTPUT_STANDARD, "datefmt": LOG_DATE_FORMAT},
@@ -68,6 +77,7 @@ def setup_logging(
                 "format": LOG_OUTPUT_STANDARD_NO_TIME,
                 "datefmt": LOG_DATE_FORMAT,
             },
+            "logfile": {"format": LOG_FILE, "datefmt": LOG_DATE_FORMAT,},
         },
         "handlers": {
             "null_out": {"class": "logging.NullHandler"},
@@ -79,6 +89,19 @@ def setup_logging(
                 "level": console_out_level,
                 "formatter": "notime",
             },
+            "conversion_file": {
+                "class": "logging.FileHandler",
+                "filename": logfile,
+                "mode": "w",
+                # "level": console_out_level,
+                "formatter": "logfile",
+            },
+            # "error_file_handler": {
+            #     "level": "WARNING",
+            #     "formatter": "error",
+            #     "class": "logging.FileHandler",
+            #     "filename": "error.log",
+            # },
             # "gui_debug_out": {
             #     "class": "dispaset.misc.colorstreamhandler.ColorStreamHandler",
             #     "stream": "ext://sys.stderr",
@@ -99,7 +122,7 @@ def setup_logging(
             #     "level": "WARNING",
             # },
         },
-        "root": {"level": "DEBUG", "handlers": [], },
+        "root": {"level": "DEBUG", "handlers": [],},
         # "interface": {
         #     "level": "INFO",
         #     "handlers": ["info_html_out", "warning_html_out"],
@@ -125,6 +148,10 @@ def setup_logging(
 
     else:
         _LOGCONFIG["root"]["handlers"].append("null_out")
+
+    # ------------------------------------------------------------ log_file
+    if log_file is not None:
+        _LOGCONFIG["root"]["handlers"].append("conversion_file")
 
     # ---------------------------------------------------------- DASH LOGS
 

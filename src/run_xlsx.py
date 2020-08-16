@@ -9,13 +9,14 @@ from logger.setup import setup_logging
 from xlsx.utils import get_workbook, write_to_sheet
 
 from xlsx.workbook import xlsx
-from files.energiebilanzen.convert.get_energy_sources_aggregates import energy_sources_aggregates
+from converter.energiebilanzen.convert.get_energy_sources_aggregates import (
+    energy_sources_aggregates,
+)
+
 # ////////////////////////////////////////////////////////////////////// INPUTS
 
 setup_logging(
-    console_log_actived=True,
-    console_log_filter=None,
-    console_out_level=logging.DEBUG,
+    console_log_actived=True, console_log_filter=None, console_out_level=logging.DEBUG,
 )
 
 eb_aggregates = [
@@ -59,15 +60,15 @@ eb_aggregates = [
 #     "Biogas"
 # ]
 
-eb_energy_sources = \
-    energy_sources_aggregates["Fossil-fest"] \
-    + energy_sources_aggregates["Fossil-flüssig"] \
-    + energy_sources_aggregates["Fossil-gasförmig"] \
-    + ["Elektrische Energie", "Fernwärme", "Umgebungswärme"]\
-    + energy_sources_aggregates["Biogen-fest"] \
-    + energy_sources_aggregates["Biogen-flüssig"] \
-    + energy_sources_aggregates["Biogen-gasförmig"] \
-
+eb_energy_sources = (
+    energy_sources_aggregates["Fossil-fest"]
+    + energy_sources_aggregates["Fossil-flüssig"]
+    + energy_sources_aggregates["Fossil-gasförmig"]
+    + ["Elektrische Energie", "Fernwärme", "Umgebungswärme"]
+    + energy_sources_aggregates["Biogen-fest"]
+    + energy_sources_aggregates["Biogen-flüssig"]
+    + energy_sources_aggregates["Biogen-gasförmig"]
+)
 nea_energy_sources = [
     "Steinkohle",
     "Insgesamt",
@@ -113,7 +114,7 @@ for aggregate in eb_aggregates:
         aggregate=eb_aggregates,
         years=years,
         provinces=provinces,
-        conversion="TJ_2_TWh"
+        conversion="TJ_2_TWh",
     )
 
     # ds.add_eb_data_per_sector(
@@ -173,7 +174,8 @@ for aggregate in eb_aggregates:
 # /////////////////////////////////////////////////////////////// FILTER DATASET
 
 g_data = [
-    v for v in ds.objects.filter(
+    v
+    for v in ds.objects.filter(
         # order="per_sector",
         # aggregate__in=["Bruttoinlandsverbrauch", "Importe"],
         # is_KPI=False
@@ -183,7 +185,8 @@ g_data = [
 # /////////////////////////////////////////////////////////////// FILTER DATASET
 
 ov_data = [
-    v.unit for v in ds.objects.filter(
+    v.unit
+    for v in ds.objects.filter(
         # order="per_years",
         aggregate__in=["Energetischer Endverbrauch"],
         # is_KPI=False
@@ -191,7 +194,7 @@ ov_data = [
     )
 ]
 
-print('ov_data: ', ov_data)
+print("ov_data: ", ov_data)
 # g_data_names = [x.name for x in g_data]
 # g_size = [sys.getsizeof(x) for x in g_data]
 
@@ -217,7 +220,7 @@ for data in g_data:
 
 
 for sheet in wb.book.sheetnames:
-    print('sheet: ', sheet)
+    print("sheet: ", sheet)
 
     dimension = wb.book[sheet].calculate_dimension()
     wb.book[sheet].move_range(dimension, rows=0, cols=10)

@@ -3,18 +3,11 @@ from pathlib import Path
 CWD = Path.cwd()
 
 file_paths = {
-
-    "eb_indices_pickled": CWD / Path(
-        "files/energiebilanzen/pickles/indices.p"
-    ),
-
-    "eb_midx_xlsx": CWD / Path(
-        "files/energiebilanzen/indices/midx_.xlsx"
-    ),
-
-    "eb_xlsx_dir": CWD / Path(
-        "files/energiebilanzen/xlsx"
-    ),
+    "eb_indices_pickled": CWD / Path("converter/energiebilanzen/pickles/indices.p"),
+    "files_eb": CWD / Path("converter/energiebilanzen/files"),
+    "midx_eb": CWD / Path("converter/energiebilanzen/files/midx_rows_eb.xlsx"),
+    "midx_res": CWD / Path("converter/energiebilanzen/files/midx_rows_res.xlsx"),
+    "pickles": CWD / Path("converter/energiebilanzen/pickles"),
     # "eev": CWD / Path(
     #     "files/energiebilanzen/pickles/eev_df.p"
     # ),
@@ -23,22 +16,12 @@ file_paths = {
     # ),
     # "sec_nrg": CWD / Path(
     #     "files/energiebilanzen/pickles/sectors_energy_df.p"
-    ),
-    "nea": CWD / Path(
-        "files/nea/pickles/nea_df.p"
-    ),
-    "nea_data_dir": CWD / Path(
-        "files/nea/data"
-    ),
-    "pop": CWD / Path(
-        "files/stats/pickles/AT_BEVÖLKERUNG.pkl"
-    ),
-    "brp": CWD / Path(
-        "files/stats/pickles/AT_BRP_REAL.pkl"
-    ),
-    "km_pkw": CWD / Path(
-        "files/stats/pickles/AT_PRIVATE_PKW_KM.pkl"
-    ),
+    # ),
+    "nea": CWD / Path("converter/nea/pickles/nea_df.p"),
+    "nea_data_dir": CWD / Path("converter/nea/data"),
+    "pop": CWD / Path("converter/stats/pickles/AT_BEVÖLKERUNG.pkl"),
+    "brp": CWD / Path("converter/stats/pickles/AT_BRP_REAL.pkl"),
+    "km_pkw": CWD / Path("converter/stats/pickles/AT_PRIVATE_PKW_KM.pkl"),
 }
 
 # balances_directory_path = Path.cwd() / "/files/energiebilanzen/data"

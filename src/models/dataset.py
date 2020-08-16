@@ -12,14 +12,10 @@ from pathlib import Path
 
 from settings import file_paths, provinces_hex, provinces, conversion_multiplicators
 
-from models.utils import (add_sums,
-                          add_means,
-                          get_shares,
-                          apply_single_index,
-                          convert)
+from models.utils import add_sums, add_means, get_shares, apply_single_index, convert
 
 from models.data import Data, FilterData
-from files.energiebilanzen.convert.get_eb_data_structures import (
+from converter.energiebilanzen.convert.get_eb_data_structures import (
     eev_aggregates,
     sectors_aggregates,
     sector_energy,
@@ -33,10 +29,10 @@ Reference = NewType("Reference", str)
 
 
 def get_eb_data_by_aggregate(aggregate: str):
-    '''
+    """
     Takes an aggregate and gives back the data from the according pickle file.
     Used to differentiate "eev", "sectors_consumption" and "sector_energy_consumption" data (dfs with different indices).
-    '''
+    """
 
     if aggregate in eev_aggregates:
 
@@ -103,8 +99,7 @@ class DataSet:
             aggregate = [aggregate]
 
         # Aggregate name without "Gesamt"
-        aggregate = "_".join(
-            [x for x in aggregate if x != "Gesamt"])
+        aggregate = "_".join([x for x in aggregate if x != "Gesamt"])
 
         # Extend eev data index -> multi index
         row_midx_addon = 5 - len(aggregate)
@@ -114,8 +109,7 @@ class DataSet:
 
         # Slice data for all given provinces and years
         df = data.loc[
-            IDX[tuple(aggregate)],
-            IDX[tuple(provinces), energy_source, years],
+            IDX[tuple(aggregate)], IDX[tuple(provinces), energy_source, years],
         ]
 
         # _______________________________________ EEV ONLY
@@ -142,8 +136,7 @@ class DataSet:
             # df_shares_per_year = get_shares(df=df, years=True)
 
             # Share of each province over total provinces per year
-            df_shares_per_province = get_shares(
-                df=df, provinces=True)
+            df_shares_per_province = get_shares(df=df, provinces=True)
 
         else:
             # Write NaN df to shares
@@ -160,8 +153,7 @@ class DataSet:
         # # Share of each province over total provinces per year
         # df_shares_per_province = get_shares(df=df, provinces=True)
 
-        logging.getLogger().info(
-            f"Added {name} to {self.name}.data_manager")
+        logging.getLogger().info(f"Added {name} to {self.name}.data_manager")
 
         # Create Data object
         self.data.append(
@@ -178,7 +170,7 @@ class DataSet:
                 shares_over_columns=df_shares_per_province,
                 provinces=provinces,
                 years=years,
-                order="per_years"
+                order="per_years",
             )
         )
 
@@ -195,8 +187,7 @@ class DataSet:
         sectors: Optional[List] = None,
     ):
         logging.getLogger().error("/" * 80)
-        logging.getLogger().info(
-            f"Adding {file} data per sector:\n{sectors}\n")
+        logging.getLogger().info(f"Adding {file} data per sector:\n{sectors}\n")
 
         # Fetch data
         data = pickle.load(open(self.file_paths[file], "rb"))
@@ -215,20 +206,15 @@ class DataSet:
                 for sector in sectors:
 
                     # Extend with energy source
-                    name = "_".join([sector,
-                                     energy_source,
-                                     str(year),
-                                     ])
+                    name = "_".join([sector, energy_source, str(year),])
 
                     # Slice data for all given provinces and years
                     s = data.loc[
-                        IDX[sector], IDX[tuple(
-                            provinces), energy_source, year],
+                        IDX[sector], IDX[tuple(provinces), energy_source, year],
                     ]
 
                     # Copy series to output df
-                    df.loc[sector, provinces] = s.droplevel(
-                        (1, 2), axis=0).T
+                    df.loc[sector, provinces] = s.droplevel((1, 2), axis=0).T
 
                 # Add sum row and column
                 df = add_sums(df=df)
@@ -240,14 +226,12 @@ class DataSet:
                         df, unit = convert(df=df, conversion=conversion)
 
                     # Share of each province over total provinces per year
-                    df_shares_per_province = get_shares(
-                        df=df, provinces=True)
+                    df_shares_per_province = get_shares(df=df, provinces=True)
                 else:
                     # Write NaN df to shares
                     df_shares_per_province = df
 
-                logging.getLogger().info(
-                    f"Added {name} to {self.name}.data_manager")
+                logging.getLogger().info(f"Added {name} to {self.name}.data_manager")
 
                 # Create a Data object
                 self.data.append(
@@ -263,16 +247,12 @@ class DataSet:
                         provinces=provinces,
                         years=years,
                         sectors=sectors,
-                        order="per_sector"
+                        order="per_sector",
                     )
                 )
 
     def add_stats_data_per_years(
-        self,
-        file: Union[str, Path],
-        provinces: List,
-        years: List,
-        name: str,
+        self, file: Union[str, Path], provinces: List, years: List, name: str,
     ):
         logging.getLogger().error("/" * 80)
 
@@ -284,7 +264,8 @@ class DataSet:
             unit = "Person"
             aggregate = name
             name = "_".join(
-                [aggregate, str(data["df"].index[0]), str(data["df"].index[-1])])
+                [aggregate, str(data["df"].index[0]), str(data["df"].index[-1])]
+            )
 
         if file == "km_pkw":
 
@@ -292,13 +273,13 @@ class DataSet:
             unit = "km"
             aggregate = name
             name = "_".join(
-                [aggregate, str(data["df"].index[0]), str(data["df"].index[-1])])
+                [aggregate, str(data["df"].index[0]), str(data["df"].index[-1])]
+            )
 
         # Slice pickled dataframe
         df = pd.DataFrame(index=years, columns=provinces)
 
-        logging.getLogger().info(
-            f"Adding {file} data per years:\n{df.index}\n")
+        logging.getLogger().info(f"Adding {file} data per years:\n{df.index}\n")
 
         # _df = data["df"].loc[years, provinces]
 
@@ -320,8 +301,7 @@ class DataSet:
         df_shares_per_province = get_shares(df=df, provinces=True)
         # print("pop_shares_provinces: ", df_shares_per_province)
 
-        logging.getLogger().info(
-            f"Added {name} to {self.name}.data_manager")
+        logging.getLogger().info(f"Added {name} to {self.name}.data_manager")
 
         # Create a Data object
         self.data.append(
@@ -336,13 +316,17 @@ class DataSet:
                 file=file,
                 provinces=provinces,
                 years=years,
-                order="per_years"
+                order="per_years",
             )
         )
         return
 
     def add_overlay(
-        self, chart_type: str, to_data: List = None, overlays: List = None, scalings: List = ["absolute"]
+        self,
+        chart_type: str,
+        to_data: List = None,
+        overlays: List = None,
+        scalings: List = ["absolute"],
     ):
 
         assert overlays != [], "No data for overlay"
@@ -359,12 +343,11 @@ class DataSet:
 
             for data in to_data:
 
-                data.overlays.append(
-                    {"data": overlay, "scale": scale}
-                )
+                data.overlays.append({"data": overlay, "scale": scale})
 
                 logging.getLogger().info(
-                    f"Added {overlay.name} to {data.name} as overlay.")
+                    f"Added {overlay.name} to {data.name} as overlay."
+                )
 
                 data.has_overlay = True
 
@@ -399,7 +382,8 @@ class DataSet:
         df_denominator = denominator[0].frame
 
         assert len(df_numerator) == len(
-            df_numerator), "Dataframe index length mismatch!"
+            df_numerator
+        ), "Dataframe index length mismatch!"
 
         df = df_numerator / df_denominator
 
@@ -419,7 +403,8 @@ class DataSet:
         # print("df_shares_provinces: ", df_shares_per_province)
 
         logging.getLogger().info(
-            f"Added KPI with {name} with unit {unit} to {self.name}.data_manager as KPI")
+            f"Added KPI with {name} with unit {unit} to {self.name}.data_manager as KPI"
+        )
 
         self.data.append(
             Data(
@@ -434,7 +419,7 @@ class DataSet:
                 denominator=denominator[0],
                 numerator=numerator[0],
                 is_KPI=True,
-                order="per_years"
+                order="per_years",
             )
         )
         return

@@ -1,0 +1,1193 @@
+_______________________________________________________________________________
+
+								 FILE CONVERSION 
+_______________________________________________________________________________
+
+Started converting:
+ 2020, 16.Aug - 05h:14min
+
+Following files found:
+ ['EB_AT_70_88', 'EB_Bgd_88_18', 'EB_Ktn_88_18', 'EB_Noe_88_18', 'EB_Ooe_88_18', 'EB_Sbg_88_18', 'EB_Stk_88_18', 'EB_Tir_88_18', 'EB_Vbg_88_18', 'EB_Wie_88_18', 'midx_rows_eb', 'midx_rows_res', '~$EB_AT_70_88', '~$EB_Bgd_88_18', '~$midx_rows_eb']
+
+///////////////////////////////////////////////////////////////////////////////
+
+						 Province: AT - File: EB_AT_70_88
+
+///////////////////////////////////////////////////////////////////////////////
+_______________________________________________________________________________
+Execution time of fetch_from_xlsx: 2 min 27.0 sec
+_______________________________________________________________________________
+_______________________________________________________________________________
+1-Kokskohle
+_______________________________________________________________________________
+
+	No sectors consumption values
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Kokskohle', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [33, 63, 94, 118, 143, 167], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Steinkohle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+2-Anthrazit
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Anthrazit', 'aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[33, 63, 94, 118, 143, 167], [40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Steinkohle', 'aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+3-Steinkohlen-Briketts
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Steinkohlen-Briketts', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [33, 63, 94, 118, 143, 167], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Steinkohle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+4-Sonstige Steinkohle
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Sonstige Steinkohle', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [33, 63, 94, 118, 143, 167], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Steinkohle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+5-Steinkohle
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+6-Subbituminöse Kohle
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Subbituminöse Kohle', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [34, 64, 95, 119, 144, 168], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Braunkohle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+7-Sonstige Braunkohle
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Sonstige Braunkohle', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [34, 64, 95, 119, 144, 168], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Braunkohle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+8-Braunkohle
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+9-Braunkohlen-Briketts
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+10-Brenntorf
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+11-Koks
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+12-Rohöl
+_______________________________________________________________________________
+
+	No sectors consumption values
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+13-NGL
+_______________________________________________________________________________
+
+	No sectors consumption values
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+14-Erdöl
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+15-Steinkohleteer
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+16-Benzol
+_______________________________________________________________________________
+
+	No sectors consumption values
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+17-Feedstocks
+_______________________________________________________________________________
+
+	No sectors consumption values
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+18-Sonstiger Raffinerieeinsatz
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+19-Motorbenzin
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+20-Industriebenzin
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+21-Flugbenzin
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+22-Benzin
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+23-Flugturbinenkraftstoff
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+24-Sonstiges Petroleum
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+25-Petroleum
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+26-Diesel
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+27-Gasöl für Heizzwecke
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+28-Heizöl<1%S
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+29-Heizöl>1%S
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+30-Heizöl
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+31-Flüssiggas
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+32-Naphta
+_______________________________________________________________________________
+
+	No sectors consumption values
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+33-Bitumen
+_______________________________________________________________________________
+
+	No sectors consumption values
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+34-Schmiermittel
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+35-Petrolkoks
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+36-Sonstige
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+37-Sonstige Prod. d. Erdölverarb.
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+38-Raffinerie-Restgas
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+39-Mischgas
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+40-Erdgas
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+41-Tiegelgas
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Tiegelgas', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [39, 69, 100, 124, 149, 173], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Gichtgas', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+42-Hochofengas
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Hochofengas', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [39, 69, 100, 124, 149, 173], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Gichtgas', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+43-Gichtgas
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+44-Kokereigas
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+45-Industrieabfall
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+46-Hausmüll nicht erneuerbar
+_______________________________________________________________________________
+
+	No sectors consumption values
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+47-Brennbare Abfälle
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+48-Scheitholz
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+49-Hausmüll Bioanteil
+_______________________________________________________________________________
+
+	No sectors consumption values
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+50-Pellets+Holzbriketts
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+51-Holzabfall
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+52-Holzkohle
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+53-Ablaugen
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+54-Deponiegas
+_______________________________________________________________________________
+
+	No sectors consumption values
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+55-Klärgas
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+56-Biogas
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+57-Bioethanol
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+58-Biodiesel
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+59-Sonst. Biogene flüssig
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+60-Sonst. Biogene fest
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+61-Biogene Brenn- u. Treibstoffe
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+62-Geothermie
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+63-Umgebungswärme
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+64-Solarwärme
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Solarwärme', 'aus Wind,PV, Solarwärme']
+	[[40, 70, 101, 125, 150, 174], [91], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Reaktionswärme', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+65-Reaktionswärme
+_______________________________________________________________________________
+
+	No sectors consumption values
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+66-Umgebungswärme etc.
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+67-WK<=1MW
+_______________________________________________________________________________
+
+	No sectors consumption values
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+68-WK<=10MW
+_______________________________________________________________________________
+
+	No sectors consumption values
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+69-WK>10MW
+_______________________________________________________________________________
+
+	No sectors consumption values
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+70-Wasserkraft
+_______________________________________________________________________________
+
+	No sectors consumption values
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+71-Wind
+_______________________________________________________________________________
+
+	No sectors consumption values
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+72-Photovoltaik
+_______________________________________________________________________________
+
+	No sectors consumption values
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+73-Wind und Photovoltaik
+_______________________________________________________________________________
+
+	No sectors consumption values
+	No sector energy consumption values
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+74-Fernwärme
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+75-Elektrische Energie
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 405
+	Sector energy consumption starts @ xlsx row nr.: 465
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf', 'aus Wind,PV, Reaktionswärme']
+	[[40, 70, 101, 125, 150, 174], [88]]
+	Data index in template:
+	['aus Brennbare Abfälle', 'aus Wind,PV, Geothermie']
+	***************************************************************************
+_______________________________________________________________________________
+76-KOHLE
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 198
+	Sector energy consumption starts @ xlsx row nr.: 228
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf']
+	[[40, 70, 101, 125, 150, 174]]
+	Data index in template:
+	['aus Brennbare Abfälle']
+	***************************************************************************
+_______________________________________________________________________________
+77-ÖL
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 198
+	Sector energy consumption starts @ xlsx row nr.: 228
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf']
+	[[40, 70, 101, 125, 150, 174]]
+	Data index in template:
+	['aus Brennbare Abfälle']
+	***************************************************************************
+_______________________________________________________________________________
+78-GAS
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 198
+	Sector energy consumption starts @ xlsx row nr.: 228
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['Transportverluste+Meßdifferenzen', 'aus Brabf']
+	[[192], [40, 70, 101, 125, 150, 174]]
+	Data index in template:
+	['Transportverluste', 'aus Brennbare Abfälle']
+	***************************************************************************
+_______________________________________________________________________________
+79-ERNEUERBARE
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 198
+	Sector energy consumption starts @ xlsx row nr.: 228
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf']
+	[[40, 70, 101, 125, 150, 174]]
+	Data index in template:
+	['aus Brennbare Abfälle']
+	***************************************************************************
+_______________________________________________________________________________
+80-ABFÄLLE
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 198
+	Sector energy consumption starts @ xlsx row nr.: 228
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['aus Brabf']
+	[[40, 70, 101, 125, 150, 174]]
+	Data index in template:
+	['aus Brennbare Abfälle']
+	***************************************************************************
+_______________________________________________________________________________
+81-Gesamtenergiebilanz
+_______________________________________________________________________________
+
+	Sectors consumptions starts @ xlsx row nr.: 198
+	Sector energy consumption starts @ xlsx row nr.: 228
+	* Missing last index Gesamt
+
+	********************************* WARNING *********************************
+	Different index in data:
+	['Transportverluste+Meßdifferenzen', 'aus Brabf']
+	[[192], [40, 70, 101, 125, 150, 174]]
+	Data index in template:
+	['Transportverluste', 'aus Brennbare Abfälle']
+	***************************************************************************
