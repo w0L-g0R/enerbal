@@ -97,7 +97,6 @@ def convert_energy_balances_to_dataframe(
             province = filename.split("_")[1]
 
             # NOTE: Not tested yet 16082020 1952
-            files.remove(file)
 
         else:
             continue
@@ -145,6 +144,9 @@ def convert_energy_balances_to_dataframe(
                     res_row_midx=res_row_midx,
                     res_col_midx=res_col_midx,
                 )
+
+        # files.remove(file)
+
     else:
         logging.getLogger().debug("\n=> No files left to convert!")
 

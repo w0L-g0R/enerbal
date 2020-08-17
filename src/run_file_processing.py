@@ -21,7 +21,7 @@ IDX = pd.IndexSlice
 from conversion.energiebilanzen.to_dataframe import convert_energy_balances_to_dataframe
 from conversion.energiebilanzen.data_structures import eb_sheet_names
 
-# convert_energy_balances_to_dataframe(last_year=2018,)
+convert_energy_balances_to_dataframe(last_year=2018,)
 # ////////////////////////////////////////////////////////////////////// NEA
 
 from conversion.nea.to_dataframe import convert_nea_to_dataframe
@@ -33,6 +33,6 @@ from conversion.nea.to_dataframe import convert_nea_to_dataframe
 
 # ////////////////////////////////////////////////////////////////////// NEA
 
-from conversion.thg.to_dataframe import convert_thg_to_dataframe
+# from conversion.thg.to_dataframe import convert_thg_to_dataframe
 
-convert_thg_to_dataframe()
+# convert_thg_to_dataframe()

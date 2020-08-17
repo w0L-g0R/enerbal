@@ -31,10 +31,10 @@ def create_indices(provinces: List, last_year: int):
     res_row_midx = None
 
     path_midx_eb = file_paths["files_eb"] / "midx_rows_eb.xlsx"
-    path_midx_res = file_paths["files_res"] / "midx_rows_res.xlsx"
+    path_midx_res = file_paths["files_eb"] / "midx_rows_res.xlsx"
 
     for path, sheet_name in zip(
-        [path_midx_eb, paths_midx_res], ["MIDX_EB", "MIDX_RES"],
+        [path_midx_eb, path_midx_res], ["MIDX_EB", "MIDX_RES"],
     ):
 
         midx = pd.MultiIndex.from_tuples(
@@ -343,8 +343,7 @@ def copy_eb_data(
 
     # Iter over sheets (==energy sources)
     for enum, energy_source in enumerate(eb_sheet_names):
-        print("energy_source: ", energy_source)
-        print("enum: ", enum)
+
         # for energy_source in ["ÖL"]:
         logging.getLogger().debug(
             "{}\n{}-{}\n{}\n".format("_" * 79, enum + 1, energy_source, "_" * 79)
@@ -413,7 +412,6 @@ def preprocess_res_sheet(
 
     # Check for differences amongst indices
     deviations = sheet_index.difference(template_index)
-    print("deviations: ", deviations)
 
     if deviations is not None:
 
@@ -445,7 +443,6 @@ def preprocess_res_sheet(
             "\Deviating indices in res data:\n\t{}".format(deviation_idx)
         )
 
-    print("deviations: ", deviations)
     # Set first column with indices as df index
     res_sheet.set_index(sheet_index, drop=True, inplace=True)
 

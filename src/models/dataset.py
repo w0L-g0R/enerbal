@@ -105,7 +105,7 @@ class DataSet:
             balance_aggregates, (list, tuple)
         ), "Wrap list or tuple around aggregate!"
 
-        aggregates = [extend_row_index(a) for a in balance_aggregates]
+        aggregates = [tuple(extend_row_index(a)) for a in balance_aggregates]
 
         data = pickle.load(open(file_paths["db_pickles"] / "eb.p", "rb"))
 
@@ -119,6 +119,7 @@ class DataSet:
         if per == "sources_for_each_agg_and_year":
 
             for aggregate in aggregates:
+                print("aggregate: ", aggregate)
 
                 for year in years:
 
@@ -127,7 +128,9 @@ class DataSet:
                         IDX[aggregate], IDX[provinces, energy_sources, year],
                     ]
 
-                    df.index.name = "_".join(("SRC_per_", aggregate, year))
+                    aggregate = "_".join([x for x in aggregate if x != "Gesamt"])
+
+                    df.index.name = "_".join(("SRC_per_", aggregate, str(year)))
 
                     dfs.append(df)
 
@@ -162,6 +165,7 @@ class DataSet:
                     dfs.append(df)
 
         for df in dfs:
+            print("df: ", df)
 
             # Data tranformation
             df = apply_single_index(df=df)
