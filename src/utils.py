@@ -2,7 +2,7 @@ import logging
 import pickle
 import pandas as pd
 
-# from converter.energiebilanzen.convert.eb_sheets import eb_sheets
+# from conversion.energiebilanzen.convert.eb_sheets import eb_sheets
 from pathlib import Path
 from pprint import pformat
 from typing import List, Type, TypeVar
@@ -92,11 +92,16 @@ def timeit(method):
         minutes, seconds = divmod((te - ts), 60)
         # else:
         logging.getLogger().debug(
-            "{}\nExecution time of {}: {} min {} sec\n{}".format(
-                "_" * 79, method.__name__, int(minutes), round(seconds, 0), "_" * 79,
+            "{}\t\nExecution time of {}: {} min {} sec\n{}".format(
+                "|" * 79, method.__name__, int(minutes), round(seconds, 0), "|" * 79,
             )
         )
-        # print(": " % (method.__name__, ))
+
+        print(
+            "{}\t\nExecution time of {}: {} min {} sec\n{}".format(
+                "|" * 79, method.__name__, int(minutes), round(seconds, 0), "|" * 79,
+            )
+        )
         return result
 
     return timed

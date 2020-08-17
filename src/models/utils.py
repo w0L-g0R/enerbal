@@ -1,4 +1,3 @@
-
 import pandas as pd
 import numpy as np
 from copy import deepcopy
@@ -31,82 +30,90 @@ def add_means(df: pd.DataFrame):
     return df.T
 
 
-def get_shares(
-    df: pd.DataFrame, years: bool = False, provinces: bool = False,
-):
+def get_shares(df: pd.DataFrame,):
 
-    # NOTE:
+    df_shares = {}
+    df_cols = deepcopy(df)
+    df_rows = deepcopy(df)
+
+    for col in df.columns:
+
+        df_cols[col] = df[col].value_counts(normalize=True)
+
+    df_shares["cols"] = df_cols
+
+    for col in df.T.columns:
+        df_cols[col] = df[col].value_counts(normalize=True)
+
+    df_shares["rows"] = df
+
     # Percentage values years
     df_shares = deepcopy(df.iloc[:-1, :])
 
-    if provinces:
-        df_shares = df_shares.T
+    return df_shares
 
-        provinces_sums_per_year = df_shares.iloc[:-
-                                                 2, :].sum(axis=0).replace(0, np.nan)
+    # if provinces:
+    #     df_shares = df_shares.T
 
-        # print("provinces_sums_per_year: ", provinces_sums_per_year)
-        AT_sums_per_year = df_shares.iloc[-2, :].replace(0, np.nan)
+    #     provinces_sums_per_year = df_shares.iloc[:-2, :].sum(axis=0).replace(0, np.nan)
 
-        # Province share over sum of provinces, per year
-        df_shares.iloc[:-
-                       2, :].replace(0, np.nan).divide(provinces_sums_per_year)
+    #     # print("provinces_sums_per_year: ", provinces_sums_per_year)
+    #     AT_sums_per_year = df_shares.iloc[-2, :].replace(0, np.nan)
 
-        # try:
-        # Percentage sum over provinces per year (== 1)
-        df_shares.iloc[-1, :].replace(0,
-                                      np.nan).divide(provinces_sums_per_year)
-        # except BaseException:
-        #     pass
+    #     # Province share over sum of provinces, per year
+    #     df_shares.iloc[:-2, :].replace(0, np.nan).divide(provinces_sums_per_year)
 
-        # Sum of selected province as a share of "AT", per year
-        df_shares.loc["AT", :] = provinces_sums_per_year.divide(
-            AT_sums_per_year)
+    #     # try:
+    #     # Percentage sum over provinces per year (== 1)
+    #     df_shares.iloc[-1, :].replace(0, np.nan).divide(provinces_sums_per_year)
+    #     # except BaseException:
+    #     #     pass
 
-        # print("df_shares: ", df_shares)
-        # Check if row values sum up to 1
-        if "Sum" in df_shares.columns:
-            for col in df_shares.columns:
-                assert round(df_shares[col].iloc[:-2].sum(axis=0), 3) == round(
-                    df_shares[col].loc["Sum"], 3
-                ), f"PROVINCES SHARES '{col}': Percentage value sum {df_shares[col].iloc[:-2].sum(axis=0)} does not match sum {df_shares[col].loc['Sum']}!"
+    #     # Sum of selected province as a share of "AT", per year
+    #     df_shares.loc["AT", :] = provinces_sums_per_year.divide(AT_sums_per_year)
 
-        if "Mean" in df_shares.columns:
-            for col in df_shares.columns:
-                assert round(df_shares[col].iloc[:-2].mean(axis=0), 3) == round(
-                    df_shares[col].loc["Mean"], 3
-                ), f"PROVINCES SHARES '{col}': Percentage value sum {df_shares[col].iloc[:-2].mean(axis=0)} does not match sum {df_shares[col].loc['Mean']}!"
+    #     # print("df_shares: ", df_shares)
+    #     # Check if row values sum up to 1
+    #     if "Sum" in df_shares.columns:
+    #         for col in df_shares.columns:
+    #             assert round(df_shares[col].iloc[:-2].sum(axis=0), 3) == round(
+    #                 df_shares[col].loc["Sum"], 3
+    #             ), f"PROVINCES SHARES '{col}': Percentage value sum {df_shares[col].iloc[:-2].sum(axis=0)} does not match sum {df_shares[col].loc['Sum']}!"
 
-        return df_shares.T
+    #     if "Mean" in df_shares.columns:
+    #         for col in df_shares.columns:
+    #             assert round(df_shares[col].iloc[:-2].mean(axis=0), 3) == round(
+    #                 df_shares[col].loc["Mean"], 3
+    #             ), f"PROVINCES SHARES '{col}': Percentage value sum {df_shares[col].iloc[:-2].mean(axis=0)} does not match sum {df_shares[col].loc['Mean']}!"
 
-    elif years:
+    #     return df_shares.T
 
-        df_shares = df_shares / df_shares.sum(axis=0)
+    # elif years:
 
-        # Check if all necessary sum values are given
-        if sum(df_shares.sum(axis=0)) == len(df_shares.columns):
+    #     df_shares = df_shares / df_shares.sum(axis=0)
 
-            df_shares.loc["Sum", :] = df_shares.sum(axis=0).values
+    #     # Check if all necessary sum values are given
+    #     if sum(df_shares.sum(axis=0)) == len(df_shares.columns):
 
-        if "Sum" in df_shares.columns:
+    #         df_shares.loc["Sum", :] = df_shares.sum(axis=0).values
 
-            # Check if row values sum up to 1
-            for col in df_shares.columns:
+    #     if "Sum" in df_shares.columns:
 
-                assert round(df_shares[col].iloc[:-1].sum(axis=0), 3) == round(
-                    df_shares[col].loc["Sum"], 3
-                ), f"YEARS SHARES: {col}: Percentage value sum {df_shares[col].sum(axis=0)-1} does not match sum {df_shares[col].loc['Sum']}!"
+    #         # Check if row values sum up to 1
+    #         for col in df_shares.columns:
 
-        if "Mean" in df_shares.index:
+    #             assert round(df_shares[col].iloc[:-1].sum(axis=0), 3) == round(
+    #                 df_shares[col].loc["Sum"], 3
+    #             ), f"YEARS SHARES: {col}: Percentage value sum {df_shares[col].sum(axis=0)-1} does not match sum {df_shares[col].loc['Sum']}!"
 
-            # Check if row values sum up to 1
-            for col in df_shares.columns:
+    #     if "Mean" in df_shares.index:
 
-                assert round(df_shares[col].iloc[:-1].mean(axis=0), 3) == round(
-                    df_shares[col].loc["Mean"], 3
-                ), f"YEARS SHARES: {col}: Percentage value sum {df_shares[col].mean(axis=0)-1} does not match sum {df_shares[col].loc['Mean']}!"
+    #         # Check if row values sum up to 1
+    #         for col in df_shares.columns:
 
-        return df_shares
+    #             assert round(df_shares[col].iloc[:-1].mean(axis=0), 3) == round(
+    #                 df_shares[col].loc["Mean"], 3
+    #             ), f"YEARS SHARES: {col}: Percentage value sum {df_shares[col].mean(axis=0)-1} does not match sum {df_shares[col].loc['Mean']}!"
 
 
 def apply_single_index(df: pd.DataFrame):
@@ -130,6 +137,21 @@ def convert(df: pd.DataFrame, conversion: str):
 
     # Assign new unit
     unit = conversion.split("_")[-1]
-    print('unit: ', unit)
+    print("unit: ", unit)
 
     return df, unit
+
+
+def extend_row_index(aggregate: str):
+
+    # # Aggregate name without "Gesamt"
+    # aggregate = "_".join([x for x in aggregate if x != "Gesamt"])
+    aggregate = [aggregate]
+
+    # Extend eev data index -> multi index
+    row_midx_addon = 5 - len(aggregate)
+
+    # Extend the  with "Gesamt" if not specified
+    aggregate.extend(["Gesamt"] * row_midx_addon)
+
+    return aggregate

@@ -1,4 +1,4 @@
-# from converter.energiebilanzen.convert.eb_sheets import eb_sheets
+# from conversion.energiebilanzen.convert.eb_sheets import eb_sheets
 # from settings import eb_indices
 
 import plotly.graph_objects as go

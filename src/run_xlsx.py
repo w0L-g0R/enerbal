@@ -9,9 +9,7 @@ from logger.setup import setup_logging
 from xlsx.utils import get_workbook, write_to_sheet
 
 from xlsx.workbook import xlsx
-from converter.energiebilanzen.convert.get_energy_sources_aggregates import (
-    energy_sources_aggregates,
-)
+from conversion.energiebilanzen.data_structures import energy_sources_aggregates
 
 # ////////////////////////////////////////////////////////////////////// INPUTS
 
@@ -33,42 +31,39 @@ eb_aggregates = [
 # ]
 # aggregates = ["Bruttoinlandsverbrauch"]
 
-# eb_energy_sources = [
-#     "Elektrische Energie"
-# ]
-#     "Wasserkraft",
-#     "Wind",
-#     "Photovoltaik",
-#     "KOHLE",
-#     "ÖL",
-#     "GAS",
+eb_energy_sources = [
+    "Elektrische Energie",
+    # ]
+    "Wasserkraft",
+    "Wind",
+    "Photovoltaik",
+    "KOHLE",
+    "ÖL",
+    # "GAS",
+    # "Sonst. Biogene fest",
+    # "Hausmüll Bioanteil",
+    # "Scheitholz",
+    # "Pellets+Holzbriketts",
+    # "Holzabfall",
+    # "Holzkohle",
+    # "Ablaugen",
+    # "Bioethanol",
+    # "Biodiesel",
+    # "Sonst. Biogene flüssig",
+    # "Deponiegas",
+    # "Klärgas",
+    # "Biogas"
+]
 
-#     "Sonst. Biogene fest",
-#     "Hausmüll Bioanteil",
-#     "Scheitholz",
-#     "Pellets+Holzbriketts",
-#     "Holzabfall",
-#     "Holzkohle",
-#     "Ablaugen",
-
-#     "Bioethanol",
-#     "Biodiesel",
-#     "Sonst. Biogene flüssig",
-
-#     "Deponiegas",
-#     "Klärgas",
-#     "Biogas"
-# ]
-
-eb_energy_sources = (
-    energy_sources_aggregates["Fossil-fest"]
-    + energy_sources_aggregates["Fossil-flüssig"]
-    + energy_sources_aggregates["Fossil-gasförmig"]
-    + ["Elektrische Energie", "Fernwärme", "Umgebungswärme"]
-    + energy_sources_aggregates["Biogen-fest"]
-    + energy_sources_aggregates["Biogen-flüssig"]
-    + energy_sources_aggregates["Biogen-gasförmig"]
-)
+# eb_energy_sources = (
+#     energy_sources_aggregates["Fossil-fest"]
+#     + energy_sources_aggregates["Fossil-flüssig"]
+#     + energy_sources_aggregates["Fossil-gasförmig"]
+#     + ["Elektrische Energie", "Fernwärme", "Umgebungswärme"]
+#     + energy_sources_aggregates["Biogen-fest"]
+#     + energy_sources_aggregates["Biogen-flüssig"]
+#     + energy_sources_aggregates["Biogen-gasförmig"]
+# )
 nea_energy_sources = [
     "Steinkohle",
     "Insgesamt",
@@ -103,30 +98,32 @@ ds = DataSet(name=f"Set_1", file_paths=file_paths)
 # )
 
 # /////////////////////////////////////////////////////////////////////////// EB
-for aggregate in eb_aggregates:
+# for aggregate in eb_aggregates:
 
-    logging.getLogger().error("/" * 80)
-    logging.getLogger().error(f"Aggregate: {aggregate}")
+logging.getLogger().error("/" * 80)
 
-    ds.add_eb_data_per_years(
-        file="eev",
-        energy_sources=eb_energy_sources,
-        aggregate=eb_aggregates,
-        years=years,
-        provinces=provinces,
-        conversion="TJ_2_TWh",
-    )
+ds.add_eb_data(
+    energy_sources=eb_energy_sources,
+    balance_aggregates=eb_aggregates,
+    years=years,
+    provinces=provinces,
+    conversion="TJ_2_TWh",
+    per="sources_for_each_agg_and_year"
+    # 1) sources_for_each_agg_and_year
+    # 2) aggs_for_each_source_and_year
+    # 3) agg_and_source_for_all_years
+)
 
-    # ds.add_eb_data_per_sector(
-    #     file="sec",
-    #     energy_sources=eb_energy_sources,
-    #     aggregate=aggregate,
-    #     # years=[2016, 2017],
-    #     years=years,
-    #     provinces=provinces,
-    #     conversion="TJ_2_TWh",
-    #     sectors=eb_sectors
-    # )
+# ds.add_eb_data_per_sector(
+#     file="sec",
+#     energy_sources=eb_energy_sources,
+#     aggregate=aggregate,
+#     # years=[2016, 2017],
+#     years=years,
+#     provinces=provinces,
+#     conversion="TJ_2_TWh",
+#     sectors=eb_sectors
+# )
 
 # for sector in sectors:
 #     # ////////////////////////////////////////////////////////////////// EB IND

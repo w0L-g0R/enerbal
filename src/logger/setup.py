@@ -54,12 +54,7 @@ def setup_logging(
     """
     Creates a logging configuration and sets up different loggers and handlers
     """
-
-    # conversion_file_name = "_".join(["conversion", now])
-    # conversion_file_name = "_".join(["conversion"])
-
-    logfile = str(Path.cwd() / "converter/logs" / log_file) + ".log"
-
+    log_file = "dummy.log"
     # ------------------------------------------------------------------- DICT
 
     _LOGCONFIG = {
@@ -91,7 +86,7 @@ def setup_logging(
             },
             "conversion_file": {
                 "class": "logging.FileHandler",
-                "filename": logfile,
+                "filename": log_file,
                 "mode": "w",
                 # "level": console_out_level,
                 "formatter": "logfile",
@@ -150,7 +145,7 @@ def setup_logging(
         _LOGCONFIG["root"]["handlers"].append("null_out")
 
     # ------------------------------------------------------------ log_file
-    if log_file is not None:
+    if log_file != "dummy.log":
         _LOGCONFIG["root"]["handlers"].append("conversion_file")
 
     # ---------------------------------------------------------- DASH LOGS

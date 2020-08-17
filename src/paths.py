@@ -3,25 +3,10 @@ from pathlib import Path
 CWD = Path.cwd()
 
 file_paths = {
-    "eb_indices_pickled": CWD / Path("converter/energiebilanzen/pickles/indices.p"),
-    "files_eb": CWD / Path("converter/energiebilanzen/files"),
-    "midx_eb": CWD / Path("converter/energiebilanzen/files/midx_rows_eb.xlsx"),
-    "midx_res": CWD / Path("converter/energiebilanzen/files/midx_rows_res.xlsx"),
-    "pickles": CWD / Path("converter/energiebilanzen/pickles"),
-    # "eev": CWD / Path(
-    #     "files/energiebilanzen/pickles/eev_df.p"
-    # ),
-    # "sec": CWD / Path(
-    #     "files/energiebilanzen/pickles/sectors_df.p"
-    # ),
-    # "sec_nrg": CWD / Path(
-    #     "files/energiebilanzen/pickles/sectors_energy_df.p"
-    # ),
-    "nea": CWD / Path("converter/nea/pickles/nea_df.p"),
-    "nea_data_dir": CWD / Path("converter/nea/data"),
-    "pop": CWD / Path("converter/stats/pickles/AT_BEVÖLKERUNG.pkl"),
-    "brp": CWD / Path("converter/stats/pickles/AT_BRP_REAL.pkl"),
-    "km_pkw": CWD / Path("converter/stats/pickles/AT_PRIVATE_PKW_KM.pkl"),
+    "files_eb": CWD / Path("conversion/energiebilanzen/files"),
+    "files_nea": CWD / Path("conversion/nea/files"),
+    "files_thg": CWD / Path("conversion/thg/files"),
+    "db_pickles": CWD / Path("database/pickles"),
 }
 
 # balances_directory_path = Path.cwd() / "/files/energiebilanzen/data"
