@@ -31,26 +31,63 @@ def add_means(df: pd.DataFrame):
 
 
 def get_shares(df: pd.DataFrame,):
+    print("-----")
+    print('df: ', df)
+    print("-----")
+
+    df_no_aggregates = df.iloc[:-1, :-2]
+    print('df_no_aggregates: ', df_no_aggregates)
 
     df_shares = {}
+
     df_cols = deepcopy(df)
+    print()
+    print('df_cols: ', df_cols)
+
     df_rows = deepcopy(df)
 
-    for col in df.columns:
+    print()
+    print('df_rows: ', df_rows)
 
-        df_cols[col] = df[col].value_counts(normalize=True)
+    # Percentage per col in one row
+    for col in df_no_aggregates.columns:
+        # print('col: ', col)
+
+        df_cols[col] = df[col] / df_no_aggregates.sum(axis="columns")
 
     df_shares["cols"] = df_cols
 
-    for col in df.T.columns:
-        df_cols[col] = df[col].value_counts(normalize=True)
+    # Percentage per row in one column
+    for index, row_values in df_no_aggregates.iterrows():
+        df_rows.loc[index, :] = row_values / df_no_aggregates.sum(axis="rows")
 
-    df_shares["rows"] = df
+    # df_rows.iloc["Sum", :] = df_rows.T.sum()
+
+    df_shares["rows"] = df_rows
 
     # Percentage values years
-    df_shares = deepcopy(df.iloc[:-1, :])
+    # df_shares = deepcopy(df.iloc[:-1, :])
 
     return df_shares
+
+
+def post_process(df: pd.DataFrame, conversion: str):
+
+    # Data tranformation
+    df = apply_single_index(df=df)
+
+    # Sum column and row
+    df = add_sums(df=df)
+
+    # Conversion
+    if conversion is not None:
+        df, unit = convert(df=df, conversion=conversion)
+    else:
+        unit = "TJ"
+
+    df_shares = get_shares(df=df)
+
+    return df, df_shares, unit
 
     # if provinces:
     #     df_shares = df_shares.T

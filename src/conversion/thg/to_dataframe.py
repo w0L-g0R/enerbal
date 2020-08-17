@@ -1,18 +1,21 @@
+from paths import file_paths
+from utils import timeit
+from conversion.thg.utils import fetch_from_xlsx
 from pathlib import Path
 import pandas as pd
 import pickle
 
 IDX = pd.IndexSlice
-from conversion.thg.utils import fetch_from_xlsx
-from utils import timeit
-from paths import file_paths
 
 
 @timeit
 def convert_thg_to_dataframe():
-
     """
     Make sure energy balance files follow the name convention: prefix "EB" + provinces_name + year_start(last two digits only) + year_end(last two digits only) , connected with underlines, eg. EB_Bgd_88_18
+
+    row index = [SRC, CLS]
+    col index = [BL, YEAR]
+
     """
     provinces = [
         "Bgd",
@@ -24,7 +27,7 @@ def convert_thg_to_dataframe():
         "Tir",
         "Vbg",
         "Wie",
-        # "AT",
+        "AT",
     ]
 
     file = Path.cwd() / "conversion/thg/files/THG_1990_2017.xlsx"
@@ -53,10 +56,11 @@ def convert_thg_to_dataframe():
 
     # Add two-level midx
     df.columns = pd.MultiIndex.from_product(
-        [provinces, thg_sources], names=["BL", "SRC"],
+        [provinces[:-1], thg_sources], names=["BL", "SRC"],
     )
 
-    for province in provinces:
+    # Add THG total values
+    for province in provinces[:-1]:
 
         for source in thg_sources:
 
@@ -64,11 +68,12 @@ def convert_thg_to_dataframe():
                 IDX[:], IDX[province, source]
             ]
 
+    # Add ETS Energy and ETS Industry data
     for df, source in zip(
-        [thg_sheets["AT_THG_ETS_ENERGY"], thg_sheets["AT_THG_ETS_INDUSTRY"],],
+        [thg_sheets["AT_THG_ETS_ENERGY"], thg_sheets["AT_THG_ETS_INDUSTRY"], ],
         ["Energie", "Industrie"],
     ):
-        for province in provinces:
+        for province in provinces[:-1]:
 
             thg_df.loc[IDX[df.index], IDX[province, source, "ETS"]] = df.loc[
                 :, province
@@ -77,6 +82,8 @@ def convert_thg_to_dataframe():
             thg_df.loc[IDX[:], IDX[province, source, "NON_ETS"]] = thg_df.loc[
                 IDX[:], IDX[province, source, "TOTAL"]
             ].subtract(thg_df.loc[IDX[:], IDX[province, source, "ETS"]])
+
+    thg_df.grouby("")
 
     # Rearrange column and row indices (new row idx == SECTOR)
     thg_df = thg_df.unstack(level="YEAR")

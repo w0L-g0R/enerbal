@@ -18,7 +18,7 @@ setup_logging(
 )
 
 eb_aggregates = [
-    "Bruttoinlandsverbrauch",
+    "Energetischer Endverbrauch",
 ]
 
 # eb_sectors = [
@@ -33,12 +33,12 @@ eb_aggregates = [
 
 eb_energy_sources = [
     "Elektrische Energie",
-    # ]
-    "Wasserkraft",
-    "Wind",
-    "Photovoltaik",
-    "KOHLE",
-    "ÖL",
+    # # ]
+    # "Wasserkraft",
+    # "Wind",
+    # "Photovoltaik",
+    # "KOHLE",
+    # "ÖL",
     # "GAS",
     # "Sonst. Biogene fest",
     # "Hausmüll Bioanteil",
@@ -114,6 +114,7 @@ ds.add_eb_data(
     # 3) agg_and_source_for_all_years
 )
 
+
 # ds.add_eb_data_per_sector(
 #     file="sec",
 #     energy_sources=eb_energy_sources,
@@ -185,13 +186,13 @@ ov_data = [
     v.unit
     for v in ds.objects.filter(
         # order="per_years",
-        aggregate__in=["Energetischer Endverbrauch"],
+        balance_aggregates__in=["Energetischer Endverbrauch"],
         # is_KPI=False
         # has_overlay=True
     )
 ]
 
-print("ov_data: ", ov_data)
+# print("ov_data: ", ov_data)
 # g_data_names = [x.name for x in g_data]
 # g_size = [sys.getsizeof(x) for x in g_data]
 
@@ -201,31 +202,32 @@ print("ov_data: ", ov_data)
 # print(g_data)
 # //////////////////////////////////////////////////////////////// WRITE TO XLSX
 
-wb = xlsx(name="WB1", path="test.xlsx", sheets=eb_aggregates)
-try:
-    wb.close()
-except BaseException:
-    pass
+# wb = xlsx(name="WB1", path="test.xlsx", sheets="Data")
+# try:
+#     wb.close()
+# except BaseException:
+#     pass
 
 for data in g_data:
+    print('data: ', data.frame)
 
     # if data.order == "per_sector":
 
-    wb.write(data=data, sheet=data.aggregate)
+    # wb.write(data=data, sheet="Data")
     # else:
     #     wb.write(data=data, sheet=data.aggregate)
 
 
-for sheet in wb.book.sheetnames:
-    print("sheet: ", sheet)
+# for sheet in wb.book.sheetnames:
+#     print("sheet: ", sheet)
 
-    dimension = wb.book[sheet].calculate_dimension()
-    wb.book[sheet].move_range(dimension, rows=0, cols=10)
+#     dimension = wb.book[sheet].calculate_dimension()
+#     wb.book[sheet].move_range(dimension, rows=0, cols=10)
 
-    wb.style(ws=wb.book[sheet])
+#     wb.style(ws=wb.book[sheet])
 
-wb.book.save(wb.path)
-wb.launch()
+# wb.book.save(wb.path)
+# wb.launch()
 
 # print('wb: ', wb.worksheets)
 
