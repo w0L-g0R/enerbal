@@ -111,8 +111,7 @@ fossil_fest = [
     "Braunkohlen-Briketts",
     "Brenntorf",
     "Koks",
-    "Industrieabfall",
-    "Hausmüll nicht erneuerbar",
+    "Brennbare Abfälle",
 ]
 
 fossil_flüssig = [
@@ -125,14 +124,15 @@ fossil_flüssig = [
     "Heizöl",
     "Flüssiggas",
     "Sonstige Prod. d. Erdölverarb.",
+
 ]
 
 fossil_gasförmig = [
+    "Gichtgas",
+    "Kokereigas",
     "Raffinerie-Restgas",
     "Mischgas",
     "Erdgas",
-    "Gichtgas",
-    "Kokereigas",
 ]
 
 biogen_fest = [
@@ -141,9 +141,9 @@ biogen_fest = [
     "Holzabfall",
     "Holzkohle",
     "Ablaugen",
-    "Hausmüll Bioanteil",
     "Sonst. Biogene fest",
-    "Brennbare Abfälle",
+    "Hausmüll Bioanteil",
+
 ]
 
 biogen_flüssig = [
