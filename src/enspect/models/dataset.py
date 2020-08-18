@@ -14,7 +14,7 @@ from enspect.settings import (
     file_paths,
     provinces_hex,
     provinces,
-    conversion_multiplicators,
+    unit,
 )
 
 from enspect.models.utils import (
@@ -23,7 +23,7 @@ from enspect.models.utils import (
     get_shares,
     apply_single_index,
     convert,
-    extend_eb_row_index,
+    drop_eb_row_levels,
     post_process,
 )
 
@@ -35,41 +35,6 @@ from enspect.conversion.energiebilanzen.data_structures import (
 )
 
 IDX = pd.IndexSlice
-
-# EnergySourceAggregate = NewType("EnergySourceAggregate", int)
-# Sku = NewType("Sku", str)
-# Reference = NewType("Reference", str)
-
-
-# def get_eb_data_by_aggregate(aggregate: str):
-#     """
-#     Takes an aggregate and gives back the data from the according pickle file.
-#     Used to differentiate "eev", "sectors_consumption" and "sector_energy_consumption" data (dfs with different indices).
-#     """
-
-#     if aggregate in eev_aggregates:
-
-#         data = pickle.load(open(self.file_paths["eev"], "rb"))
-
-#     elif aggregate in sectors_aggregates:
-
-#         data = pickle.load(open(self.file_paths["sec"], "rb"))
-
-#     elif aggregate in sector_energy:
-
-#         data = pickle.load(open(self.file_paths["sec_nrg"], "rb"))
-
-#     return data
-
-#     # Create a searchable name
-#     # name = "_".join(
-#     #     [
-#     #         aggregate,
-#     #         energy_source,
-#     #         str(years[0]),
-#     #         str(years[-1]),
-#     #     ]
-#     # )
 
 
 class DataSet:
@@ -91,11 +56,13 @@ class DataSet:
         self,
         provinces: List,
         years: List,
-        per: str,
-        balance_aggregates: List,
-        energy_sources: List,
+        columns: Union[List, str],
+        rows: Union[List, str],
         conversion: str = None,
-        energy_source_aggregates: List = None,
+        balance_aggregates: List = None,
+        energy_sources: List = None,
+        energy_sources_aggregates: List = None,
+        sort_column_by: str = None,
     ):
         """
         
@@ -112,18 +79,89 @@ class DataSet:
             balance_aggregates, (list, tuple)
         ), "Wrap list or tuple around aggregate!"
 
-        aggregates = [tuple(extend_eb_row_index(a)) for a in balance_aggregates]
-        print("aggregates: ", aggregates)
+        df = pickle.load(open(file_paths["db_pickles"] / "eb.p", "rb"))
 
-        data = pickle.load(open(file_paths["db_pickles"] / "eb.p", "rb"))
+        df = drop_eb_row_levels(balance_aggregates=balance_aggregates, df=df)
+        print("df: ", df.head())
 
+        if rows == "balance_aggregates" and columns == "energy_sources":
+
+            group = df.groupby(level=["ET"], axis=1).filter(
+                lambda x: x.columns.get_level_values(1).unique() in energy_sources
+            )
+
+            group = group.groupby(level=["IDX_0"], axis=0).filter(
+                lambda x: x.index.unique() in balance_aggregates
+            )
+
+            for year in years:
+
+                data = group.groupby(level=["YEAR"], axis=1).get_group(year)
+
+                if sort_column_by == "province":
+                    data = data.swaplevel(0, 1, axis=1).sort_index(axis=1, level=0)
+
+                data.loc["Column_Total"] = data.sum(numeric_only=True, axis=0)
+
+                if len(energy_sources) == 1:
+                    data.loc[:, "Row_Total"] = data.sum(
+                        numeric_only=True, axis=1
+                    ).subtract(data[data.columns[0]])
+
+                data *= unit[conversion]
+                data = round(data, 2)
+
+                print("data: ", data)
+
+        if rows == "balance_aggregates" and columns == "energy_sources":
+
+            group = df.groupby(level=["ET"], axis=1).filter(
+                lambda x: x.columns.get_level_values(1).unique() in energy_sources
+            )
+
+            group = group.groupby(level=["IDX_0"], axis=0).filter(
+                lambda x: x.index.unique() in balance_aggregates
+            )
+
+            for year in years:
+
+                data = group.groupby(level=["YEAR"], axis=1).get_group(year)
+
+                shares_over_rows = (
+                    data.groupby(level="BL", axis=1)
+                    .apply(lambda x: 100 * x / float(x.sum()))
+                    .round(2)
+                )
+
+                shares_over_cols = (
+                    data.groupby(level=0, axis=0)
+                    .apply(lambda x: 100 * x / float(x.iloc[:, 1:].sum(axis=1)))
+                    .round(2)
+                )
+
+                if sort_column_by == "province":
+                    data = data.swaplevel(0, 1, axis=1).sort_index(axis=1, level=0)
+
+                data.loc["Column_Total"] = data.sum(numeric_only=True, axis=0)
+
+                if len(energy_sources) == 1:
+                    data.loc[:, "Row_Total"] = data.sum(
+                        numeric_only=True, axis=1
+                    ).subtract(data[data.columns[0]])
+
+                data *= unit[conversion]
+                data = round(data, 2)
+                print("data: ", data)
+
+                print("shares_over_rows: ", shares_over_rows)
+                print("shares_over_cols: ", shares_over_cols)
         # Slice data for all given provinces and years
-        eb_df = data.loc[
-            IDX[aggregates], IDX[provinces, energy_sources, years],
-        ]
+        # eb_df = data.loc[
+        #     IDX[aggregates], IDX[provinces, energy_sources, years],
+        # ]
 
-        print("per: ", per)
-        # if per == "sources_for_each_agg_and_year":
+        # print("per: ", per)
+        # if per == "sources_per_agg_and_year":
 
         #     for aggregate in aggregates:
         #         print("aggregate: ", aggregate)
@@ -143,9 +181,8 @@ class DataSet:
         #             aggregate_name = aggregate_name.replace(".", "")
 
         #             df.index.name = "_".join(["SRC", aggregate_name, str(year)])
-        #             print("df.index.name: ", df.index.name)
 
-        #             df, df_shares, unit = post_process(df=df, conversion=conversion)
+        #             # df, df_shares, unit = post_process(df=df, conversion=conversion)
 
         #             # Create Data object
         #             self.data.append(
@@ -166,43 +203,43 @@ class DataSet:
         #                 )
         #             )
 
-        # if per == "aggs_for_each_source_and_year ":
+        # if per == "aggs_per_source_and_year":
 
-        print("PRINTS")
+        #     print("PRINTS")
 
-        for source in energy_sources:
+        #     for source in energy_sources:
 
-            for year in years:
+        #         for year in years:
 
-                # Slice data for all given provinces and years
-                df = eb_df.loc[
-                    IDX[aggregates], IDX[provinces, source, year],
-                ]
+        #             # Slice data for all given provinces and years
+        #             df = eb_df.loc[
+        #                 IDX[aggregates], IDX[provinces, source, year],
+        #             ]
 
-                print("df: ", df)
+        #             print("df: ", df)
 
-                df.index.name = "_".join(("AGG", source, str(year)))
+        #             df.index.name = "_".join(("AGG", source, str(year)))
 
-                df, df_shares, unit = post_process(df=df, conversion=conversion)
+        #             df, df_shares, unit = post_process(df=df, conversion=conversion)
 
-                # Create Data object
-                self.data.append(
-                    Data(
-                        # title=name,
-                        name="_".join(("AGG", year)),
-                        file="eb",
-                        source="Energiebilanzen Bundesländer",
-                        unit=unit,
-                        frame=df,
-                        balance_aggregates=aggregates,
-                        energy_sources=energy_sources,
-                        shares_over_rows=df_shares["rows"],
-                        shares_over_columns=df_shares["cols"],
-                        provinces=provinces,
-                        years=years,
-                        order="per",
-                    )
-                )
+        #             # Create Data object
+        #             self.data.append(
+        #                 Data(
+        #                     # title=name,
+        #                     name="_".join(("AGG", year)),
+        #                     file="eb",
+        #                     source="Energiebilanzen Bundesländer",
+        #                     unit=unit,
+        #                     frame=df,
+        #                     balance_aggregates=aggregates,
+        #                     energy_sources=energy_sources,
+        #                     shares_over_rows=df_shares["rows"],
+        #                     shares_over_columns=df_shares["cols"],
+        #                     provinces=provinces,
+        #                     years=years,
+        #                     order="per",
+        #                 )
+        #             )
 
         # elif per == "agg_and_source_for_all_years ":
 

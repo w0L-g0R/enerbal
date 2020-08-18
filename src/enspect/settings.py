@@ -63,7 +63,7 @@ scale_options = {
     2: {"label": "Index", "style": range_slider_style},
 }
 
-conversion_multiplicators = {
+unit = {
     "MWh_2_GWh": 0.001,
     "GWh_2_TJ": (1 / 0.27778),
     "TJ_2_PJ": 0.001,

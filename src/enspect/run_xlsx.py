@@ -9,7 +9,11 @@ from enspect.logger.setup import setup_logging
 from enspect.xlsx.utils import get_workbook, write_to_sheet
 
 from enspect.xlsx.workbook import xlsx
-from enspect.conversion.energiebilanzen.data_structures import energy_sources_aggregates
+from enspect.conversion.energiebilanzen.data_structures import (
+    energy_sources_aggregates,
+    eev_aggregates,
+    eev_generation,
+)
 
 # ////////////////////////////////////////////////////////////////////// INPUTS
 
@@ -21,24 +25,25 @@ eb_aggregates = [
     "Energetischer Endverbrauch",
 ]
 
-# eb_sectors = [
-#     "Energetischer Endverbrauch",
-#     # "Produzierender Bereich",
-#     # "Verkehr",
-#     # "Öffentliche und Private Dienstleistungen",
-#     # "Private Haushalte",
-#     # "Landwirtschaft",
-# ]
+eb_sectors = [
+    # "Energetischer Endverbrauch",
+    "Produzierender Bereich",
+    "Verkehr",
+    "Öffentliche und Private Dienstleistungen",
+    "Private Haushalte",
+    "Landwirtschaft",
+]
 # aggregates = ["Bruttoinlandsverbrauch"]
 
 eb_energy_sources = [
-    "Elektrische Energie",
+    "Gesamtenergiebilanz",
+    # "Elektrische Energie",
     # ]
-    "Wasserkraft",
-    "Wind",
-    "Photovoltaik",
-    "KOHLE",
-    "ÖL",
+    # "Wasserkraft",
+    # "Wind",
+    # "Photovoltaik",
+    # "KOHLE",
+    # "ÖL",
     # "GAS",
     # "Sonst. Biogene fest",
     # "Hausmüll Bioanteil",
@@ -80,7 +85,7 @@ nea_sectors = [
 ]
 
 # years = list(range(2005, 2019, 1))
-years = [2016, 2017]
+years = [2016, 2017, 2018]
 
 # /////////////////////////////////////////////////////////////// CREATE DATASET
 
@@ -104,11 +109,14 @@ logging.getLogger().error("/" * 80)
 
 ds.add_eb_data(
     energy_sources=eb_energy_sources,
-    balance_aggregates=eb_aggregates,
+    balance_aggregates=eb_sectors,
     years=years,
     provinces=provinces,
     conversion="TJ_2_TWh",
-    per="sources_for_each_agg_and_year"
+    rows="balance_aggregates",
+    columns="energy_sources",
+    sort_column_by="province"
+    # per="sources_for_each_agg_and_year"
     # 1) sources_for_each_agg_and_year
     # 2) aggs_for_each_source_and_year
     # 3) agg_and_source_for_all_years
@@ -170,28 +178,28 @@ ds.add_eb_data(
 
 # /////////////////////////////////////////////////////////////// FILTER DATASET
 
-g_data = [
-    v
-    for v in ds.objects.filter(
-        # order="per_sector",
-        # aggregate__in=["Bruttoinlandsverbrauch", "Importe"],
-        # is_KPI=False
-    )
-]
+# g_data = [
+#     v
+#     for v in ds.objects.filter(
+#         # order="per_sector",
+#         # aggregate__in=["Bruttoinlandsverbrauch", "Importe"],
+#         # is_KPI=False
+#     )
+# ]
 
 # /////////////////////////////////////////////////////////////// FILTER DATASET
 
-ov_data = [
-    v.unit
-    for v in ds.objects.filter(
-        # order="per_years",
-        balance_aggregates__in=["Energetischer Endverbrauch"],
-        # is_KPI=False
-        # has_overlay=True
-    )
-]
+# ov_data = [
+#     v.unit
+#     for v in ds.objects.filter(
+#         # order="per_years",
+#         balance_aggregates__in=["Energetischer Endverbrauch"],
+#         # is_KPI=False
+#         # has_overlay=True
+#     )
+# ]
 
-print("ov_data: ", ov_data)
+# print("ov_data: ", ov_data)
 # g_data_names = [x.name for x in g_data]
 # g_size = [sys.getsizeof(x) for x in g_data]
 
@@ -201,31 +209,31 @@ print("ov_data: ", ov_data)
 # print(g_data)
 # //////////////////////////////////////////////////////////////// WRITE TO XLSX
 
-wb = xlsx(name="WB1", path="test.xlsx", sheets=eb_aggregates)
-try:
-    wb.close()
-except BaseException:
-    pass
+# wb = xlsx(name="WB1", path="test.xlsx", sheets=eb_aggregates)
+# try:
+#     wb.close()
+# except BaseException:
+#     pass
 
-for data in g_data:
+# for data in g_data:
 
-    # if data.order == "per_sector":
+#     # if data.order == "per_sector":
 
-    wb.write(data=data, sheet=data.aggregate)
-    # else:
-    #     wb.write(data=data, sheet=data.aggregate)
+#     wb.write(data=data, sheet=data.aggregate)
+#     # else:
+#     #     wb.write(data=data, sheet=data.aggregate)
 
 
-for sheet in wb.book.sheetnames:
-    print("sheet: ", sheet)
+# for sheet in wb.book.sheetnames:
+#     print("sheet: ", sheet)
 
-    dimension = wb.book[sheet].calculate_dimension()
-    wb.book[sheet].move_range(dimension, rows=0, cols=10)
+#     dimension = wb.book[sheet].calculate_dimension()
+#     wb.book[sheet].move_range(dimension, rows=0, cols=10)
 
-    wb.style(ws=wb.book[sheet])
+#     wb.style(ws=wb.book[sheet])
 
-wb.book.save(wb.path)
-wb.launch()
+# wb.book.save(wb.path)
+# wb.launch()
 
 # print('wb: ', wb.worksheets)
 

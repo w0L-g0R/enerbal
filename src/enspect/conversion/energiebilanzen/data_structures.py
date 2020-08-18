@@ -82,6 +82,90 @@ eb_sheet_names = [
     "Gesamtenergiebilanz",
 ]
 
+eb_aggregate_names = [
+    "",  # "Kokskohle",
+    "",  # "Anthrazit",
+    "",  # "Steinkohlen-Briketts",
+    "",  # "Sonstige Steinkohle",
+    "fossil_fest",  # "Steinkohle",
+    "",  # "Subbituminöse Kohle",
+    "",  # "Sonstige Braunkohle",
+    "fossil_fest",  # "Braunkohle",
+    "fossil_fest",  # "Braunkohlen-Briketts",
+    "fossil_fest",  # "Brenntorf",
+    "fossil_fest",  # "Koks",
+    "",  # "Rohöl",
+    "",  # "NGL",
+    "fossil_flüssig",  # "Erdöl",
+    "",  # "Steinkohleteer",
+    "",  # "Benzol",
+    "",  # "Feedstocks",
+    "fossil_flüssig",  # "Sonstiger Raffinerieeinsatz",
+    "",  # "Motorbenzin",
+    "",  # "Industriebenzin",
+    "",  # "Flugbenzin",
+    "fossil_flüssig",  # "Benzin",
+    "",  # "Flugturbinenkraftstoff",
+    "",  # "Sonstiges Petroleum",
+    "fossil_flüssig",  # "Petroleum",
+    "fossil_flüssig",  # "Diesel",
+    "fossil_flüssig",  # "Gasöl für Heizzwecke",
+    "",  # "Heizöl<1%S",
+    "",  # "Heizöl>1%S",
+    "",  # "Heizöl",
+    "fossil_flüssig",  # "Flüssiggas",
+    "",  # "Naphta",
+    "",  # "Bitumen",
+    "",  # "Schmiermittel",
+    "",  # "Petrolkoks",
+    "",  # "Sonstige",
+    "fossil_flüssig",  # "Sonstige Prod. d. Erdölverarb.",
+    "fossil_gasförmig",  # "Raffinerie-Restgas",
+    "fossil_gasförmig",  # "Mischgas",
+    "fossil_gasförmig",  # "Erdgas",
+    "",  # "Tiegelgas",
+    "",  # "Hochofengas",
+    "fossil_gasförmig",  # "Gichtgas",
+    "fossil_gasförmig",  # "Kokereigas",
+    "fossil_gasförmig",  # "Industrieabfall",
+    "",  # "Hausmüll nicht erneuerbar",
+    "fossil_fest",  # "Brennbare Abfälle",
+    "biogen_fest",  # "Scheitholz",
+    "biogen_fest",  # "Hausmüll Bioanteil",
+    "biogen_fest",  # "Pellets+Holzbriketts",
+    "biogen_fest",  # "Holzabfall",
+    "biogen_fest",  # "Holzkohle",
+    "biogen_fest",  # "Ablaugen",
+    "biogen_gasförmig",  # "Deponiegas",
+    "biogen_gasförmig",  # "Klärgas",
+    "biogen_gasförmig",  # "Biogas",
+    "biogen_flüssig",  # "Bioethanol",
+    "biogen_flüssig",  # "Biodiesel",
+    "biogen_flüssig",  # "Sonst. Biogene flüssig",
+    "biogen_fest",  # "Sonst. Biogene fest",
+    "",  # "Biogene Brenn- u. Treibstoffe",
+    "",  # "Geothermie",
+    "",  # "Umgebungswärme",
+    "",  # "Solarwärme",
+    "",  # "Reaktionswärme",
+    "",  # "Umgebungswärme etc.",
+    "",  # "WK<=1MW",
+    "",  # "WK<=10MW",
+    "",  # "WK>10MW",
+    "erneuerbar",  # "Wasserkraft",
+    "erneuerbar",  # "Wind",
+    "erneuerbar",  # "Photovoltaik",
+    "",  # "Wind und Photovoltaik",
+    "",  # "Fernwärme",
+    "",  # "Elektrische Energie",
+    "",  # "KOHLE",
+    "",  # "ÖL",
+    "",  # "GAS",
+    "",  # "ERNEUERBARE",
+    "",  # "ABFÄLLE",
+    "",  # "Gesamtenergiebilanz",
+]
+
 # ///////////////////////////////////////////////////// ENERGY SOURCE AGGREGATES
 
 hauptaggregate = [
@@ -124,7 +208,6 @@ fossil_flüssig = [
     "Heizöl",
     "Flüssiggas",
     "Sonstige Prod. d. Erdölverarb.",
-
 ]
 
 fossil_gasförmig = [
@@ -143,7 +226,6 @@ biogen_fest = [
     "Ablaugen",
     "Sonst. Biogene fest",
     "Hausmüll Bioanteil",
-
 ]
 
 biogen_flüssig = [
@@ -208,6 +290,25 @@ eev_aggregates = [
     "Energetischer Endverbrauch",
 ]
 
+eev_generation = [
+    "Inländ. Erzeugung v. Rohenergie",
+    "Importe",
+    "Lager",
+    "Recycling/Prod. Trans.",
+    "Exporte",
+    "Bruttoinlandsverbrauch",
+]
+
+eev_usage = [
+    "Bruttoinlandsverbrauch",
+    "Umwandlungseinsatz",
+    "Umwandlungsausstoß",
+    "Verbrauch des Sektors Energie",
+    "Transportverluste",
+    "Nichtenergetischer Verbrauch",
+    "Energetischer Endverbrauch",
+]
+
 # "Energetischer Endverbrauch, Verbrauch der Sektoren"
 sectors = [
     "Eisen- und Stahlerzeugung",
@@ -228,6 +329,15 @@ sectors = [
     "Transport in Rohrfernleitungen",
     "Binnenschiffahrt",
     "Flugverkehr",
+    "Öffentliche und Private Dienstleistungen",
+    "Private Haushalte",
+    "Landwirtschaft",
+    "Produzierender Bereich",
+    "Verkehr",
+    "Sonstige",
+]
+
+sector_aggregates = [
     "Öffentliche und Private Dienstleistungen",
     "Private Haushalte",
     "Landwirtschaft",
