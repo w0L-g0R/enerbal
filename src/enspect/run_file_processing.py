@@ -6,7 +6,10 @@ import pandas as pd
 pd.set_option("display.max_columns", 10)  # or 1000
 pd.set_option("display.max_rows", None)  # or 1000
 pd.set_option("display.width", None)  # or 1000
+pd.set_option("max_colwidth", 20)  # or 1000
 
+
+max_colwidth
 import pickle
 import numpy as np
 from time import time, ctime

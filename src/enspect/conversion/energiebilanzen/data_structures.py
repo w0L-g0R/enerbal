@@ -180,13 +180,9 @@ hauptaggregate = [
 ]
 
 erneuerbare = [
-    "ERNEUERBARE",
     "Wasserkraft",
     "Wind",
     "Photovoltaik",
-    "Wind und Photovoltaik",
-    "Geothermie",
-    "Solarwärme",
 ]
 
 fossil_fest = [
@@ -257,9 +253,10 @@ abfall = [
 ]
 
 
-energy_sources_aggregates = {
+energy_aggregate_lookup = {
     "Hauptaggregate": hauptaggregate,
-    "Elektrische Energie": ["Elektrische Energie"],
+    "Elektrische": ["Elektrische Energie"],
+    "Fernwärme": ["Fernwärme"],
     "Erneuerbare": erneuerbare,
     "Fossil-fest": fossil_fest,
     "Fossil-flüssig": fossil_flüssig,

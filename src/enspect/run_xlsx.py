@@ -5,15 +5,27 @@ from pprint import pprint
 
 from enspect.settings import file_paths, provinces
 from enspect.models.dataset import DataSet
+from enspect.models.utils import add_eb_data
+
 from enspect.logger.setup import setup_logging
 from enspect.xlsx.utils import get_workbook, write_to_sheet
 
 from enspect.xlsx.workbook import xlsx
 from enspect.conversion.energiebilanzen.data_structures import (
-    energy_sources_aggregates,
     eev_aggregates,
     eev_generation,
+    energy_aggregate_lookup,
 )
+import pandas as pd
+
+pd.set_option("display.max_columns", 6)  # or 1000
+pd.set_option("display.max_rows", None)  # or 1000
+pd.set_option("display.width", None)  # or 1000
+pd.set_option("max_colwidth", 15)  # or 1000
+# pd.set_option("display.multi_sparse", True)  # or 1000
+pd.set_option("display.column_space", 5)  # or 1000
+pd.set_option("display.colheader_justify", "left")  # or 1000
+pd.set_option("display.precision", 2)  # or 1000
 
 # ////////////////////////////////////////////////////////////////////// INPUTS
 
@@ -21,23 +33,23 @@ setup_logging(
     console_log_actived=True, console_log_filter=None, console_out_level=logging.DEBUG,
 )
 
-eb_aggregates = [
+eev_aggregates = [
     "Energetischer Endverbrauch",
 ]
 
 eb_sectors = [
     # "Energetischer Endverbrauch",
     "Produzierender Bereich",
-    "Verkehr",
-    "Öffentliche und Private Dienstleistungen",
-    "Private Haushalte",
-    "Landwirtschaft",
+    # "Verkehr",
+    # "Öffentliche und Private Dienstleistungen",
+    # "Private Haushalte",
+    # "Landwirtschaft",
 ]
 # aggregates = ["Bruttoinlandsverbrauch"]
 
 eb_energy_sources = [
     "Gesamtenergiebilanz",
-    # "Elektrische Energie",
+    "Elektrische Energie",
     # ]
     # "Wasserkraft",
     # "Wind",
@@ -69,6 +81,18 @@ eb_energy_sources = [
 #     + energy_sources_aggregates["Biogen-flüssig"]
 #     + energy_sources_aggregates["Biogen-gasförmig"]
 # )
+energy_aggregates = [
+    "Elektrische",
+    "Fernwärme",
+    "Erneuerbare",
+    "Fossil-fest",
+    "Fossil-flüssig",
+    "Fossil-gasförmig",
+    "Biogen-fest",
+    "Biogen-flüssig",
+    "Biogen-gasförmig",
+]
+
 nea_energy_sources = [
     "Steinkohle",
     "Insgesamt",
@@ -85,7 +109,7 @@ nea_sectors = [
 ]
 
 # years = list(range(2005, 2019, 1))
-years = [2016, 2017, 2018]
+years = [2018]
 
 # /////////////////////////////////////////////////////////////// CREATE DATASET
 
@@ -107,20 +131,49 @@ ds = DataSet(name=f"Set_1", file_paths=file_paths)
 
 logging.getLogger().error("/" * 80)
 
-ds.add_eb_data(
+# add_eb_data(
+#     dataset=ds,
+#     energy_sources=eb_energy_sources,
+#     balance_aggregates=eb_sectors,
+#     years=years,
+#     provinces=provinces,
+#     conversion="TJ_2_TWh",
+#     # per_year=True,
+# )
+
+# add_eb_data(
+#     dataset=ds,
+#     energy_sources=eb_energy_sources,
+#     balance_aggregates=eb_sectors,
+#     years=years,
+#     provinces=provinces,
+#     conversion="TJ_2_TWh",
+#     per_balance_aggregate=True,
+# )
+
+
+# add_eb_data(
+#     dataset=ds,
+#     energy_sources=eb_energy_sources,
+#     balance_aggregates=eb_sectors,
+#     energy_aggregates=energy_aggregates,
+#     years=years,
+#     provinces=provinces,
+#     conversion="TJ_2_TWh",
+#     per_energy_source=True,
+# )
+
+add_eb_data(
+    dataset=ds,
     energy_sources=eb_energy_sources,
     balance_aggregates=eb_sectors,
+    energy_aggregates=energy_aggregates,
     years=years,
     provinces=provinces,
     conversion="TJ_2_TWh",
-    rows="balance_aggregates",
-    columns="energy_sources",
-    sort_column_by="province"
-    # per="sources_for_each_agg_and_year"
-    # 1) sources_for_each_agg_and_year
-    # 2) aggs_for_each_source_and_year
-    # 3) agg_and_source_for_all_years
+    per_energy_aggregate=True,
 )
+
 
 # ds.add_eb_data_per_sector(
 #     file="sec",

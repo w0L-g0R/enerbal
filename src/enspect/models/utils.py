@@ -4,6 +4,13 @@ from copy import deepcopy
 from enspect.settings import unit
 from typing import List, Union
 from pprint import pprint
+import logging
+import pickle
+from enspect.conversion.energiebilanzen.data_structures import energy_aggregate_lookup
+from enspect.paths import file_paths
+
+from pandas.core.common import flatten
+
 
 IDX = pd.IndexSlice
 
@@ -230,3 +237,187 @@ def post_process(df: pd.DataFrame, conversion: str):
     df_shares = get_shares(df=df)
 
     return df, df_shares, unit
+
+
+def convert_round_save(func):
+    def wrapper(*args, **kwargs):
+
+        data, conversion = func(*args, **kwargs)
+        print("data: ", type(data))
+
+        if isinstance(data, pd.DataFrame):
+            data = [data]
+
+        data = [f.round(2) * unit[conversion] for f in data]
+
+        print("data: ", data)
+        # print("frame: ", frame)
+        # dataset.objects
+        return
+
+    return wrapper
+
+
+@convert_round_save
+def add_eb_data(
+    dataset: object,
+    provinces: List,
+    years: List,
+    # columns: Union[List, str],
+    # rows: Union[List, str],
+    conversion: str = None,
+    balance_aggregates: List = None,
+    energy_sources: List = None,
+    energy_aggregates: List = None,
+    sort_column_by: str = None,
+    per_balance_aggregate: bool = False,
+    per_energy_source: bool = False,
+    per_energy_aggregate: bool = False,
+    per_year: bool = False,
+):
+    """
+    
+    row index:
+        balance aggregate = ["IDX_0", "IDX_1", "IDX_2", "IDX_3", "IDX_4"]
+    
+    col_index:
+        province, source, year = ["BL", "ET", "YEAR"]
+
+    """
+    logging.getLogger().error("/" * 80)
+
+    assert isinstance(
+        balance_aggregates, (list, tuple)
+    ), "Wrap list or tuple around aggregate!"
+
+    df = pickle.load(open(file_paths["db_pickles"] / "eb.p", "rb"))
+
+    df = drop_eb_row_levels(balance_aggregates=balance_aggregates, df=df)
+
+    # Filter aggregates
+    df = df.groupby(level=["IDX_0"], axis=0).filter(
+        lambda x: x.index.unique() in balance_aggregates
+    )
+
+    # Filter years
+    df = df.groupby(level=["YEAR"], axis=1).filter(
+        lambda x: x.columns.get_level_values(2).unique() in years
+    )
+
+    data = []
+
+    print("df init: ", df.head())
+    if per_energy_aggregate:
+
+        energy_sources = list(
+            flatten([energy_aggregate_lookup[source] for source in energy_aggregates])
+        )
+
+        df = (
+            df.groupby(level=["ET"], axis=1)
+            .filter(lambda x: x.columns.get_level_values(1).unique() in energy_sources)
+            .stack("ET")
+            .unstack("IDX_0")
+        )
+
+        data = []
+
+        for aggregate_name in energy_aggregates:
+            print()
+            print("name: ", aggregate_name)
+
+            #     data
+            energy_aggregate = df.groupby(level=["ET"], axis=0).filter(
+                lambda x: x.index in energy_aggregate_lookup[aggregate_name]
+            )
+
+            energy_aggregate.loc["SUM", IDX[:]] = energy_aggregate.sum(
+                numeric_only=True, axis=0
+            )
+
+            energy_aggregate.index = pd.MultiIndex.from_product(
+                iterables=[
+                    [aggregate_name],
+                    list(energy_aggregate.index),
+                ],  # .replace("_", "-").capitalize()],
+                names=["ET_AGG", energy_aggregate.index.name],
+            )
+
+            data.append(energy_aggregate)
+
+        data = pd.concat(data, axis=0)
+
+        # USE FOR SUM ROWS ONLY -> Chart
+        # d = data.groupby(level=["ET"], axis=0).get_group("SUM")
+        # print("d: ", d)
+        # # g =
+        # # g.index
+        # print("g.index: ", g.index)
+        # # g.drop(labels=aggregate, level=0, axis=0)
+        # # print("g.index: ", g.index)
+        # # print("g.columns: ", g.columns)
+        # #     data = data.swaplevel(0, 1, axis=1).sort_index(axis=1, level=0)
+
+        # print("g: ", g)
+
+        # .agg("sum")
+        # for aggregate in energy_aggregate_lookup[source]:
+        #     data
+
+        # energy_sources
+        print("energy_sources: ", energy_sources)
+        # print("data: ", data)
+
+        # return data, conversion
+    else:
+        # Filter sources
+        df = df.groupby(level=["ET"], axis=1).filter(
+            lambda x: x.columns.get_level_values(1).unique() in energy_sources
+        )
+
+        if per_balance_aggregate:
+            print("per_balance_aggregate: ", per_balance_aggregate)
+
+            for aggregate in balance_aggregates:
+                print("aggregate: ", aggregate)
+
+                data = df.groupby(level=["IDX_0"], axis=0).get_group(aggregate)
+
+        elif per_energy_source:
+            print("per_energy_source: ", per_energy_source)
+
+            for energy_source in energy_sources:
+
+                data.append(df.groupby(level=["ET"], axis=1).get_group(energy_source))
+
+    # pass
+
+    # if rows == "balance_aggregates" and columns == "energy_sources":
+    # if per_year:
+
+    #     # For each year
+    #     for year in years:
+
+    #         data = df.groupby(level=["YEAR"], axis=1).get_group(year)
+
+    # if sort_column_by == "province":
+    #     data = data.swaplevel(0, 1, axis=1).sort_index(axis=1, level=0)
+
+    # data.loc["Column_Total"] = data.sum(numeric_only=True, axis=0)
+
+    # if len(energy_sources) == 1:
+    #     data.loc[:, "Row_Total"] = data.sum(numeric_only=True, axis=1).subtract(
+    #         data[data.columns[0]]
+    #     )
+
+    # if rows == "energy_sources" and columns == "balance_aggregates":
+
+    # data = data.groupby(level=["ET"], axis=1).filter(
+    #     lambda x: x.columns.get_level_values(1).unique() in energy_sources
+    # )
+
+    # data = data.groupby(level=["IDX_0"], axis=0).filter(
+    #     lambda x: x.index.unique() in balance_aggregates
+    # )
+
+    return data, conversion
