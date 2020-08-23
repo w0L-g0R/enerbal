@@ -62,8 +62,8 @@ class xlsx:
         self,
         data: pd.DataFrame,
         sheet: Worksheet,
-        scale: str = "absolute",
-        shares: str = None,
+        # scale: str = "absolute",
+        # shares: str = None,
     ):
         """
         write [summary]
@@ -129,65 +129,65 @@ class xlsx:
         #  Main plot data
         self.add(info=True, data=data, ws=ws)
 
-        if scale == "absolute":
-            df = data.frame
+        # if scale == "absolute":
+        #     df = data.frame
 
-        if scale == "shares_over_rows":
-            df = data.shares_over_rows
+        # if scale == "shares_over_rows":
+        #     df = data.shares_over_rows
 
-        if scale == "shares_over_columns":
-            df = data.shares_over_columns
+        # if scale == "shares_over_columns":
+        #     df = data.shares_over_columns
 
         # Change columns AT and Sum, add column with difference AT-Sum
-        df = self.swap_columns(df=df)
+        # df = self.swap_columns(df=df)
 
         # Create generator object from dataframe
-        rows = dataframe_to_rows(df, index=True, header=True)
+        # rows = dataframe_to_rows(df, index=True, header=True)
 
-        # Store value for styling
-        self.width_df = len(df.columns)
+        # # Store value for styling
+        # self.width_df = len(df.columns)
 
-        for r_idx, row in enumerate(rows, 1):
+        # for r_idx, row in enumerate(rows, 1):
 
-            if r_idx == 1:
-                row.pop(0)
-                row.insert(0, data.unit)
+        #     if r_idx == 1:
+        #         row.pop(0)
+        #         row.insert(0, data.unit)
 
-            ws.append(row)
+        #     ws.append(row)
 
         ws.next_row_start = ws.max_row - len(df.index) - 1
         # ws.row_end_info = ws.min_row
         ws.next_col_start = ws.min_column + len(df.columns) + 2
         # ws.col_end_info = ws.max_column
 
-        if shares:
+        # if shares:
 
-            self.add(shares=shares, ws=ws, data=data, scale="Shares_" + shares)
+        #     self.add(shares=shares, ws=ws, data=data, scale="Shares_" + shares)
 
-            ws.next_col_start += len(df.columns) + 2
+        #     ws.next_col_start += len(df.columns) + 2
 
-        if data.is_KPI:
-            for data in [data.numerator, data.denominator]:
-                self.add(
-                    ws=ws, data=data,
-                )
+        # if data.is_KPI:
+        #     for data in [data.numerator, data.denominator]:
+        #         self.add(
+        #             ws=ws, data=data,
+        #         )
 
-                ws.next_col_start += len(df.columns) + 2
+        #         ws.next_col_start += len(df.columns) + 2
 
-        if data.has_overlay:
+        # if data.has_overlay:
 
-            for overlay in data.overlays:
+        #     for overlay in data.overlays:
 
-                self.add(
-                    ws=ws, data=overlay["data"], scale=overlay["scale"],
-                )
+        #         self.add(
+        #             ws=ws, data=overlay["data"], scale=overlay["scale"],
+        #         )
 
-                ws.next_col_start += len(df.columns) + 2
+        #         ws.next_col_start += len(df.columns) + 2
 
-        ws.delete_rows(ws.row_start_info + self.height_info + 2)
+        # ws.delete_rows(ws.row_start_info + self.height_info + 2)
 
-        ws.row_start_info += len(data.frame) + self.height_info + 2
-        ws.col_start_info = 1
+        # ws.row_start_info += len(data.frame) + self.height_info + 2
+        # ws.col_start_info = 1
 
         # Insert empty row
         # ws.append([])
@@ -203,36 +203,7 @@ class xlsx:
         info: bool = False,
     ):
 
-        if info:
-            print("info.name: ", data.name)
-            df = pd.DataFrame(
-                index=["Title", "Data", "Scale", "Source", "Created", "Chart"],
-                data=[
-                    data.title,
-                    data.name,
-                    scale,
-                    data.source,
-                    datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    ""
-                    # chart,
-                ],
-            )
-
-            rows = dataframe_to_rows(df, index=True, header=False)
-
-            for r_idx, row in enumerate(rows, ws.row_start_info):
-                for c_idx, value in enumerate(row, ws.col_start_info):
-                    if value is None:
-                        pass
-                    else:
-                        ws.cell(row=r_idx, column=c_idx, value=value)
-
-            ws.row_end_info += len(df) + 1
-
-            ws.col_start_info += len(data.frame.columns) + 3
-            return
-
-        self.add(info=True, data=data, ws=ws, scale=scale)
+        self.add_info(ws=ws)
 
         if scale == "shares_over_rows" or shares == "over_rows":
             df = data.shares_over_rows
@@ -246,9 +217,9 @@ class xlsx:
             df = data.frame
             unit = data.unit
 
-        df = self.swap_columns(df=df)
+        # df = self.swap_columns(df=df)
 
-        rows = dataframe_to_rows(df, index=True, header=True)
+        rows = dataframe_to_rows(df, index=True)
 
         for r_idx, row in enumerate(rows, ws.next_row_start):
 

@@ -5,18 +5,21 @@ from pprint import pprint
 
 from enspect.settings import file_paths, provinces
 from enspect.models.dataset import DataSet
-from enspect.models.utils import add_eb_data
+from enspect.models.workbook import Workbook
+
+# from enspect.models.workbook import xlsx
+from enspect.models.utils import close_xlsx
 
 from enspect.logger.setup import setup_logging
-from enspect.xlsx.utils import get_workbook, write_to_sheet
 
-from enspect.xlsx.workbook import xlsx
+# from enspect.xlsx.workbook import xlsx
 from enspect.conversion.energiebilanzen.data_structures import (
     eev_aggregates,
     eev_generation,
     energy_aggregate_lookup,
 )
 import pandas as pd
+import io
 
 pd.set_option("display.max_columns", 6)  # or 1000
 pd.set_option("display.max_rows", None)  # or 1000
@@ -40,10 +43,10 @@ eev_aggregates = [
 eb_sectors = [
     # "Energetischer Endverbrauch",
     "Produzierender Bereich",
-    # "Verkehr",
-    # "Öffentliche und Private Dienstleistungen",
-    # "Private Haushalte",
-    # "Landwirtschaft",
+    "Verkehr",
+    "Öffentliche und Private Dienstleistungen",
+    "Private Haushalte",
+    "Landwirtschaft",
 ]
 # aggregates = ["Bruttoinlandsverbrauch"]
 
@@ -108,12 +111,14 @@ nea_sectors = [
     "Landwirtschaft",
 ]
 
-# years = list(range(2005, 2019, 1))
-years = [2018]
+years = list(range(2005, 2010, 1))
+print("years: ", years)
+# years = [2018]
 
 # /////////////////////////////////////////////////////////////// CREATE DATASET
 
 ds = DataSet(name=f"Set_1", file_paths=file_paths)
+print("ds: ", ds)
 
 # //////////////////////////////////////////////////////////////////////// STATS
 # ds.add_stats_data_per_years(
@@ -131,49 +136,48 @@ ds = DataSet(name=f"Set_1", file_paths=file_paths)
 
 logging.getLogger().error("/" * 80)
 
-# add_eb_data(
-#     dataset=ds,
+
+# ds.get_eb_data(
 #     energy_sources=eb_energy_sources,
 #     balance_aggregates=eb_sectors,
+#     energy_aggregates=energy_aggregates,
 #     years=years,
 #     provinces=provinces,
-#     conversion="TJ_2_TWh",
-#     # per_year=True,
+#     per_energy_aggregate=True,
 # )
 
-# add_eb_data(
-#     dataset=ds,
+# ds.get_eb_data(
 #     energy_sources=eb_energy_sources,
 #     balance_aggregates=eb_sectors,
+#     energy_aggregates=energy_aggregates,
 #     years=years,
 #     provinces=provinces,
-#     conversion="TJ_2_TWh",
-#     per_balance_aggregate=True,
+#     # conversion="TJ_2_TWh",
+#     # per_year=False,
 # )
 
+ds.add_eb_data(
+    energy_sources=eb_energy_sources,
+    balance_aggregates=eb_sectors,
+    energy_aggregates=energy_aggregates,
+    years=years,
+    provinces=provinces,
+    per_balance_aggregate=True,
+    # conversion="TJ_2_TWh",
+    # per_year=False,
+)
 
-# add_eb_data(
+
+# ds.objects = get_eb_data(
 #     dataset=ds,
 #     energy_sources=eb_energy_sources,
 #     balance_aggregates=eb_sectors,
 #     energy_aggregates=energy_aggregates,
 #     years=years,
 #     provinces=provinces,
-#     conversion="TJ_2_TWh",
-#     per_energy_source=True,
+#     # conversion="TJ_2_TWh",
+#     # per_year=False,
 # )
-
-add_eb_data(
-    dataset=ds,
-    energy_sources=eb_energy_sources,
-    balance_aggregates=eb_sectors,
-    energy_aggregates=energy_aggregates,
-    years=years,
-    provinces=provinces,
-    conversion="TJ_2_TWh",
-    per_energy_aggregate=True,
-)
-
 
 # ds.add_eb_data_per_sector(
 #     file="sec",
@@ -185,6 +189,67 @@ add_eb_data(
 #     conversion="TJ_2_TWh",
 #     sectors=eb_sectors
 # )
+
+
+filename = Path.cwd() / "wings.xlsx"
+print("filename: ", filename)
+
+# with open(filename, "rb") as f:
+#     file = io.BytesIO(f.read())
+
+# wb = xw.Book(filename)
+
+# close_xlsx()
+
+wb = Workbook(name="WB1", filename=filename)
+
+# wb = xlsx(name="WB1", filename=filename)
+wb.add_sheets(sheets=["EEV", "BIV", "THG"])
+# # try:
+# #     wb.close()
+# # except BaseException:
+
+
+# #     pass
+
+for data in ds.objects:
+    print("data: ", data.name)
+
+    #     # if data.order == "per_sector":
+
+    wb.write_to_sheet(data=data, sheet="EEV")
+    # else:
+    #     wb.write(data=data, sheet=data.aggregate)
+
+
+wb.book.save(wb.path)
+wb.launch()
+
+# for sheet in wb.book.sheetnames:
+#     print("sheet: ", sheet)
+
+#     dimension = wb.book[sheet].calculate_dimension()
+#     wb.book[sheet].move_range(dimension, rows=0, cols=10)
+
+#     wb.style(ws=wb.book[sheet])
+
+
+# print('wb: ', wb.worksheets)
+
+# for data in kpi_data:
+# print(data.frame)
+# for ds in graphs:
+#     ds.write_to_sheet(
+#         scaled="absolute", aggregates=["Bruttoinlandsverbrauch"],
+#     )
+
+
+# print("ds: ", ds)
+
+# pprint(sorted(g_data))
+
+# kpi_data = [v for v in ds.objects.filter(is_KPI=True)]
+
 
 # for sector in sectors:
 #     # ////////////////////////////////////////////////////////////////// EB IND
@@ -261,45 +326,3 @@ add_eb_data(
 
 # print(g_data)
 # //////////////////////////////////////////////////////////////// WRITE TO XLSX
-
-# wb = xlsx(name="WB1", path="test.xlsx", sheets=eb_aggregates)
-# try:
-#     wb.close()
-# except BaseException:
-#     pass
-
-# for data in g_data:
-
-#     # if data.order == "per_sector":
-
-#     wb.write(data=data, sheet=data.aggregate)
-#     # else:
-#     #     wb.write(data=data, sheet=data.aggregate)
-
-
-# for sheet in wb.book.sheetnames:
-#     print("sheet: ", sheet)
-
-#     dimension = wb.book[sheet].calculate_dimension()
-#     wb.book[sheet].move_range(dimension, rows=0, cols=10)
-
-#     wb.style(ws=wb.book[sheet])
-
-# wb.book.save(wb.path)
-# wb.launch()
-
-# print('wb: ', wb.worksheets)
-
-# for data in kpi_data:
-# print(data.frame)
-# for ds in graphs:
-#     ds.write_to_sheet(
-#         scaled="absolute", aggregates=["Bruttoinlandsverbrauch"],
-#     )
-
-
-# print("ds: ", ds)
-
-# pprint(sorted(g_data))
-
-# kpi_data = [v for v in ds.objects.filter(is_KPI=True)]

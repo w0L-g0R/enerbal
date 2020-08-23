@@ -11,7 +11,7 @@ def print_inside_tests(\*args, \*\*kwargs):
         for kwarg in kwargs:
             pprint.PrettyPrinter(indent=4, depth=4).pprint(kwarg)
 
-****\*\*\*\*****\*\*****\*\*\*\*****\_\_****\*\*\*\*****\*\*****\*\*\*\***** PYTESTDOCS
+\***\*\*\*\*\*\*\***\*\*\***\*\*\*\*\*\*\***\_\_\***\*\*\*\*\*\*\***\*\*\***\*\*\*\*\*\*\*** PYTESTDOCS
 @ https://docs.pytest.org/en/latest/usage.html#cmdline
 
 Running pytest can result in six different exit codes:
@@ -26,7 +26,6 @@ Exit code 5: No tests were collected
 pytest --version # shows where pytest was imported from
 pytest --fixtures # show available builtin function arguments
 pytest -h | --help # show help on command line and config file options
-
 
 # Collecting info about existing tests
 
@@ -78,7 +77,7 @@ a - all except pP
 A - all
 N - none, this can be used to display nothing (since fE is the default)
 
-****\*\*\*\*****\*\*****\*\*\*\*****\_\_****\*\*\*\*****\*\*****\*\*\*\***** PYTESTGUIDE
+\***\*\*\*\*\*\*\***\*\*\***\*\*\*\*\*\*\***\_\_\***\*\*\*\*\*\*\***\*\*\***\*\*\*\*\*\*\*** PYTESTGUIDE
 @ https://pytestguide.readthedocs.io/en/latest/pytestGuide/
 
 1.2. Test Code
@@ -110,7 +109,7 @@ def test_stat2Num(x, y):
 
     assert stat2Num(x, y) == (x+y, (x+y)/2)
 
-****\*\*\*\*****\*\*****\*\*\*\*****\_\_****\*\*\*\*****\*\*****\*\*\*\***** PYTESTDOCS
+\***\*\*\*\*\*\*\***\*\*\***\*\*\*\*\*\*\***\_\_\***\*\*\*\*\*\*\***\*\*\***\*\*\*\*\*\*\*** PYTESTDOCS
 @ https://docs.pytest.org/en/latest/fixture.html#fixtures
 
 Parametrizing fixtures
@@ -172,7 +171,7 @@ f.write("hello")
     def test_cwd_again_starts_empty(self):
         assert os.listdir(os.getcwd()) == []
 
-****\*\*\*\*****\*\*****\*\*\*\*****\_\_****\*\*\*\*****\*\*****\*\*\*\***** PYTESTDOCS
+\***\*\*\*\*\*\*\***\*\*\***\*\*\*\*\*\*\***\_\_\***\*\*\*\*\*\*\***\*\*\***\*\*\*\*\*\*\*** PYTESTDOCS
 https://docs.pytest.org/en/latest/monkeypatch.html
 
 Monkeypatching/mocking modules and environments

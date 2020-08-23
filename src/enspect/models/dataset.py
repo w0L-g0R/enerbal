@@ -9,6 +9,7 @@ from time import gmtime, strftime
 import pandas as pd
 import numpy as np
 from pathlib import Path
+from pandas.core.common import flatten
 
 from enspect.settings import (
     file_paths,
@@ -16,15 +17,21 @@ from enspect.settings import (
     provinces,
     unit,
 )
-
+from enspect.conversion.energiebilanzen.data_structures import energy_aggregate_lookup
 from enspect.models.utils import (
-    add_sums,
-    add_means,
-    get_shares,
-    apply_single_index,
-    convert,
+    # add_sums,
+    # add_means,
+    # get_shares,
+    # apply_single_index,
+    # convert,
     drop_eb_row_levels,
-    post_process,
+    slice_eb_inputs,
+    add_row_total,
+    # get_eb_energy_aggregates,
+    # get_eb_energy_soures,
+    # get_eb_balance_aggregates,
+    # get_eb_over_all_years,
+    # post_process,
 )
 
 from enspect.models.data import Data, FilterData
@@ -33,168 +40,420 @@ from enspect.conversion.energiebilanzen.data_structures import (
     sectors,
     sector_energy,
 )
+from copy import deepcopy
 
 IDX = pd.IndexSlice
 
 
 class DataSet:
-    def __init__(self, name: str, file_paths=file_paths, data: List = list()):
-        self.data = data
+    def __init__(self, name: str, file_paths=file_paths):
+        self._objects = []
         self.name = name
         logging.getLogger().error(f"Added: {self.name}")
         return
 
     @property
     def objects(self):
-        return FilterData(self.data)
+        return FilterData(self._objects)
 
     def __repr__(self):
         return self.name
 
-    def add_eb_data_per_sector(
+    # @property
+    # def data(self):
+    #     return self._data
+
+    @objects.setter
+    def objects(self, _objects: List = list):
+        # print(data)
+        # if not isinstance(_objects, list):
+        #     _objects = [_objects]
+
+        _ids = [
+            data._id
+            for data in self._objects
+            # if not isinstance(_object, list)
+        ]
+
+        print("_ids: ", _ids)
+
+        # if not _ids:
+        self._objects.append(_objects)
+        # else:
+        #     # for _id in _ids:
+        #     #     print("_object: ", data.name)
+        #     if data._id in _ids:
+        #         pass
+        #     else:
+        #         self._objects.append(data)
+
+        _ids = [
+            data._id
+            for data in self._objects
+            # if not isinstance(_object, list)
+        ]
+
+        print("_ids: ", _ids)
+
+    # @convert_round_save
+    def add_eb_data(
         self,
-        file: Union[str, Path],
-        aggregate: List,
         provinces: List,
         years: List,
-        conversion: Optional[str] = None,
-        energy_sources: Optional[List] = None,
-        sectors: Optional[List] = None,
+        balance_aggregates: List = None,
+        energy_sources: List = None,
+        energy_aggregates: List = None,
+        per_balance_aggregate: bool = False,
+        per_energy_source: bool = False,
+        per_energy_aggregate: bool = False,
+        per_years: bool = False,
+        show_source_values_for_energy_aggregates: bool = False,
     ):
-        logging.getLogger().error("/" * 80)
-        logging.getLogger().info(f"Adding {file} data per sector:\n{sectors}\n")
 
-        # Fetch data
-        data = pickle.load(open(self.file_paths[file], "rb"))
-        unit = "TJ"
-
-        for year in years:
-
-            logging.getLogger().info(f"Year: {year}")
-
-            for energy_source in energy_sources:
-
-                # Output df which holds sector series
-                df = pd.DataFrame(index=sectors, columns=provinces)
-
-                # Iter over sectors (= actually list of aggregates)
-                for sector in sectors:
-
-                    # Extend with energy source
-                    name = "_".join([sector, energy_source, str(year),])
-
-                    # Slice data for all given provinces and years
-                    s = data.loc[
-                        IDX[sector], IDX[tuple(provinces), energy_source, year],
-                    ]
-
-                    # Copy series to output df
-                    df.loc[sector, provinces] = s.droplevel((1, 2), axis=0).T
-
-                # Add sum row and column
-                df = add_sums(df=df)
-
-                # If all sum of sum column == 0, than all values are NaN
-                if df["Sum"].sum() != 0:
-
-                    if conversion is not None:
-                        df, unit = convert(df=df, conversion=conversion)
-
-                    # Share of each province over total provinces per year
-                    df_shares_per_province = get_shares(df=df, provinces=True)
-                else:
-                    # Write NaN df to shares
-                    df_shares_per_province = df
-
-                logging.getLogger().info(f"Added {name} to {self.name}.data_manager")
-
-                # Create a Data object
-                self.data.append(
-                    Data(
-                        name=name,
-                        file="sec",
-                        source="Energiebilanzen Bundesländer, EEV nach Sektoren",
-                        unit=unit,
-                        frame=df,
-                        aggregate=aggregate,
-                        energy_source=energy_source,
-                        shares_over_columns=df_shares_per_province,
-                        provinces=provinces,
-                        years=years,
-                        sectors=sectors,
-                        order="per_sector",
-                    )
-                )
-
-    def add_stats_data_per_years(
-        self, file: Union[str, Path], provinces: List, years: List, name: str,
-    ):
         logging.getLogger().error("/" * 80)
 
-        data = pickle.load(open(self.file_paths[file], "rb"))
+        assert isinstance(
+            balance_aggregates, (list, tuple)
+        ), "Wrap list or tuple around aggregate!"
 
-        if file == "pop":
-
-            # Unit
-            unit = "Person"
-            aggregate = name
-            name = "_".join(
-                [aggregate, str(data["df"].index[0]), str(data["df"].index[-1])]
-            )
-
-        if file == "km_pkw":
-
-            # Unit
-            unit = "km"
-            aggregate = name
-            name = "_".join(
-                [aggregate, str(data["df"].index[0]), str(data["df"].index[-1])]
-            )
-
-        # Slice pickled dataframe
-        df = pd.DataFrame(index=years, columns=provinces)
-
-        logging.getLogger().info(f"Adding {file} data per years:\n{df.index}\n")
-
-        # _df = data["df"].loc[years, provinces]
-
-        for index, row in df.iterrows():
-            try:
-                df.loc[index, :] = data["df"].loc[index, provinces]
-            except BaseException:
-                pass
-
-        # Compute sums on rows axis (years) and on col axis (provinces)
-        df = add_sums(df=df)
-
-        # Create shares
-        # Share of each year over total years per province
-        df_shares_per_year = get_shares(df=df, years=True)
-        # print("pop_shares_years: ", df_shares_per_year)
-
-        # Share of each province over total provinces per year
-        df_shares_per_province = get_shares(df=df, provinces=True)
-        # print("pop_shares_provinces: ", df_shares_per_province)
-
-        logging.getLogger().info(f"Added {name} to {self.name}.data_manager")
-
-        # Create a Data object
-        self.data.append(
-            Data(
-                name=name,
-                source=df.index.name,
-                aggregate=aggregate,
-                frame=df,
-                shares_over_rows=df_shares_per_year,
-                shares_over_columns=df_shares_per_province,
-                unit=unit,
-                file=file,
-                provinces=provinces,
+        df = (
+            slice_eb_inputs(
+                df=pickle.load(open(file_paths["db_pickles"] / "eb.p", "rb")),
+                balance_aggregates=balance_aggregates,
                 years=years,
-                order="per_years",
+            )
+            .swaplevel(0, 2, axis=1)
+            .sort_index(axis=1, level=0)
+        )
+
+        data = Data(
+            # frame=frame,
+            unit="Tj",
+            balance_aggregates=balance_aggregates,
+            energy_sources=energy_sources,
+            energy_aggregates=energy_aggregates,
+            years=years,
+            provinces=provinces,
+            per_balance_aggregate=per_balance_aggregate,
+            per_energy_source=per_energy_source,
+            per_energy_aggregate=per_energy_aggregate,
+            per_years=per_years,
+            show_source_values_for_energy_aggregates=show_source_values_for_energy_aggregates,
+        )
+
+        print("df init: ", df.head())
+
+        if per_energy_aggregate:
+
+            self.get_eb_energy_aggregates(df=df, data=data)
+
+        else:
+            # Filter sources
+            df = df.groupby(level=["ET"], axis=1).filter(
+                lambda x: x.columns.get_level_values(1).unique() in energy_sources
+            )
+
+            if per_balance_aggregate:
+
+                self.get_eb_energy_soures(df=df, data=data)
+
+            elif per_energy_source:
+
+                self.get_eb_balance_aggregates(df=df, data=data)
+
+            # All years
+            elif per_years:
+                self.get_eb_over_all_years(df=df, data=data)
+        return
+
+    # ////////////////////////////////////////////////////////////////// E-AGGS
+
+    def get_eb_energy_aggregates(self, df: pd.DataFrame, data: Data):
+
+        # Get all energy sources for selected energy aggregates
+        energy_sources = list(
+            flatten(
+                [energy_aggregate_lookup[source] for source in data.energy_aggregates]
             )
         )
-        return
+
+        # Filter energy sources from pickled df
+        df = (
+            df.groupby(level=["ET"], axis=1)
+            .filter(lambda x: x.columns.get_level_values(1).unique() in energy_sources)
+            .stack("ET")
+            .unstack("IDX_0")
+        )
+
+        for balance_aggregate in data.balance_aggregates:
+
+            # Use lookup table for slicing
+            _df = df.groupby(level=["IDX_0"], axis=1).get_group(balance_aggregate)
+
+            _energy_aggregates = []
+
+            # Iter over energy aggregates
+            for energy_aggregate in data.energy_aggregates:
+
+                # Use lookup table for slicing
+                __df = _df.groupby(level=["ET"], axis=0).filter(
+                    lambda x: x.index in energy_aggregate_lookup[energy_aggregate]
+                )
+
+                __df.loc["SUM", :] = __df.sum(numeric_only=True, axis=0)
+
+                # Create multiindex with energy_aggregate as first idx
+                __df.index = pd.MultiIndex.from_product(
+                    iterables=[[energy_aggregate], list(__df.index),],
+                    names=["ET_AGG", __df.index.name],
+                )
+
+                name = "_".join(["Energie_Aggregate", balance_aggregate])
+
+                _id = "_".join(["EAGGS", balance_aggregate[:3].upper()])
+
+                _energy_aggregates.append(__df)
+
+            # Copy
+            _data = deepcopy(data)
+
+            # Concat
+            _df = pd.concat(_energy_aggregates, axis=0)
+
+            # Swap
+            _df = _df.swaplevel("BL", "IDX_0", axis=1).sort_index(axis=1, level=0)
+
+            # Assign and rename
+            _data.name, _data._id, _data.frame = (name, _id, _df)
+
+            self.objects = _data
+
+    # ////////////////////////////////////////////////////////////////// E-SRCS
+
+    def get_eb_energy_soures(self, df: pd.DataFrame, data: pd.DataFrame):
+
+        for energy_source in data.energy_sources:
+            # Copy
+            _data = deepcopy(data)
+
+            # Info update
+            _data.energy_aggregates = None
+            _data.energy_sources = energy_source
+
+            name = "_".join([energy_source.replace(" ", "_"), "Bilanz_Aggregate",])
+
+            _id = "_".join(["BAGGS", energy_source.replace(" ", "_")[:3].upper(),])
+
+            # Slice
+            _df = df.groupby(level=["ET"], axis=1).get_group(energy_source)
+
+            _data.name, _data._id, _data.frame = (name, _id, _df)
+
+            # self.add_object(data=_data)
+            self.objects = _data
+
+        return data
+
+    # ////////////////////////////////////////////////////////////////// YEARLY
+
+    def get_eb_over_all_years(self, df: pd.DataFrame, data: Data):
+
+        name = "Year"
+
+        _id = "YEAR"
+
+        _df = df.stack("YEAR").unstack("IDX_0")
+
+        _df = _df.swaplevel("BL", "IDX_0", axis=1).sort_index(axis=1, level=0)
+
+        data.name, data._id, data.frame = (name, _id, _df)
+
+        # self.add_object(data=_data)
+        self.objects = data
+
+    # # ////////////////////////////////////////////////////////////////// E-SRCS
+
+    # @staticmethod
+    # def get_eb_balance_aggregates(df: pd.DataFrame, data: Data):
+    #     for aggregate in data.balance_aggregates:
+
+    #         data.frame = df.groupby(
+    #             level=["IDX_0"], axis=0).get_group(aggregate)
+    #         # data.frame
+
+    #     return data
+    # if rows == "balance_aggregates" and columns == "energy_sources":
+    # if per_year:
+
+    #     data = [
+    #         df.groupby(level=["YEAR"], axis=1).get_group(year) for year in years
+    #     ]
+
+    # print("EEEEEEEEEEEEEEEEEEEEEEEEEEEEE: ", data)
+    #     data = data
+    # print("data: ", data)
+
+    # self.objects = [
+    #     Data(
+    #         frame=frame,
+    #         unit="Tj",
+    #         balance_aggregates=balance_aggregates,
+    #         energy_sources=energy_sources,
+    #         energy_aggregates=energy_aggregates,
+    #         years=years,
+    #         provinces=provinces,
+    #         per_balance_aggregate=per_balance_aggregate,
+    #         per_energy_source=per_energy_source,
+    #         per_energy_aggregate=per_energy_aggregate,
+    #         per_year=per_year,
+    #     )
+    #     for frame in data
+    # ]
+
+    # def add_eb_data_per_sector(
+    #     self,
+    #     file: Union[str, Path],
+    #     aggregate: List,
+    #     provinces: List,
+    #     years: List,
+    #     conversion: Optional[str] = None,
+    #     energy_sources: Optional[List] = None,
+    #     sectors: Optional[List] = None,
+    # ):
+    #     logging.getLogger().error("/" * 80)
+    #     logging.getLogger().info(f"Adding {file} data per sector:\n{sectors}\n")
+
+    #     # Fetch data
+    #     data = pickle.load(open(self.file_paths[file], "rb"))
+    #     unit = "TJ"
+
+    #     for year in years:
+
+    #         logging.getLogger().info(f"Year: {year}")
+
+    #         for energy_source in energy_sources:
+
+    #             # Output df which holds sector series
+    #             df = pd.DataFrame(index=sectors, columns=provinces)
+
+    #             # Iter over sectors (= actually list of aggregates)
+    #             for sector in sectors:
+
+    #                 # Extend with energy source
+    #                 name = "_".join([sector, energy_source, str(year),])
+
+    #                 # Slice data for all given provinces and years
+    #                 s = data.loc[
+    #                     IDX[sector], IDX[tuple(provinces), energy_source, year],
+    #                 ]
+
+    #                 # Copy series to output df
+    #                 df.loc[sector, provinces] = s.droplevel((1, 2), axis=0).T
+
+    #             # Add sum row and column
+    #             df = add_sums(df=df)
+
+    #             # If all sum of sum column == 0, than all values are NaN
+    #             if df["Sum"].sum() != 0:
+
+    #                 if conversion is not None:
+    #                     df, unit = convert(df=df, conversion=conversion)
+
+    #                 # Share of each province over total provinces per year
+    #                 df_shares_per_province = get_shares(df=df, provinces=True)
+    #             else:
+    #                 # Write NaN df to shares
+    #                 df_shares_per_province = df
+
+    #             logging.getLogger().info(f"Added {name} to {self.name}.data_manager")
+
+    #             # Create a Data object
+    #             self.data.append(
+    #                 Data(
+    #                     name=name,
+    #                     file="sec",
+    #                     source="Energiebilanzen Bundesländer, EEV nach Sektoren",
+    #                     unit=unit,
+    #                     frame=df,
+    #                     aggregate=aggregate,
+    #                     energy_source=energy_source,
+    #                     shares_over_columns=df_shares_per_province,
+    #                     provinces=provinces,
+    #                     years=years,
+    #                     sectors=sectors,
+    #                     order="per_sector",
+    #                 )
+    #             )
+
+    # def add_stats_data_per_years(
+    #     self, file: Union[str, Path], provinces: List, years: List, name: str,
+    # ):
+    #     logging.getLogger().error("/" * 80)
+
+    #     data = pickle.load(open(self.file_paths[file], "rb"))
+
+    #     if file == "pop":
+
+    #         # Unit
+    #         unit = "Person"
+    #         aggregate = name
+    #         name = "_".join(
+    #             [aggregate, str(data["df"].index[0]), str(data["df"].index[-1])]
+    #         )
+
+    #     if file == "km_pkw":
+
+    #         # Unit
+    #         unit = "km"
+    #         aggregate = name
+    #         name = "_".join(
+    #             [aggregate, str(data["df"].index[0]), str(data["df"].index[-1])]
+    #         )
+
+    #     # Slice pickled dataframe
+    #     df = pd.DataFrame(index=years, columns=provinces)
+
+    #     logging.getLogger().info(f"Adding {file} data per years:\n{df.index}\n")
+
+    #     # _df = data["df"].loc[years, provinces]
+
+    #     for index, row in df.iterrows():
+    #         try:
+    #             df.loc[index, :] = data["df"].loc[index, provinces]
+    #         except BaseException:
+    #             pass
+
+    #     # Compute sums on rows axis (years) and on col axis (provinces)
+    #     df = add_sums(df=df)
+
+    #     # Create shares
+    #     # Share of each year over total years per province
+    #     df_shares_per_year = get_shares(df=df, years=True)
+    #     # print("pop_shares_years: ", df_shares_per_year)
+
+    #     # Share of each province over total provinces per year
+    #     df_shares_per_province = get_shares(df=df, provinces=True)
+    #     # print("pop_shares_provinces: ", df_shares_per_province)
+
+    #     logging.getLogger().info(f"Added {name} to {self.name}.data_manager")
+
+    #     # Create a Data object
+    #     self.data.append(
+    #         Data(
+    #             name=name,
+    #             source=df.index.name,
+    #             aggregate=aggregate,
+    #             frame=df,
+    #             shares_over_rows=df_shares_per_year,
+    #             shares_over_columns=df_shares_per_province,
+    #             unit=unit,
+    #             file=file,
+    #             provinces=provinces,
+    #             years=years,
+    #             order="per_years",
+    #         )
+    #     )
+    #     return
 
     # def add_overlay(
     #     self,
