@@ -26,7 +26,7 @@
 #         "rb",
 #     )
 # )
-# # # nea_df.index.name = "ET"
+# # # nea_df.index.name = "ES"
 # # thg_df.head()
 # # IDX rows = ENERGY SOURCE
 # # IDX columns PROV, AGGREGATE, USAGE CAT, YEARS
@@ -47,7 +47,7 @@
 #     ]
 
 # s = thg_df.T.groupby(["YEAR"]).sum()
-# # s = s.T.groupby("BL")
+# # s = s.T.groupby("PROV")
 # print("\n")
 # # print("/" * 79)
 # # print("\n")

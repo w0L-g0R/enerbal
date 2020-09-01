@@ -14,6 +14,10 @@ def set_pd_options():
     pd.set_option("display.max_rows", None)  # or 1000
     pd.set_option("display.width", None)  # or 1000
     pd.set_option("max_colwidth", 20)  # or 1000
+    # pd.set_option("display.multi_sparse", True)  # or 1000
+    # pd.set_option("display.column_space", 5)  # or 1000
+    # pd.set_option("display.colheader_justify", "left")  # or 1000
+    # pd.set_option("display.precision", 2)  # or 1000
     return
 
 
@@ -59,9 +63,7 @@ unit_converter = {
 
 
 DEFAULT_CHART_CONFIG = {
-    "edits": {
-        "titleText": True,
-    },
+    "edits": {"titleText": True,},
     "modeBarButtons": [
         [
             "toImage",

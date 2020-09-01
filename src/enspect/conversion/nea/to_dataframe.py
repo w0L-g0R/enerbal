@@ -6,9 +6,12 @@ from typing import List, Union
 
 import numpy as np
 import pandas as pd
-from enspect.conversion.nea.data_structures import nea_data_structures
-from enspect.conversion.nea.utils import (create_nea_col_midx, fetch_from_xlsx,
-                                          write_to_log_file)
+from enspect.aggregates.nea import *
+from enspect.conversion.nea.utils import (
+    create_nea_col_midx,
+    fetch_from_xlsx,
+    write_to_log_file,
+)
 from enspect.paths import file_paths
 from enspect.utils import timeit
 from enspect.aggregates.common import provinces
@@ -17,9 +20,7 @@ IDX = pd.IndexSlice
 
 
 @timeit
-def convert_nea_to_dataframe(
-    last_year: int,
-):
+def convert_nea_to_dataframe(last_year: int,):
 
     # //////////////////////////////////////////////////// CREATE MULTI INDEX
 
@@ -40,8 +41,7 @@ def convert_nea_to_dataframe(
     files = list(file_paths["files_nea"].glob("*.xlsx"))
 
     write_to_log_file(
-        log_file=file_paths["conversion_logs"] / "nutzenergieanalyse.log",
-        files=files,
+        log_file=file_paths["conversion_logs"] / "nutzenergieanalyse.log", files=files,
     )
 
     for file in files:
@@ -91,16 +91,12 @@ def convert_nea_to_dataframe(
                     _sector = sheets[nea_year].iloc[starting_row, 0]
 
                     logging.getLogger().warning(
-                        "{}{}-Sector: {}".format(
-                            "\t" * 4,
-                            province,
-                            sector,
-                        )
+                        "{}{}-Sector: {}".format("\t" * 4, province, sector,)
                     )
 
                     # Extract sector data from sheet
                     sector_data = sheets[nea_year].iloc[
-                        starting_row + 2: starting_row + 24, :
+                        starting_row + 2 : starting_row + 24, :
                     ]
 
                     # Set first col as index
@@ -138,8 +134,7 @@ def convert_nea_to_dataframe(
                         # Assign values
                         _usage_type = sheets[nea_year].iloc[starting_row, enum + 1]
                         nea_df.loc[
-                            IDX[sources_index], IDX[province,
-                                                    sector, usage_type, year]
+                            IDX[sources_index], IDX[province, sector, usage_type, year]
                         ] = sector_data[usage_type]
 
                     # Increase counter variable
@@ -161,10 +156,24 @@ def convert_nea_to_dataframe(
     # New Column_midx
     nea_df = nea_df.unstack(level=["PROV", "ES", "UC", "YEAR"])
 
+    # Remove existing file if exists
+    pickle_file = file_paths["db_pickles"] / Path("nea.p")
+
+    if pickle_file.exists():
+
+        pickle_file.unlink()
+
+        logging.getLogger().warning(
+            "\n{}\n\n{} Removed existing file \n\n{}".format(
+                "/" * 79, "\t" * 6, "/" * 79
+            )
+        )
+
+    with open(pickle_file, "wb") as file:
+        pickle.dump(nea_df, file)
+
     logging.getLogger().warning(
-        "{}\n\n{} Finished NEA file conversion \n\n{}".format(
+        "\n{}\n\n{} Finished NEA file conversion \n\n{}".format(
             "/" * 79, "\t" * 6, "/" * 79
         )
     )
-
-    pickle.dump(nea_df, open(file_paths["db_pickles"] / Path("nea.p"), "wb"))

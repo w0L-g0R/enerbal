@@ -10,14 +10,17 @@ from utils import timeit
 
 from enspect.aggregates.eb import eb_sheet_names
 from enspect.conversion.energiebilanzen.check_errors import check_index_errors
-from enspect.conversion.energiebilanzen.utils import (add_missing_row_indices,
-                                                      copy_eb_data, copy_res_data,
-                                                      create_index_template,
-                                                      create_indices,
-                                                      fetch_from_xlsx,
-                                                      get_sectors_data,
-                                                      preprocess_res_sheet,
-                                                      write_to_log_file)
+from enspect.conversion.energiebilanzen.utils import (
+    add_missing_row_indices,
+    copy_eb_data,
+    copy_res_data,
+    create_index_template,
+    create_indices,
+    fetch_from_xlsx,
+    get_sectors_data,
+    preprocess_res_sheet,
+    write_to_log_file,
+)
 from enspect.paths import file_paths
 from enspect.aggregates.common import provinces
 
@@ -27,9 +30,7 @@ IDX = pd.IndexSlice
 
 
 @timeit
-def convert_energy_balances_to_dataframe(
-    last_year: int,
-):
+def convert_energy_balances_to_dataframe(last_year: int,):
     """
     Make sure energy balance files follow the name convention: prefix "EB" + provinces_name + year_start(last two digits only) + year_end(last two digits only) , connected with underlines, eg. EB_Bgl_88_18. Use the province abbrevations as given in enspect.settings!
     """
@@ -49,8 +50,7 @@ def convert_energy_balances_to_dataframe(
     # ________________________________________________ TEMPLATES (SINGLE INDEX)
 
     eb_idx_template = create_index_template(midx=eb_row_midx, data_type="eb")
-    res_idx_template = create_index_template(
-        midx=res_row_midx, data_type="res")
+    res_idx_template = create_index_template(midx=res_row_midx, data_type="res")
 
     # ////////////////////////////////////////////////////// CREATE STORAGE DFS
 
@@ -86,8 +86,9 @@ def convert_energy_balances_to_dataframe(
             print("Province: ", province)
 
             write_to_log_file(
-                log_file=file_paths["conversion_logs"] /
-                "energiebilanzen" / ".".join((province, "log")),
+                log_file=file_paths["conversion_logs"]
+                / "energiebilanzen"
+                / ".".join((province, "log")),
                 files=files,
                 filename=filename,
             )
@@ -128,13 +129,36 @@ def convert_energy_balances_to_dataframe(
     else:
         logging.getLogger().debug("\n=> No files left to convert!")
 
-    pickle.dump(
-        eb_df,
-        open(file_paths["db_pickles"] / Path("eb.p"), "wb"),
-    )
+    # Remove existing file if exists
+    pickle_file = file_paths["db_pickles"] / Path("eb.p")
 
-    pickle.dump(
-        res_df,
-        open(file_paths["db_pickles"] / Path("res.p"), "wb"),
-    )
+    if pickle_file.exists():
+
+        pickle_file.unlink()
+
+        logging.getLogger().warning(
+            "\n{}\n\n{} Removed existing file \n\n{}".format(
+                "/" * 79, "\t" * 6, "/" * 79
+            )
+        )
+
+    with open(pickle_file, "wb") as file:
+        pickle.dump(eb_df, file)
+
+    # Remove existing file if exists
+    pickle_file = file_paths["db_pickles"] / Path("res.p")
+
+    if pickle_file.exists():
+
+        pickle_file.unlink()
+
+        logging.getLogger().warning(
+            "\n{}\n\n{} Removed existing file \n\n{}".format(
+                "/" * 79, "\t" * 6, "/" * 79
+            )
+        )
+
+    with open(pickle_file, "wb") as file:
+        pickle.dump(eb_df, file)
+
     return

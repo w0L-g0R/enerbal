@@ -35,7 +35,7 @@ def test_dataset():
 
 
 @pytest.fixture(scope="session")
-def test_workbooks_eb():
+def test_workbook():
 
     os.system("TASKKILL /F /IM excel.exe")
 
@@ -84,7 +84,7 @@ def test_write_to_xlsx():
     def _write(wb, data_objects, sheet_name):
         # data_objects = [_data for _data in ds.objects.filter()]
 
-        # data_object_ids = [_data._id for _data in ds.objects.filter()]
+        # data_object_ids = [_data.key for _data in ds.objects.filter()]
 
         # wb.add_sheets(sheets=sheet_name)
 

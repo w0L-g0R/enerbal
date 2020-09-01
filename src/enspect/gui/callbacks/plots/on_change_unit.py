@@ -35,11 +35,7 @@ def change_unit(scale: str, setup: Dict, energy_source: str = None, year: int = 
                 setup["data"]
                 .loc[
                     IDX[setup["row_index"]],
-                    IDX[
-                        setup["provinces"],
-                        energy_source,
-                        setup["years"],
-                    ],
+                    IDX[setup["provinces"], energy_source, setup["years"],],
                 ]
                 .fillna(0)
             )
@@ -47,13 +43,7 @@ def change_unit(scale: str, setup: Dict, energy_source: str = None, year: int = 
         if "ErnRL" in setup["data_section"]:
             data_slice = (
                 setup["data"]
-                .loc[
-                    IDX[setup["row_index"]],
-                    IDX[
-                        setup["provinces"],
-                        setup["years"],
-                    ],
-                ]
+                .loc[IDX[setup["row_index"]], IDX[setup["provinces"], setup["years"],],]
                 .fillna(0)
             )
 
@@ -85,11 +75,7 @@ def change_unit(scale: str, setup: Dict, energy_source: str = None, year: int = 
                 setup["data"]
                 .loc[
                     IDX[setup["row_index"]],
-                    IDX[
-                        setup["provinces"],
-                        setup["energy_sources"],
-                        year,
-                    ],
+                    IDX[setup["provinces"], setup["energy_sources"], year,],
                 ]
                 .fillna(0)
             )
@@ -97,13 +83,7 @@ def change_unit(scale: str, setup: Dict, energy_source: str = None, year: int = 
         if "ErnRL" in setup["data_section"]:
             data_slice = (
                 setup["data"]
-                .loc[
-                    IDX[setup["row_index"]],
-                    IDX[
-                        setup["provinces"],
-                        year,
-                    ],
-                ]
+                .loc[IDX[setup["row_index"]], IDX[setup["provinces"], year,],]
                 .fillna(0)
             )
 
@@ -112,7 +92,7 @@ def change_unit(scale: str, setup: Dict, energy_source: str = None, year: int = 
         #     sum_per_year = data_slice.T.groupby(
         #         'BL').sum()
 
-        #     data_slice = data_slice.T.groupby("BL").apply(
+        #     data_slice = data_slice.T.groupby("PROV").apply(
         #         lambda x: x / sum_per_year
         #     ).T * multiplicator(
         #         unit=setup["unit"], normalized=True

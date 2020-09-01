@@ -18,7 +18,7 @@ class Data:
 
     # Shown as chart name
     name: str = None
-    _id: str = None
+    key: str = None
 
     # # Pickle file name
     # file: str = None
@@ -49,9 +49,9 @@ class Data:
     per_energy_source: bool = False
     per_energy_aggregate: bool = False
     per_usage_category: bool = False
-    and_usage_category: bool = False
-    and_balance_aggregate: bool = False
-    and_energy_source: bool = False
+    stacked_usage_category: bool = False
+    stacked_balance_aggregate: bool = False
+    stacked_energy_source: bool = False
 
     per_years: bool = False
     show_source_values_for_energy_aggregates: bool = False
@@ -97,7 +97,7 @@ class Data:
         return pformat(
             dict(
                 name=self.name,
-                _id=self._id,
+                key=self.key,
                 frame=self.frame,
                 unit=self.unit,
                 balance_aggregates=self.balance_aggregates,
@@ -114,7 +114,7 @@ class Data:
         )
 
     def __eq__(self, other):
-        return self._id == other._id
+        return self.key == other.key
 
     def xlsx_formatted(self):
 
@@ -138,8 +138,8 @@ class Data:
 
         #             df.reset_index(inplace=True)
 
-        #             # df_sums = df.groupby("ET").get_group("SUM")
-        #             df.drop(["ET", "YEAR"], inplace=True, axis=1)
+        #             # df_sums = df.groupby("ES").get_group("SUM")
+        #             df.drop(["ES", "YEAR"], inplace=True, axis=1)
         #             df = add_row_total(df=df)
         #             df.iloc[-1, 0] = "SUM"
 
@@ -164,15 +164,15 @@ class Data:
 
         #             df.reset_index(inplace=True)
 
-        #             df_sums = df.groupby("ET").get_group("SUM")
-        #             df_sums.drop(["ET", "IDX_0", "YEAR"], inplace=True, axis=1)
+        #             df_sums = df.groupby("ES").get_group("SUM")
+        #             df_sums.drop(["ES", "BAGG_0", "YEAR"], inplace=True, axis=1)
         #             df_sums = add_row_total(df=df_sums)
         #             df_sums.iloc[-1, 0] = "SUM"
 
         #             _dfs = []
         #             _dfs.append(df_sums)
 
-        #             df.drop(["IDX_0", "YEAR"], inplace=True, axis=1)
+        #             df.drop(["BAGG_0", "YEAR"], inplace=True, axis=1)
         #             _dfs.append(df)
 
         #             dfs[year][aggregate] = _dfs
@@ -189,7 +189,7 @@ class Data:
         #                 self.frame.loc[IDX[:], IDX[energy_source, aggregate, :],]
         #                 .swaplevel(0, 1, axis=1)
         #                 .stack([0, 1])
-        #                 .sort_values(["ET", "YEAR"])
+        #                 .sort_values(["ES", "YEAR"])
         #             )
 
         #             df.reset_index(inplace=True)

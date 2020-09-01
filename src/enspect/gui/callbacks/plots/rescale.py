@@ -226,7 +226,7 @@ def rescale(setup: Dict, new_scale: str):
     #         sum_per_year = data_slice.T.groupby(
     #             'BL').sum()
 
-    #         data_slice = data_slice.T.groupby("BL").apply(
+    #         data_slice = data_slice.T.groupby("PROV").apply(
     #             lambda x: x / sum_per_year
     #         ).T * multiplicator(
     #             unit=setup["unit"], normalized=True

@@ -38,7 +38,7 @@ def convert_thg_to_dataframe():
 
     midx = pd.MultiIndex.from_product(
         [provinces, thg_sources, ["TOTAL", "ETS", "NON_ETS"]],
-        names=["BL", "SRC", "CLS"],
+        names=["PROV", "SRC", "CLS"],
     )
     # print("midx: ", midx)
 
@@ -53,8 +53,7 @@ def convert_thg_to_dataframe():
 
     # Add two-level midx
     df.columns = pd.MultiIndex.from_product(
-        [provinces, thg_sources],
-        names=["BL", "SRC"],
+        [provinces, thg_sources], names=["PROV", "SRC"],
     )
 
     for province in provinces:
@@ -66,10 +65,7 @@ def convert_thg_to_dataframe():
             ]
 
     for df, source in zip(
-        [
-            thg_sheets["AT_THG_ETS_ENERGY"],
-            thg_sheets["AT_THG_ETS_INDUSTRY"],
-        ],
+        [thg_sheets["AT_THG_ETS_ENERGY"], thg_sheets["AT_THG_ETS_INDUSTRY"],],
         ["Energie", "Industrie"],
     ):
         for province in provinces:
@@ -86,7 +82,7 @@ def convert_thg_to_dataframe():
     thg_df = thg_df.unstack(level="YEAR")
 
     # New Column_midx
-    thg_df = thg_df.unstack(level=["BL", "YEAR"])
+    thg_df = thg_df.unstack(level=["PROV", "YEAR"])
 
     print("thg_df: ", thg_df)
 

@@ -65,17 +65,17 @@ def switch_sum_and_AT_col(df: pd.DataFrame):
 
 def make_AT_last_midx_col(df: pd.DataFrame):
 
-    col_list = list(df.columns.get_level_values(level="BL").unique())
+    col_list = list(df.columns.get_level_values(level="PROV").unique())
     col_list.append(col_list[0])
     col_list.pop(0)
 
     df.columns = pd.MultiIndex.from_product(
         iterables=[
             df.columns.get_level_values(level="YEAR").unique(),
-            df.columns.get_level_values(level="IDX_0").unique(),
+            df.columns.get_level_values(level="BAGG_0").unique(),
             col_list,
         ],
-        names=["YEAR", "IDX_0", "BL"],
+        names=["YEAR", "BAGG_0", "PROV"],
     )
 
     return df
@@ -93,7 +93,7 @@ def reduce_eb_row_index(balance_aggregates: List):
 
 
 def add_row_total(df: pd.DataFrame):
-    # Add colum_total row
+    # Sum over columns
     df.loc["SUM", :] = df.sum(numeric_only=True, axis=0)
 
     df.iloc[-1, 0] = "SUM"
@@ -101,9 +101,8 @@ def add_row_total(df: pd.DataFrame):
 
 
 def add_col_total(df: pd.DataFrame):
-    # Add colum_total row
-    df.loc[:, "SUM"] = df.sum(
-        numeric_only=True, axis=1).subtract(df[df.columns[0]])
+
+    df.loc[:, "SUM"] = df.sum(numeric_only=True, axis=1).subtract(df[df.columns[0]])
 
     col_list = list(df.columns)
     col_list.remove("AT")
@@ -146,7 +145,7 @@ def slice_eb_inputs(df: pd.DataFrame, balance_aggregates: List, years=List):
 
     # new_cols = df.columns.reindex(cols, level = 0)
 
-    # return df.columns.reindex(col_list, level="BL")
+    # return df.columns.reindex(col_list, level="PROV")
 
 
 # def get_shares(df: pd.DataFrame,):
@@ -292,7 +291,7 @@ def slice_eb_inputs(df: pd.DataFrame, balance_aggregates: List, years=List):
 #     return wrapper
 
 #     data.append(
-#         df.groupby(level=["IDX_0"], axis=0).get_group(aggregate)
+#         df.groupby(level=["BAGG_0"], axis=0).get_group(aggregate)
 #         # .swaplevel(2, 1, axis=1)
 #         # .sort_index(axis=1, level=0)
 #     )
@@ -309,7 +308,7 @@ def slice_eb_inputs(df: pd.DataFrame, balance_aggregates: List, years=List):
 # return data
 
 # USE FOR SUM ROWS ONLY -> Chart
-# d = data.groupby(level=["ET"], axis=0).get_group("SUM")
+# d = data.groupby(level=["ES"], axis=0).get_group("SUM")
 # print("d: ", d)
 # # g =
 # # g.index

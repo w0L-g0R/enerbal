@@ -8,15 +8,14 @@ import openpyxl
 import pandas as pd
 import xlwings as xw
 from openpyxl import load_workbook
-from openpyxl.styles import (
-    Alignment, Border, Color, Fill, Font, PatternFill, Side)
+from openpyxl.styles import Alignment, Border, Color, Fill, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 from openpyxl.utils.dataframe import dataframe_to_rows, expand_levels
+
 # from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
 from enspect.models.data import Data
-from enspect.models.utils import add_col_total, add_row_total
 
 
 def concat_generators(*args):
@@ -93,24 +92,40 @@ class Workbook:
     ):
         ws = self.book[sheet]
 
-        if data.per_balance_aggregate:
-
-            self.add_balance_aggregates(data=data, ws=ws)
-
         if data.per_energy_aggregate:
 
-            self.add_energy_aggregates(data=data, ws=ws)
+            df = data.frame
 
-        if data.per_years:
+            mask = df["ES"].values == "SUM"
 
-            self.add_yearly_data(data=data, ws=ws)
+            df_sums_only = df[mask]
 
-    def write_to_cells(self, ws: Worksheet, _id: str, df: pd.DataFrame, data: Data):
+            self.write_to_cells(ws=ws, df=df_sums_only, data=data)
 
-        info = self.get_info(ws=ws, data=data, _id=_id)
+            if data.show_source_values_for_energy_aggregates:
+
+                self.update_next_empty_row(
+                    ws=ws, up_shift=len(df_sums_only) + self.len_info
+                )
+
+                self.update_next_empty_col(ws=ws, right_shift=len(df.columns))
+
+                self.write_to_cells(ws=ws, df=df, data=data)
+
+                self.update_next_empty_col(ws=ws, left_shift=len(df.columns))
+
+        else:
+
+            self.write_to_cells(ws=ws, df=data.frame, data=data)
+
+    def write_to_cells(self, ws: Worksheet, df: pd.DataFrame, data: Data):
+
+        # Add info rows in sheet
+        info = self.get_info(ws=ws, data=data)
 
         rows = dataframe_to_rows(df, index=False)
 
+        # Since rows and info are generators, concat them with this util func
         rows = concat_generators(info, rows)
 
         for r_idx, row in enumerate(rows, ws.next_empty_row):
@@ -125,102 +140,7 @@ class Workbook:
 
         return
 
-    def add_balance_aggregates(self, data: Data, ws: Worksheet):
-
-        for year in data.years:
-
-            for energy_source in [data.energy_sources]:
-
-                df = data.frame.loc[
-                    IDX[:],
-                    IDX[
-                        year,
-                        energy_source,
-                        :,
-                    ],
-                ].stack([0, 1])
-
-                df = add_col_total(df=df)
-
-                df.reset_index(inplace=True)
-
-                df.drop(["ET", "YEAR"], inplace=True, axis=1)
-
-                df = add_row_total(df=df)
-
-                _id = data._id + f"_{year}"
-
-                self.write_to_cells(ws=ws, _id=_id, df=df, data=data)
-
-    def add_energy_aggregates(self, data: Data, ws: Worksheet):
-
-        for year in data.years:
-
-            for balance_aggregate in [data.balance_aggregates]:
-                print("balance_aggregate: ", balance_aggregate)
-
-                df = data.frame.loc[
-                    IDX[:],
-                    IDX[
-                        year,
-                        balance_aggregate,
-                        :,
-                    ],
-                ].stack([0, 1])
-
-                df = add_col_total(df=df)
-
-                df.reset_index(inplace=True)
-
-                # df_sums = df.groupby("ET").get_group("SUM")
-                df.drop(["IDX_0", "YEAR"], inplace=True, axis=1)
-
-                # df = add_row_total(df=df)
-                mask = df["ET"].values == "SUM"
-                df_sums_only = df[mask]
-
-                _id = data._id + f"_{year}"
-
-                self.write_to_cells(ws=ws, _id=_id, df=df_sums_only, data=data)
-
-                if data.show_source_values_for_energy_aggregates:
-
-                    self.update_next_empty_row(
-                        ws=ws, up_shift=len(df_sums_only) + self.len_info
-                    )
-
-                    self.update_next_empty_col(ws=ws, right_shift=len(df.columns))
-
-                    self.write_to_cells(ws=ws, _id=_id, df=df, data=data)
-
-                    self.update_next_empty_col(ws=ws, left_shift=len(df.columns))
-
-    def add_yearly_data(self, data: Data, ws: Worksheet):
-
-        for energy_source in data.energy_sources:
-
-            for balance_aggregate in data.balance_aggregates:
-
-                df = data.frame.loc[
-                    IDX[:],
-                    IDX[
-                        energy_source,
-                        balance_aggregate,
-                        :,
-                    ],
-                ].stack([0, 1])
-
-                df = add_col_total(df=df)
-
-                df.reset_index(inplace=True)
-
-                df = add_row_total(df=df)
-
-                _id = data._id + f"_{energy_source}_{balance_aggregate}"
-
-                self.write_to_cells(ws=ws, _id=_id, df=df, data=data)
-
-    def get_info(self, ws: Worksheet, data: pd.DataFrame, _id: str):
+    def get_info(self, ws: Worksheet, data: pd.DataFrame):
 
         info = pd.DataFrame(
             index=["Title", "Data", "Scale", "Source", "Created", "ID"],
@@ -231,7 +151,7 @@ class Workbook:
                 None,
                 data.source,
                 datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                _id
+                data.key
                 # chart,
             ],
         )
@@ -242,9 +162,7 @@ class Workbook:
 
     @staticmethod
     def update_next_empty_row(
-        ws: Worksheet,
-        down_shift: int = None,
-        up_shift: int = None,
+        ws: Worksheet, down_shift: int = None, up_shift: int = None,
     ):
 
         if down_shift is not None:
@@ -297,7 +215,7 @@ class Workbook:
     #                     ]
     #                 )
 
-    #                 _id = "_".join(
+    #                 key = "_".join(
     #                     [
     #                         "EA",
     #                         energy_aggregate.replace(" ", "_")[:3].upper(),
@@ -305,7 +223,7 @@ class Workbook:
     #                     ]
     #                 )
 
-    #                 info = list(self.get_info(ws=ws, data=data, name=name, _id=_id))
+    #                 info = list(self.get_info(ws=ws, data=data, name=name, key=key))
 
     #                 rows = dataframe_to_rows(df, index=False)
 
@@ -342,7 +260,7 @@ class Workbook:
     #                 ]
     #             )
 
-    #             _id = "_".join(
+    #             key = "_".join(
     #                 [
     #                     energy_source_name.replace(" ", "_")[:3].upper(),
     #                     balance_aggregate_name.replace(" ", "_")[:3].upper(),
@@ -351,7 +269,7 @@ class Workbook:
     #                 ]
     #             )
 
-    #             info = list(self.get_info(ws=ws, data=data, name=name, _id=_id))
+    #             info = list(self.get_info(ws=ws, data=data, name=name, key=key))
 
     #             rows = dataframe_to_rows(df, index=False)
 
@@ -442,10 +360,10 @@ class Workbook:
 
 #         dfs = data.xlsx_formatted()
 
-#         # df = df.stack(level="BL")
+#         # df = df.stack(level="PROV")
 
 #         # df.reset_index(level="YEAR", col_level=0, inplace=True)
-#         # df.reset_index(col_level="BL", inplace=True)
+#         # df.reset_index(col_level="PROV", inplace=True)
 #         # df.reset_index(self, drop=True, inplace=True)
 #         # print("df: ", df)
 #         # print("data: ", data)

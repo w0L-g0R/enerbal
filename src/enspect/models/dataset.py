@@ -10,15 +10,23 @@ import numpy as np
 import pandas as pd
 from pandas.core.common import flatten
 
-from enspect.conversion.energiebilanzen.data_structures import (
-    eev_aggregates, energy_aggregate_lookup, sector_energy, sectors)
+from enspect.aggregates.eb import (
+    eev_aggregates,
+    energy_aggregate_lookup,
+    sector_energy,
+    sectors,
+)
 from enspect.models.data import Data, FilterData
-from enspect.settings import file_paths, provinces, provinces_hex, unit_converter
+from enspect.paths import file_paths
+from enspect.aggregates.common import provinces
+from enspect.settings import unit_converter
 
 from enspect.models.utils import (
     add_row_total,
     slice_eb_inputs,
 )
+
+from enspect.models.utils import add_col_total, add_row_total
 
 IDX = pd.IndexSlice
 
@@ -43,35 +51,45 @@ class DataSet:
 
     @objects.setter
     def objects(self, _objects: List = list):
+
+        # TODO: Catch duplicates here
+
         # print(data)
         # if not isinstance(_objects, list):
         #     _objects = [_objects]
 
         _ids = [
-            data._id
+            data.key
             for data in self._objects
             # if not isinstance(_object, list)
         ]
 
-        print("_ids: ", _ids)
+        # print("_ids: ", _ids)
 
         # if not _ids:
         self._objects.append(_objects)
         # else:
-        #     # for _id in _ids:
+        #     # for key in _ids:
         #     #     print("_object: ", data.name)
-        #     if data._id in _ids:
+        #     if data.key in _ids:
         #         pass
         #     else:
         #         self._objects.append(data)
 
         _ids = [
-            data._id
+            data.key
             for data in self._objects
             # if not isinstance(_object, list)
         ]
 
-        print("_ids: ", _ids)
+        # print("_ids: ", _ids)
+
+    # __________________________________________________________________________
+    #
+    # /////////////////////////////////////////////////////////////////////////
+    # //////////////////////////////  EB DATA  ////////////////////////////////
+    # /////////////////////////////////////////////////////////////////////////
+    # __________________________________________________________________________
 
     def add_eb_data(
         self,
@@ -89,16 +107,10 @@ class DataSet:
 
         logging.getLogger().error("/" * 80)
 
-        assert isinstance(
-            balance_aggregates, (list, tuple)
-        ), "Wrap list or tuple around aggregate!"
+        df = pickle.load(open(file_paths["db_pickles"] / "eb.p", "rb"))
 
         df = (
-            slice_eb_inputs(
-                df=pickle.load(open(file_paths["db_pickles"] / "eb.p", "rb")),
-                balance_aggregates=balance_aggregates,
-                years=years,
-            )
+            slice_eb_inputs(df=df, balance_aggregates=balance_aggregates, years=years,)
             .swaplevel(0, 2, axis=1)
             .sort_index(axis=1, level=0)
         )
@@ -125,11 +137,9 @@ class DataSet:
             self.add_eb_energy_aggregates(df=df, data=data)
 
         else:
-            # TODO: Get rid of lambda - replace with loc
             # Filter sources
-            df = df.groupby(level=["ET"], axis=1).filter(
-                lambda x: x.columns.get_level_values(
-                    1).unique() in energy_sources
+            df = df.groupby(level=["ES"], axis=1).filter(
+                lambda x: x.columns.get_level_values(1).unique() in energy_sources
             )
 
             if per_balance_aggregate:
@@ -152,29 +162,19 @@ class DataSet:
         # Get all energy sources for selected energy aggregates
         energy_sources = list(
             flatten(
-                [energy_aggregate_lookup[source]
-                    for source in data.energy_aggregates]
+                [energy_aggregate_lookup[source] for source in data.energy_aggregates]
             )
         )
 
         # Filter energy sources from pickled df
-        # TODO: Get rid of lambda - replace with loc
-
-        df = (
-            df.groupby(level=["ET"], axis=1)
-            .filter(lambda x: x.columns.get_level_values(1).unique() in energy_sources)
-            .stack("ET")
-            .unstack("IDX_0")
-        )
+        df = df.loc[IDX[:], IDX[:, energy_sources, :]].stack("ES").unstack("BAGG_0")
 
         for balance_aggregate in data.balance_aggregates:
 
             # Use lookup table for slicing
-            _df = df.groupby(
-                level=["IDX_0"],
-                axis=1).get_group(balance_aggregate)
+            df_I = df.groupby(level=["BAGG_0"], axis=1).get_group(balance_aggregate)
 
-            _energy_aggregates = []
+            energy_aggregates = []
 
             # Iter over energy aggregates
             for energy_aggregate in data.energy_aggregates:
@@ -182,85 +182,105 @@ class DataSet:
                 # Use lookup table for slicing
                 # TODO: Maybe Get rid of lambda - replace with loc
 
-                __df = _df.groupby(level=["ET"], axis=0).filter(
+                df_II = df_I.groupby(level=["ES"], axis=0).filter(
                     lambda x: x.index in energy_aggregate_lookup[energy_aggregate]
                 )
 
-                __df.loc["SUM", :] = __df.sum(numeric_only=True, axis=0)
+                df_II.loc["SUM", :] = df_II.sum(numeric_only=True, axis=0)
 
                 # Create multiindex with energy_aggregate as first idx
-                __df.index = pd.MultiIndex.from_product(
-                    iterables=[
-                        [energy_aggregate],
-                        list(__df.index),
-                    ],
-                    names=["ET_AGG", __df.index.name],
+                df_II.index = pd.MultiIndex.from_product(
+                    iterables=[[energy_aggregate], list(df_II.index),],
+                    names=["ES_AGG", df_II.index.name],
                 )
 
-                name = "_".join(["Energie_Aggregate", balance_aggregate])
-
-                _id = "_".join(
-                    [
-                        "EAGGS",
-                        balance_aggregate[:3].upper(),
-                        str(data.years[0])[-2:],
-                        str(data.years[-1])[-2:],
-                    ]
-                )
-
-                _energy_aggregates.append(__df)
-
-            # Copy
-            _data = deepcopy(data)
+                energy_aggregates.append(df_II)
 
             # Concat
-            _df = pd.concat(_energy_aggregates, axis=0)
+            df_III = pd.concat(energy_aggregates, axis=0)
 
-            # Swap
-            _df = _df.swaplevel(
-                "BL", "IDX_0", axis=1).sort_index(
-                axis=1, level=0)
+            # Create
+            for year in data.years:
 
-            # Assign and rename
-            _data.name, _data._id, _data.frame = (name, _id, _df)
+                # Name and key
+                name = "_".join(("Energie_Aggregate", balance_aggregate, str(year)))
 
-            self.objects = _data
+                key = "_".join(("EAGGS", balance_aggregate[:3].upper(), str(year)[-2:]))
+
+                df_IV = (
+                    df_III.groupby(level="YEAR", axis=1).get_group(year).stack([0, 2])
+                )
+
+                # Add sum over rows for each column
+                df_IV = add_col_total(df=df_IV)
+
+                df_IV.reset_index(inplace=True)
+
+                # Drop indices
+                df_IV.drop(columns=["BAGG_0", "YEAR"], inplace=True)
+
+                # Copy
+                _data = deepcopy(data)
+
+                (
+                    _data.name,
+                    _data.key,
+                    _data.frame,
+                    _data.balance_aggregates,
+                    _data.years,
+                ) = (name, key, df_I, balance_aggregate, year)
+
+                self.objects = _data
 
     # ////////////////////////////////////////////////////////////////// E-SRCS
 
     def add_eb_balance_aggregates(self, df: pd.DataFrame, data: pd.DataFrame):
 
         for energy_source in data.energy_sources:
-            # Copy
-            _data = deepcopy(data)
 
-            # Info update
-            _data.energy_aggregates = None
-            _data.energy_sources = energy_source
+            for year in data.years:
 
-            name = "_".join(
-                [
-                    energy_source.replace(" ", "_"),
-                    "Bilanz_Aggregate",
-                ]
-            )
+                name = "_".join(
+                    (energy_source.replace(" ", "_"), "Bilanz_Aggregate", str(year))
+                )
 
-            _id = "_".join(
-                [
-                    "BAGGS",
-                    energy_source.replace(" ", "_")[:3].upper(),
-                    str(data.years[0])[-2:],
-                    str(data.years[-1])[-2:],
-                ]
-            )
+                key = "_".join(
+                    [
+                        "BAGGS",
+                        energy_source.replace(" ", "_")[:3].upper(),
+                        str(year)[-2:],
+                    ]
+                )
 
-            # Slice
-            _df = df.groupby(level=["ET"], axis=1).get_group(energy_source)
+                # Slice
+                df_I = df.loc[IDX[:], IDX[year, energy_source, provinces,]].stack(
+                    [0, 1]
+                )
 
-            _data.name, _data._id, _data.frame = (name, _id, _df)
+                df_I = add_col_total(df=df_I)
 
-            # self.add_object(data=_data)
-            self.objects = _data
+                df_I.reset_index(inplace=True)
+
+                df_I.drop(["ES", "YEAR"], inplace=True, axis=1)
+
+                df_I = add_row_total(df=df_I)
+
+                # Copy
+                _data = deepcopy(data)
+
+                # Info update
+                _data.energy_aggregates = None
+
+                (
+                    _data.name,
+                    _data.key,
+                    _data.frame,
+                    _data.energy_sources,
+                    _data.years,
+                ) = (name, key, df_I, energy_source, year)
+
+                # self.add_object(data=_data)
+                self.objects = _data
 
         return data
 
@@ -268,22 +288,65 @@ class DataSet:
 
     def add_eb_over_all_years(self, df: pd.DataFrame, data: Data):
 
-        name = "Year"
+        for energy_source in data.energy_sources:
 
-        _id = "_".join(("YEARS",
+            for balance_aggregate in data.balance_aggregates:
+
+                name = "_".join(
+                    (
+                        energy_source,
+                        balance_aggregate,
+                        str(data.years[0]),
+                        str(data.years[-1]),
+                    )
+                )
+
+                key = "_".join(
+                    (
+                        "YEARS",
+                        energy_source[:3].upper(),
+                        balance_aggregate[:3].upper(),
                         str(data.years[0])[-2:],
-                        str(data.years[-1])[-2:]))
+                        str(data.years[-1])[-2:],
+                    )
+                )
 
-        _df = df.stack("YEAR").unstack("IDX_0")
+                df_I = (
+                    df.loc[IDX[balance_aggregate], IDX[:, energy_source, provinces,],]
+                    .to_frame()
+                    .stack()
+                    .unstack("PROV")
+                )
 
-        _df = _df.swaplevel("BL", "IDX_0", axis=1).sort_index(axis=1, level=0)
+                df_I = add_col_total(df=df_I)
 
-        data.name, data._id, data.frame = (name, _id, _df)
+                df_I.reset_index(inplace=True)
 
-        # self.add_object(data=_data)
-        self.objects = data
+                df_I = add_row_total(df=df_I)
 
-    # //////////////////////////////////////////////////////////////// E-SRCS
+                # level_2: BAGG_0 index lost due to series slicing and stack
+                df_I.drop(columns=["ES", "level_2"], inplace=True)
+
+                # Copy
+                _data = deepcopy(data)
+
+                (
+                    _data.name,
+                    _data.key,
+                    _data.frame,
+                    _data.energy_sources,
+                    _data.balance_aggregates,
+                ) = (name, key, df_I, energy_source, balance_aggregate)
+
+                # self.add_object(data=_data)
+                self.objects = _data
+
+    # __________________________________________________________________________
+    #
+    # /////////////////////////////////////////////////////////////////////////
+    # //////////////////////////////  NEA DATA  ///////////////////////////////
+    # /////////////////////////////////////////////////////////////////////////
+    # __________________________________________________________________________
 
     def add_nea_data(
         self,
@@ -295,17 +358,13 @@ class DataSet:
         per_usage_category: bool = False,
         per_balance_aggregate: bool = False,
         per_energy_source: bool = False,
-        and_usage_category: bool = False,
-        and_balance_aggregate: bool = False,
-        and_energy_source: bool = False,
+        stacked_usage_category: bool = False,
+        stacked_balance_aggregate: bool = False,
+        stacked_energy_source: bool = False,
         per_years: bool = False,
     ):
 
         logging.getLogger().error("/" * 80)
-
-        assert isinstance(
-            balance_aggregates, (list, tuple)
-        ), "Wrap list or tuple around aggregate!"
 
         df = (
             pickle.load(open(file_paths["db_pickles"] / "nea.p", "rb")).sort_index(
@@ -315,8 +374,7 @@ class DataSet:
         )
 
         print("df head: ", df.head())
-        # df = df.sort_index()
-        print("df head: ", df.head())
+
         # Filter aggregates
         df = df.loc[
             IDX[balance_aggregates],
@@ -334,52 +392,89 @@ class DataSet:
             per_usage_category=per_usage_category,
             per_balance_aggregate=per_balance_aggregate,
             per_energy_source=per_energy_source,
-            and_usage_category=and_usage_category,
-            and_balance_aggregate=and_balance_aggregate,
-            and_energy_source=and_energy_source,
+            stacked_usage_category=stacked_usage_category,
+            stacked_balance_aggregate=stacked_usage_category,
+            stacked_energy_source=stacked_energy_source,
             per_years=per_years,
         )
 
         # /////////////////////////////////////////////////////////// PER E-SRC
 
         # CASE 1.1: X-Axis: UC, Y-Axis: Stacked SEC
-        if int(per_energy_source) + int(and_usage_category) == 2:
+        # if int(per_energy_source) + int(and_usage_category) == 2:
+        if per_energy_source and stacked_usage_category:
+            print("\n CASE 1.1: ")
 
             for energy_source in data.energy_sources:
-                _df = df.groupby(level=["ET"], axis=1).get_group(energy_source)
+                df_I = df.groupby(level=["ES"], axis=1).get_group(energy_source)
 
                 for usage_category in data.usage_categories:
-                    __df = _df.groupby(level=["USAGE"], axis=1).get_group(
-                        usage_category
-                    )
-                    for year in years:
-                        ___df = __df.groupby(
-                            level=["YEAR"], axis=1).get_group(year)
-                        print("___df: ", ___df)
+                    df_II = df_I.groupby(level=["UC"], axis=1).get_group(usage_category)
 
-            pass
+                    for year in years:
+                        df_III = (
+                            df_II.groupby(level=["YEAR"], axis=1)
+                            .get_group(year)
+                            .stack([1, 2, 3])
+                            # .to_frame()
+                            # .stack("PROV")
+                        )
+                        print("df_III: ", df_III)
+
+                        df_III = add_col_total(df=df_III)
+
+                        df_III.reset_index(inplace=True)
+
+                        # df_III = add_row_total(df=df_III)
+
+                        df_III.drop(columns=["ES", "UC", "YEAR"], inplace=True)
+
+                        # level_2: BAGG_0 index lost due to series slicing and stack
+                        # df_III.drop(columns=["ES", "level_2"], inplace=True)
+                        name = "_".join((energy_source, usage_category, str(year),))
+
+                        key = "_".join(
+                            (
+                                "EC_STACKED_UC",
+                                energy_source[:3].upper(),
+                                usage_category[:3].upper(),
+                                str(year),
+                            )
+                        )
+                        # Copy
+                        _data = deepcopy(data)
+
+                        (
+                            _data.name,
+                            _data.key,
+                            _data.frame,
+                            _data.energy_sources,
+                            _data.usage_categories,
+                        ) = (name, key, df_III, energy_source, usage_category)
+
+                        # self.add_object(data=_data)
+                        self.objects = _data
+
         # CASE 1.2: X-Axis: SEC, Y-Axis: Stacked UC
         elif int(per_energy_source) + int(and_balance_aggregate) == 2:
 
             for energy_source in data.energy_sources:
-                _df = df.groupby(level=["ET"], axis=1).get_group(energy_source)
+                df_I = df.groupby(level=["ES"], axis=1).get_group(energy_source)
 
                 for balance_aggregate in data.balance_aggregates:
-                    __df = _df.groupby(level=["SECTOR"], axis=0).get_group(
+                    df_II = df_I.groupby(level=["BAGG_0"], axis=0).get_group(
                         balance_aggregate
                     )
                     for year in years:
-                        ___df = __df.groupby(
-                            level=["YEAR"], axis=1).get_group(year)
+                        df_III = df_II.groupby(level=["YEAR"], axis=1).get_group(year)
 
-                        index = ___df.columns.get_level_values(
-                            level="USAGE").unique()
+                        index = df_III.columns.get_level_values(level="UC").unique()
 
-                        ___df = ___df.stack("USAGE").unstack("SECTOR")
+                        df_III = df_III.stack("UC").unstack("BAGG_0")
 
-                        ___df = ___df.reindex(index)
+                        df_III = df_III.reindex(index)
 
-                        print("___df: ", ___df)
+                        print("df_III: ", df_III)
                         print()
 
         # /////////////////////////////////////////////////////////// PER B-AGG
@@ -388,31 +483,28 @@ class DataSet:
         elif per_balance_aggregate:
 
             for balance_aggregate in data.balance_aggregates:
-                _df = df.groupby(
-                    level=["SECTOR"],
-                    axis=0).get_group(balance_aggregate)
+                df_I = df.groupby(level=["BAGG_0"], axis=0).get_group(balance_aggregate)
 
                 # for energy_source in data.energy_sources:
-                #     __df = _df.groupby(level=["ET"], axis=1).get_group(energy_source)
+                #     df_II = _df.groupby(level=["ES"], axis=1).get_group(energy_source)
 
                 for year in years:
 
-                    __df = _df.groupby(level=["YEAR"], axis=1).get_group(year)
+                    df_II = df_I.groupby(level=["YEAR"], axis=1).get_group(year)
 
                     # CASE 3.1: X-Axis: SEC, Y-Axis: Stacked ET
-                    if and_usage_category:
-                        index = __df.columns.get_level_values(
-                            level="USAGE").unique()
+                    if and_UC_category:
+                        index = df_II.columns.get_level_values(level="UC").unique()
 
-                        __df = __df.stack("USAGE").unstack("SECTOR")
+                        df_II = df_II.stack("UC").unstack("SECTOR")
 
-                        __df = __df.reindex(index)
+                        df_II = df_II.reindex(index)
 
                         print("_df: ", _df)
 
                     if and_energy_source:
 
-                        print("__df: ", __df)
+                        print("df_II: ", df_II)
 
         # CASE 2.2: X-Axis: UC, Y-Axis: Stacked ET
         # elif int(per_balance_aggregate) + int(and_usage_category) == 2:
@@ -421,19 +513,19 @@ class DataSet:
         #         _df = df.groupby(level=["SECTOR"], axis=0).get_group(balance_aggregate)
 
         #         # for usage_category in data.usage_categories:
-        #         #     __df = _df.groupby(level=["USAGE"], axis=1).get_group(
+        #         #     df_II = _df.groupby(level=["USAGE"], axis=1).get_group(
         #         #         usage_category
         #         #     )
         #         for year in years:
-        #             ___df = __df.groupby(level=["YEAR"], axis=1).get_group(year)
+        #             _df_II = df_II.groupby(level=["YEAR"], axis=1).get_group(year)
 
-        #             index = ___df.columns.get_level_values(level="ET").unique()
+        #             index = _df_II.columns.get_level_values(level="ES").unique()
 
-        #             ___df = ___df.stack("ET").unstack("SECTOR")
+        #             _df_II = _df_II.stack("ES").unstack("SECTOR")
 
-        #             ___df = ___df.reindex(index)
+        #             _df_II = _df_II.reindex(index)
 
-        #             print("___df: ", ___df)
+        #             print("_df_II: ", _df_II)
         #             print()
 
         # /////////////////////////////////////////////////////////// PER UC
@@ -441,32 +533,29 @@ class DataSet:
         elif per_usage_category:
 
             for usage_category in data.usage_categories:
-                _df = df.groupby(
-                    level=["USAGE"],
-                    axis=1).get_group(usage_category)
+                df_I = df.groupby(level=["USAGE"], axis=1).get_group(usage_category)
 
                 # for energy_source in data.energy_sources:
-                #     __df = _df.groupby(level=["ET"], axis=1).get_group(energy_source)
+                #     df_II = df_I.groupby(level=["ES"], axis=1).get_group(energy_source)
 
                 for year in data.years:
-                    __df = _df.groupby(level=["YEAR"], axis=1).get_group(year)
+                    df_II = df_I.groupby(level=["YEAR"], axis=1).get_group(year)
 
                     # CASE 3.1: X-Axis: SEC, Y-Axis: Stacked ET
                     if and_balance_aggregate:
 
-                        index = __df.columns.get_level_values(
-                            level="ET").unique()
+                        index = df_II.columns.get_level_values(level="ES").unique()
 
-                        __df = __df.stack("ET").unstack("SECTOR")
+                        df_II = df_II.stack("ES").unstack("SECTOR")
 
-                        __df = __df.reindex(index)
+                        df_II = df_II.reindex(index)
 
-                        print("___df: ", ___df)
+                        print("df_I_II: ", df_II)
 
                     # CASE 3.2: X-Axis: ET, Y-Axis: Stacked SEC
 
                     elif and_energy_source:
-                        print("__df: ", __df)
+                        print("df_II: ", df_II)
 
         # CASE 2.2: X-Axis: ET, Y-Axis: Stacked UC
         # elif int(per_usage_category) + int(and_energy_source) == 2:
@@ -475,20 +564,20 @@ class DataSet:
         #         _df = df.groupby(level=["USAGE"], axis=1).get_group(usage_category)
 
         #         for balance_aggregate in data.balance_aggregates:
-        #             __df = _df.groupby(level=["SECTOR"], axis=0).get_group(
+        #             df_II = _df.groupby(level=["SECTOR"], axis=0).get_group(
         #                 balance_aggregate
         #             )
 
         #             for year in years:
-        #                 ___df = __df.groupby(level=["YEAR"], axis=1).get_group(year)
+        #                 _df_II = df_II.groupby(level=["YEAR"], axis=1).get_group(year)
 
-        #                 # index = ___df.columns.get_level_values(level="ET").unique()
+        #                 # index = _df_II.columns.get_level_values(level="ES").unique()
 
-        #                 # ___df = ___df.stack("ET").unstack("SECTOR")
+        #                 # _df_II = _df_II.stack("ES").unstack("SECTOR")
 
-        #                 # ___df = ___df.reindex(index)
+        #                 # _df_II = _df_II.reindex(index)
 
-        #                 print("___df: ", ___df)
+        #                 print("_df_II: ", _df_II)
         #                 print()
         return
 
@@ -506,7 +595,7 @@ class DataSet:
 
     #         name = "_".join([energy_source.replace(" ", "_"), "Bilanz_Aggregate",])
 
-    #         _id = "_".join(
+    #         key = "_".join(
     #             [
     #                 "BAGGS",
     #                 energy_source.replace(" ", "_")[:3].upper(),
@@ -516,9 +605,9 @@ class DataSet:
     #         )
 
     #         # Slice
-    #         _df = df.groupby(level=["ET"], axis=1).get_group(energy_source)
+    #         _df = df.groupby(level=["ES"], axis=1).get_group(energy_source)
 
-    #         _data.name, _data._id, _data.frame = (name, _id, _df)
+    #         _data.name, _data.key, _data.frame = (name, key, _df)
 
     #         # self.add_object(data=_data)
     #         self.objects = _data
@@ -530,7 +619,7 @@ class DataSet:
     #     for aggregate in data.balance_aggregates:
 
     #         data.frame = df.groupby(
-    #             level=["IDX_0"], axis=0).get_group(aggregate)
+    #             level=["BAGG_0"], axis=0).get_group(aggregate)
     #         # data.frame
 
     #     return data
@@ -905,12 +994,12 @@ class DataSet:
     #     data = group.groupby(level=["YEAR"], axis=1).get_group(year)
 
     # shares_over_rows = (
-    #     data.groupby(level="BL", axis=1)
+    #     data.groupby(level="PROV", axis=1)
     #     .apply(lambda x: 100 * x / float(x.sum()))
     #     .round(2)
     # )
 
-    # shares_over_rows_sum = data.groupby(level="BL", axis=1).sum()
+    # shares_over_rows_sum = data.groupby(level="PROV", axis=1).sum()
     # print("shares_over_rows_sum: ", shares_over_rows_sum)
     # shares_over_rows = data / shares_over_rows_sum
 

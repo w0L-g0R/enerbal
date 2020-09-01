@@ -3,96 +3,31 @@ import logging
 import sys
 from pathlib import Path
 from pprint import pprint
-
+import pickle
 import pandas as pd
 import xlwings as xw
 
 # from enspect.xlsx.workbook import xlsx
-from enspect.conversion.energiebilanzen.data_structures import (
-    eev_aggregates, eev_generation, energy_aggregate_lookup)
+from enspect.aggregates.eb import (
+    eev_aggregates,
+    eev_generation,
+    energy_aggregate_lookup,
+)
 from enspect.logger.setup import setup_logging
 from enspect.models.dataset import DataSet
+
 # from enspect.models.workbook import xlsx
 from enspect.models.utils import close_xlsx
 from enspect.models.workbook import Workbook
-from enspect.settings import file_paths, provinces
+from enspect.paths import file_paths
+from enspect.aggregates.common import provinces
 
-pd.set_option("display.max_columns", 6)  # or 1000
-pd.set_option("display.max_rows", None)  # or 1000
-pd.set_option("display.width", None)  # or 1000
-pd.set_option("max_colwidth", 15)  # or 1000
-# pd.set_option("display.multi_sparse", True)  # or 1000
-pd.set_option("display.column_space", 5)  # or 1000
-pd.set_option("display.colheader_justify", "left")  # or 1000
-pd.set_option("display.precision", 2)  # or 1000
 
 # ////////////////////////////////////////////////////////////////////// INPUTS
 
 setup_logging(
-    console_log_actived=True,
-    console_log_filter=None,
-    console_out_level=logging.DEBUG,
+    console_log_actived=True, console_log_filter=None, console_out_level=logging.DEBUG,
 )
-
-balances_aggregates = [
-    "Energetischer Endverbrauch",
-]
-
-eb_sectors = [
-    # "Energetischer Endverbrauch",
-    "Produzierender Bereich",
-    "Verkehr",
-    "Öffentliche und Private Dienstleistungen",
-    "Private Haushalte",
-    "Landwirtschaft",
-]
-# aggregates = ["Bruttoinlandsverbrauch"]
-
-eb_energy_sources = [
-    "Gesamtenergiebilanz",
-    "Elektrische Energie",
-    # ]
-    # "Wasserkraft",
-    # "Wind",
-    # "Photovoltaik",
-    # "KOHLE",
-    # "ÖL",
-    # "GAS",
-    # "Sonst. Biogene fest",
-    # "Hausmüll Bioanteil",
-    # "Scheitholz",
-    # "Pellets+Holzbriketts",
-    # "Holzabfall",
-    # "Holzkohle",
-    # "Ablaugen",
-    # "Bioethanol",
-    # "Biodiesel",
-    # "Sonst. Biogene flüssig",
-    # "Deponiegas",
-    # "Klärgas",
-    # "Biogas"
-]
-
-# eb_energy_sources = (
-#     energy_sources_aggregates["Fossil-fest"]
-#     + energy_sources_aggregates["Fossil-flüssig"]
-#     + energy_sources_aggregates["Fossil-gasförmig"]
-#     + ["Elektrische Energie", "Fernwärme", "Umgebungswärme"]
-#     + energy_sources_aggregates["Biogen-fest"]
-#     + energy_sources_aggregates["Biogen-flüssig"]
-#     + energy_sources_aggregates["Biogen-gasförmig"]
-# )
-energy_aggregates = [
-    "Elektrische",
-    "Fernwärme",
-    "Erneuerbare",
-    "Fossil-fest",
-    "Fossil-flüssig",
-    "Fossil-gasförmig",
-    "Biogen-fest",
-    "Biogen-flüssig",
-    "Biogen-gasförmig",
-]
 
 nea_energy_sources = [
     "Steinkohle",
@@ -145,40 +80,6 @@ ds = DataSet(name=f"Set_1", file_paths=file_paths)
 
 logging.getLogger().error("/" * 80)
 
-
-# ds.get_eb_data(
-#     energy_sources=eb_energy_sources,
-#     balance_aggregates=eb_sectors,
-#     energy_aggregates=energy_aggregates,
-#     years=years,
-#     provinces=provinces,
-#     per_energy_aggregate=True,
-# )
-
-# ds.get_eb_data(
-#     energy_sources=eb_energy_sources,
-#     balance_aggregates=eb_sectors,
-#     energy_aggregates=energy_aggregates,
-#     years=years,
-#     provinces=provinces,
-#     # conversion="TJ_2_TWh",
-#     # per_year=False,
-# )
-
-# ds.add_eb_data(
-#     energy_sources=eb_energy_sources,
-#     balance_aggregates=eb_sectors,
-#     energy_aggregates=energy_aggregates,
-#     years=years,
-#     provinces=provinces,
-#     per_years=True,
-#     per_balance_aggregate=True,
-#     # per_energy_aggregate=True,
-#     # show_source_values_for_energy_aggregates=True,
-#     # conversion="TJ_2_TWh",
-#     # per_year=False,
-# )
-
 ds.add_nea_data(
     energy_sources=nea_energy_sources,
     balance_aggregates=nea_sectors,
@@ -186,37 +87,13 @@ ds.add_nea_data(
     years=years,
     provinces=provinces,
     # per_usage_category=True,
-    per_balance_aggregate=True,
-    # per_energy_source=True,
-    and_usage_category=True,
-    # and_balance_aggregate=True,
-    # and_energy_source=True,
+    # per_balance_aggregate=True,
+    per_energy_source=True,
+    stacked_usage_category=True,
+    # stacked_balance_aggregate=True,
+    # stacked_energy_source=True,
     # per_years=per_years,
 )
-
-
-# ds.objects = get_eb_data(
-#     dataset=ds,
-#     energy_sources=eb_energy_sources,
-#     balance_aggregates=eb_sectors,
-#     energy_aggregates=energy_aggregates,
-#     years=years,
-#     provinces=provinces,
-#     # conversion="TJ_2_TWh",
-#     # per_year=False,
-# )
-
-# ds.add_eb_data_per_sector(
-#     file="sec",
-#     energy_sources=eb_energy_sources,
-#     aggregate=aggregate,
-#     # years=[2016, 2017],
-#     years=years,
-#     provinces=provinces,
-#     conversion="TJ_2_TWh",
-#     sectors=eb_sectors
-# )
-
 
 filename = Path.cwd() / "wings.xlsx"
 print("filename: ", filename)
@@ -224,7 +101,7 @@ print("filename: ", filename)
 # with open(filename, "rb") as f:
 #     file = io.BytesIO(f.read())
 
-# wb = xw.Book(filename)
+wb = xw.Book(filename)
 
 # close_xlsx()
 
@@ -238,12 +115,12 @@ print("filename: ", filename)
 
 
 # wb = xw.Book(filename)
-# sht = wb.sheets["Sheet"]
+sht = wb.sheets["Sheet1"]
 
-# for data in ds.objects:
-#     print(id(data))
-#     print("data ID: ", data._id)
-#     sht.range("A1").value = data.frame
+for data in ds.objects:
+    print(id(data))
+    print("data ID: ", data.key)
+    sht.range("A1").value = data.frame
 
 #     # if data.order == "data.frane":
 
