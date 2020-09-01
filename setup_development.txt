@@ -1,0 +1,45 @@
+Workaround for import pitfalls within python projects
+-> Separated folders for src code and test code 
+-> Use setup.py to put your packages (under development) into your local site-packages folder (within your virtual env)
+   This allows you to import them with their package name within your working directory (e.g. inside src and test folder).
+
+	Use the following project structure: 
+	e.g. your working dir:
+	
+	working_directory				# eg. my_dispat_folder
+	└── src
+		├── your_package			# package name e.g. dispat
+		│   ├── __init__.py         # make it a package
+		│   └── some_module.py
+		│	
+		├──test_package				# test package name
+		│	├── __init__.py         # also make test a package
+		│	└── test_some_module.py
+		│
+		└── setup.py				# setup.py file -> you might use setup_develop.py to not confuse it with your real setup.py file later
+		
+	see why: 
+			https://blog.ionelmc.ro/2014/05/25/python-packaging/#the-structure)
+			https://docs.pytest.org/en/latest/goodpractices.html
+		
+- 	@ setup.py # used here with most simplest version for development purposes
+
+	from setuptools import setup
+	from setuptools import find_packages
+
+	setup(
+		name='dispat_development',
+		version='1.0',
+		description='dispat package in development stage',
+		author='gadmin',
+		author_email='aea.gadmin@protonmail.com',
+		packages=find_packages('src'),
+		package_dir={'': 'src'},
+	)
+
+-	TO INSTALL: Call `setup.py` with argument `develop` file from your working_directory:
+
+	e.g. `setup_develop.py develop`
+	
+	see also: 
+		http://www.siafoo.net/article/77#install-vs-develop
