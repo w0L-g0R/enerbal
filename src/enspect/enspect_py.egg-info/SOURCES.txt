@@ -1,9 +1,0 @@
-setup.py
-.vscode/launch.json
-.vscode/settings.json
-__pycache__/test.cpython-37.pyc
-src/enspect/enspect_py.egg-info/PKG-INFO
-src/enspect/enspect_py.egg-info/SOURCES.txt
-src/enspect/enspect_py.egg-info/dependency_links.txt
-src/enspect/enspect_py.egg-info/top_level.txt
-src/enspect/enspect_py.egg-info/SOURCES.txt
