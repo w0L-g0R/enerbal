@@ -19,7 +19,7 @@ import pickle
 import dash_table.FormatTemplate as FormatTemplate
 from gui.assets.AEA_colors import provinces_color_table, provinces_color_table_rgba
 
-from conversion.energiebilanzen.convert.get_energy_source_aggregates import (
+from files.energiebilanzen.convert.get_energy_source_aggregates import (
     energy_source_aggregates,
 )
 

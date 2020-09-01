@@ -1,4 +1,4 @@
-# from conversion.energiebilanzen.convert.get_eb_data_structures import eb_sheets
+# from files.energiebilanzen.convert.get_eb_data_structures import eb_sheets
 from enspect.utils import create_row_indices
 from enspect.paths import file_paths
 from enspect.gui.assets.styles import range_slider_style, label_style

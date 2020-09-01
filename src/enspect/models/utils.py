@@ -25,30 +25,30 @@ def close_xlsx():
 IDX = pd.IndexSlice
 
 
-def add_sums(df: pd.DataFrame):
+# def add_sums(df: pd.DataFrame):
 
-    # Create provinces sum column and years sum row
-    # print("df sums: ", df)
-    df["Sum"] = df.iloc[:, :-1].sum(axis=1)
-    # print("df sums col: ", df)
-    df = df.T
-    # print("df sums T: ", df)
-    df["Sum"] = df.sum(axis=1)
+#     # Create provinces sum column and years sum row
+#     # print("df sums: ", df)
+#     df["Sum"] = df.iloc[:, :-1].sum(axis=1)
+#     # print("df sums col: ", df)
+#     df = df.T
+#     # print("df sums T: ", df)
+#     df["Sum"] = df.sum(axis=1)
 
-    return df.T
+#     return df.T
 
 
-def add_means(df: pd.DataFrame):
+# def add_means(df: pd.DataFrame):
 
-    # Create provinces sum column and years sum row
-    # print("df sums: ", df)
-    df["Mean"] = df.iloc[:, :-1].mean(axis=1)
-    # print("df sums col: ", df)
-    df = df.T
-    # print("df sums T: ", df)
-    df["Mean"] = df.mean(axis=1)
+#     # Create provinces sum column and years sum row
+#     # print("df sums: ", df)
+#     df["Mean"] = df.iloc[:, :-1].mean(axis=1)
+#     # print("df sums col: ", df)
+#     df = df.T
+#     # print("df sums T: ", df)
+#     df["Mean"] = df.mean(axis=1)
 
-    return df.T
+#     return df.T
 
 
 def switch_sum_and_AT_col(df: pd.DataFrame):
@@ -86,30 +86,9 @@ def reduce_eb_row_index(balance_aggregates: List):
     return "_".join([x for x in aggregate if x != "Gesamt"])
 
 
-def drop_eb_row_levels(balance_aggregates: Union[List, str], df: pd.DataFrame):
+# def drop_eb_row_levels(balance_aggregates: Union[List, str], df: pd.DataFrame):
 
-    ua_indices = 0
-    ue_indices = 0
-
-    for aggregate in balance_aggregates:
-
-        if "Umwandlungsausstoß" in aggregate:
-            try:
-                ua_indices = len(aggregate.split("_"))
-            except:
-                pass
-        if "Umwandlungseinsatz" in aggregate:
-            try:
-                ue_indices = len(aggregate.split("_"))
-            except:
-                pass
-
-    cutoff_indices = list(range(4, max(ua_indices, ue_indices), -1))
-
-    df = df.droplevel(level=cutoff_indices[::-1], axis=0)
-    # df = df.droplevel(level=[1, 2, 3, 4], axis=0)
-
-    return df
+#     return df
 
 
 def add_row_total(df: pd.DataFrame):
@@ -134,18 +113,27 @@ def add_col_total(df: pd.DataFrame):
 
 def slice_eb_inputs(df: pd.DataFrame, balance_aggregates: List, years=List):
 
-    df = drop_eb_row_levels(balance_aggregates=balance_aggregates, df=df)
+    ua_indices = 0
+    ue_indices = 0
 
-    # Filter aggregates
-    df = df.groupby(level=["IDX_0"], axis=0).filter(
-        lambda x: x.index.unique() in balance_aggregates
-    )
+    for aggregate in balance_aggregates:
 
-    print("df: ", df.columns.get_level_values(2).unique())
-    # Filter years
-    df = df.groupby(level=["YEAR"], axis=1).filter(
-        lambda x: x.columns.get_level_values(2).unique() in years
-    )
+        if "Umwandlungsausstoß" in aggregate:
+            try:
+                ua_indices = len(aggregate.split("_"))
+            except:
+                pass
+        if "Umwandlungseinsatz" in aggregate:
+            try:
+                ue_indices = len(aggregate.split("_"))
+            except:
+                pass
+
+    cutoff_indices = list(range(4, max(ua_indices, ue_indices), -1))
+
+    df = df.droplevel(level=cutoff_indices[::-1], axis=0)
+
+    df = df.loc[IDX[balance_aggregates], IDX[:, :, years]]
 
     return df
 

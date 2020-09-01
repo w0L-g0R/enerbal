@@ -46,6 +46,11 @@ class Data:
     per_balance_aggregate: bool = False
     per_energy_source: bool = False
     per_energy_aggregate: bool = False
+    per_usage_category: bool = False
+    and_usage_category: bool = False
+    and_balance_aggregate: bool = False
+    and_energy_source: bool = False
+
     per_years: bool = False
     show_source_values_for_energy_aggregates: bool = False
 
@@ -72,7 +77,7 @@ class Data:
 
         # TODO: Link to settings
         conversion = {
-            "mwh_2_gwh": 0.001,
+            "MWh_2_GWh": 0.001,
             "gwh_2_tj": (1 / 0.27778),
             "tj_2_pj": 0.001,
             "gwh_2_mwh": 1000,

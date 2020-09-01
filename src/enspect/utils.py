@@ -2,7 +2,7 @@ import logging
 import pickle
 import pandas as pd
 
-# from conversion.energiebilanzen.convert.eb_sheets import eb_sheets
+# from files.energiebilanzen.convert.eb_sheets import eb_sheets
 from pathlib import Path
 from pprint import pformat
 from typing import List, Type, TypeVar

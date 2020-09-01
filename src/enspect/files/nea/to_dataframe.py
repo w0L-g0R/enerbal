@@ -7,8 +7,8 @@ import pickle
 import datetime
 
 from utils import timeit
-from conversion.nea.data_structures import nea_data_structures
-from conversion.nea.utils import create_nea_col_midx, fetch_from_xlsx, write_to_log_file
+from files.nea.data_structures import nea_data_structures
+from files.nea.utils import create_nea_col_midx, fetch_from_xlsx, write_to_log_file
 
 from paths import file_paths
 
@@ -62,7 +62,7 @@ def convert_nea_to_dataframe(last_year: int,):
 
         province = filename.split("_")[1]
 
-        files.remove(file)
+        # files.remove(file)
 
         if province in provinces:
 
@@ -164,7 +164,7 @@ def convert_nea_to_dataframe(last_year: int,):
     nea_df = nea_df.unstack(level="ET")
 
     # New Column_midx
-    nea_df = nea_df.unstack(level=["BL", "ET", "USAGE", "YEAR"])
+    nea_df = nea_df.unstack(level=["BL", "ET", "UC", "YEAR"])
 
     logging.getLogger().warning(
         "{}\n\n{} Finished NEA file conversion \n\n{}".format(

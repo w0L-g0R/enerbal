@@ -8,7 +8,7 @@ import dash_html_components as html
 from gui.assets.styles import range_slider_style, label_style
 from settings import chart_type_options, units
 from utils import create_eev_energy_source_options
-from conversion.energiebilanzen.convert.get_eb_data_structures import eb_sheets
+from files.energiebilanzen.convert.get_eb_data_structures import eb_sheets
 
 energy_sources_options = create_eev_energy_source_options(energy_sources=eb_sheets)
 

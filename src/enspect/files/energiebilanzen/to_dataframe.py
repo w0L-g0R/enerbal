@@ -6,9 +6,9 @@ import pickle
 import numpy as np
 from utils import timeit
 
-from conversion.energiebilanzen.data_structures import eb_sheet_names
+from enspect.files.energiebilanzen.data_structures import eb_sheet_names
 
-from conversion.energiebilanzen.utils import (
+from enspect.files.energiebilanzen.utils import (
     create_indices,
     create_index_template,
     fetch_from_xlsx,
@@ -20,8 +20,8 @@ from conversion.energiebilanzen.utils import (
     write_to_log_file,
 )
 
-from conversion.energiebilanzen.check_errors import check_index_errors
-from paths import file_paths
+from enspect.files.energiebilanzen.check_errors import check_index_errors
+from enspect.paths import file_paths
 
 from pprint import pprint
 
@@ -89,14 +89,12 @@ def convert_energy_balances_to_dataframe(
 
         filename = Path(file).stem
 
-        # Filter for actual balances files
+        # Filter current balances files
         if filename.startswith("EB"):
 
             file = str(Path(file))
 
             province = filename.split("_")[1]
-
-            # NOTE: Not tested yet 16082020 1952
 
         else:
             continue
@@ -127,8 +125,6 @@ def convert_energy_balances_to_dataframe(
 
             if province != "AT":
 
-                logging.getLogger().critical("REEEEEESS")
-
                 res_sheet = preprocess_res_sheet(
                     res_sheet=res_sheet,
                     res_conversion_factors=res_conversion_factors,
@@ -144,8 +140,6 @@ def convert_energy_balances_to_dataframe(
                     res_row_midx=res_row_midx,
                     res_col_midx=res_col_midx,
                 )
-
-        # files.remove(file)
 
     else:
         logging.getLogger().debug("\n=> No files left to convert!")

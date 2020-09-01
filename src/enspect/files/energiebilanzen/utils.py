@@ -10,8 +10,8 @@ import logging
 from logger.setup import setup_logging
 
 
-from conversion.energiebilanzen.data_structures import eb_sheet_names
-from conversion.energiebilanzen.check_errors import (
+from files.energiebilanzen.data_structures import eb_sheet_names
+from files.energiebilanzen.check_errors import (
     check_column_errors,
     check_sheetname_errors,
     check_index_errors,

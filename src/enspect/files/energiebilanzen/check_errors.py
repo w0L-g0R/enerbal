@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import List, Dict
 import pandas as pd
 import logging
-from conversion.energiebilanzen.data_structures import eb_sheet_names
+from files.energiebilanzen.data_structures import eb_sheet_names
 from utils import timeit
 
 

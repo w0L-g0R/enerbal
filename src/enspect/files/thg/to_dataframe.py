@@ -3,7 +3,7 @@ import pandas as pd
 import pickle
 
 IDX = pd.IndexSlice
-from conversion.thg.utils import fetch_from_xlsx
+from files.thg.utils import fetch_from_xlsx
 from utils import timeit
 from paths import file_paths
 

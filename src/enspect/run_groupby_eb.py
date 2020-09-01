@@ -9,11 +9,11 @@ from enspect.settings import file_paths, provinces
 # from enspect.xlsx.utils import get_workbook, write_to_sheet
 
 # from enspect.xlsx.workbook import xlsx
-from enspect.conversion.energiebilanzen.data_structures import (
+from enspect.files.energiebilanzen.data_structures import (
     energy_sources_aggregates,
     eev_aggregates,
 )
-from conversion.energiebilanzen.data_structures import (
+from files.energiebilanzen.data_structures import (
     eb_sheet_names,
     eb_aggregate_names,
 )

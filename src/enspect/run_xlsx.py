@@ -13,13 +13,15 @@ from enspect.models.utils import close_xlsx
 from enspect.logger.setup import setup_logging
 
 # from enspect.xlsx.workbook import xlsx
-from enspect.conversion.energiebilanzen.data_structures import (
+from enspect.files.energiebilanzen.data_structures import (
     eev_aggregates,
     eev_generation,
     energy_aggregate_lookup,
 )
 import pandas as pd
 import io
+
+import xlwings as xw
 
 pd.set_option("display.max_columns", 6)  # or 1000
 pd.set_option("display.max_rows", None)  # or 1000
@@ -36,7 +38,7 @@ setup_logging(
     console_log_actived=True, console_log_filter=None, console_out_level=logging.DEBUG,
 )
 
-eev_aggregates = [
+balances_aggregates = [
     "Energetischer Endverbrauch",
 ]
 
@@ -103,22 +105,33 @@ nea_energy_sources = [
 ]
 
 nea_sectors = [
-    "Ö Gesamt (ohne E1 - E7)",
+    "Gesamt (ohne E1 - E7)",
     "Produzierender Bereich Gesamt",
-    "Transport Gesamt ",
+    "Transport Gesamt",
     "Offentliche und Private Dienstleistungen",
     "Private Haushalte",
     "Landwirtschaft",
 ]
 
-years = list(range(2005, 2010, 1))
+nea_usage_categories = [
+    "Raumheizung und Klimaanlagen",
+    "Dampferzeugung",
+    # "Industrieöfen",
+    # "Standmotoren",
+    # "Traktion",
+    # "Beleuchtung und EDV",
+    # "Elektrochemische Zwecke",
+    # "Summe",
+]
+
+
+# years = list(range(2005, 2010, 1))
+years = [2018]
 print("years: ", years)
-# years = [2018]
 
 # /////////////////////////////////////////////////////////////// CREATE DATASET
 
 ds = DataSet(name=f"Set_1", file_paths=file_paths)
-print("ds: ", ds)
 
 # //////////////////////////////////////////////////////////////////////// STATS
 # ds.add_stats_data_per_years(
@@ -156,15 +169,33 @@ logging.getLogger().error("/" * 80)
 #     # per_year=False,
 # )
 
-ds.add_eb_data(
-    energy_sources=eb_energy_sources,
-    balance_aggregates=eb_sectors,
-    energy_aggregates=energy_aggregates,
+# ds.add_eb_data(
+#     energy_sources=eb_energy_sources,
+#     balance_aggregates=eb_sectors,
+#     energy_aggregates=energy_aggregates,
+#     years=years,
+#     provinces=provinces,
+#     per_years=True,
+#     per_balance_aggregate=True,
+#     # per_energy_aggregate=True,
+#     # show_source_values_for_energy_aggregates=True,
+#     # conversion="TJ_2_TWh",
+#     # per_year=False,
+# )
+
+ds.add_nea_data(
+    energy_sources=nea_energy_sources,
+    balance_aggregates=nea_sectors,
+    usage_categories=nea_usage_categories,
     years=years,
     provinces=provinces,
+    # per_usage_category=True,
     per_balance_aggregate=True,
-    # conversion="TJ_2_TWh",
-    # per_year=False,
+    # per_energy_source=True,
+    and_usage_category=True,
+    # and_balance_aggregate=True,
+    # and_energy_source=True,
+    # per_years=per_years,
 )
 
 
@@ -201,29 +232,32 @@ print("filename: ", filename)
 
 # close_xlsx()
 
-wb = Workbook(name="WB1", filename=filename)
+# wb = Workbook(name="WB1", filename=filename)
 
 # wb = xlsx(name="WB1", filename=filename)
-wb.add_sheets(sheets=["EEV", "BIV", "THG"])
+# wb.add_sheets(sheets=["EEV", "BIV", "THG"])
 # # try:
 # #     wb.close()
 # # except BaseException:
 
 
-# #     pass
+# wb = xw.Book(filename)
+# sht = wb.sheets["Sheet"]
 
-for data in ds.objects:
-    print("data: ", data.name)
+# for data in ds.objects:
+#     print(id(data))
+#     print("data ID: ", data._id)
+#     sht.range("A1").value = data.frame
 
-    #     # if data.order == "per_sector":
+#     # if data.order == "data.frane":
 
-    wb.write_to_sheet(data=data, sheet="EEV")
-    # else:
-    #     wb.write(data=data, sheet=data.aggregate)
+# wb.write_to_sheet(data=data, sheet="EEV")
+# else:
+#     wb.write(data=data, sheet=data.aggregate)
 
 
-wb.book.save(wb.path)
-wb.launch()
+# wb.book.save(wb.path)
+# wb.launch()
 
 # for sheet in wb.book.sheetnames:
 #     print("sheet: ", sheet)
