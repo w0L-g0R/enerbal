@@ -1,10 +1,12 @@
-import pytest
-from pathlib import Path
 import os
-from enspect.paths import file_paths
+import time
+from pathlib import Path
+
+import pytest
+
 from enspect.models.dataset import DataSet
 from enspect.models.workbook import Workbook
-import time
+from enspect.paths import file_paths
 
 CWD = Path(__file__).parent.resolve()
 
@@ -87,6 +89,7 @@ def test_balance_aggregates_inputs_output():
         "Nichtenergetischer Verbrauch",
         "Energetischer Endverbrauch",
     ]
+
 
 @pytest.fixture(scope="session")
 def test_balance_aggregates_energetischer():

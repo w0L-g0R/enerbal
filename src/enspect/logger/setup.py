@@ -1,20 +1,11 @@
+import datetime
 import logging
 import logging.config
-from typing import Optional
 from pathlib import Path
-from .filters import (
-    DebugFilter,
-    InfoFilter,
-    WarningFilter,
-    CriticalFilter,
-)
+from typing import Optional
 
-from .utils import (
-    add_file_handler,
-    change_logger_state,
-)
-
-import datetime
+from .filters import CriticalFilter, DebugFilter, InfoFilter, WarningFilter
+from .utils import add_file_handler, change_logger_state
 
 # /////////////////////////////////////////////////////////////////// CONSTANTS
 
@@ -54,17 +45,27 @@ def setup_logging(
     """
     Creates a logging configuration and sets up different loggers and handlers
     """
-    log_file = "dummy.log"
+    if log_file is None:
+        log_file = "placeholder.log"
+
     # ------------------------------------------------------------------- DICT
 
     _LOGCONFIG = {
         "version": 1,
         "disable_existing_loggers": False,
         "filters": {
-            "debug_only": {"()": DebugFilter,},
-            "info_only": {"()": InfoFilter,},
-            "warning_only": {"()": WarningFilter,},
-            "critical_only": {"()": CriticalFilter,},
+            "debug_only": {
+                "()": DebugFilter,
+            },
+            "info_only": {
+                "()": InfoFilter,
+            },
+            "warning_only": {
+                "()": WarningFilter,
+            },
+            "critical_only": {
+                "()": CriticalFilter,
+            },
         },
         "formatters": {
             "standard": {"format": LOG_OUTPUT_STANDARD, "datefmt": LOG_DATE_FORMAT},
@@ -72,7 +73,10 @@ def setup_logging(
                 "format": LOG_OUTPUT_STANDARD_NO_TIME,
                 "datefmt": LOG_DATE_FORMAT,
             },
-            "logfile": {"format": LOG_FILE, "datefmt": LOG_DATE_FORMAT,},
+            "logfile": {
+                "format": LOG_FILE,
+                "datefmt": LOG_DATE_FORMAT,
+            },
         },
         "handlers": {
             "null_out": {"class": "logging.NullHandler"},
@@ -117,7 +121,10 @@ def setup_logging(
             #     "level": "WARNING",
             # },
         },
-        "root": {"level": "DEBUG", "handlers": [],},
+        "root": {
+            "level": "DEBUG",
+            "handlers": [],
+        },
         # "interface": {
         #     "level": "INFO",
         #     "handlers": ["info_html_out", "warning_html_out"],
@@ -145,7 +152,7 @@ def setup_logging(
         _LOGCONFIG["root"]["handlers"].append("null_out")
 
     # ------------------------------------------------------------ log_file
-    if log_file != "dummy.log":
+    if log_file != "placeholder.log":
         _LOGCONFIG["root"]["handlers"].append("conversion_file")
 
     # ---------------------------------------------------------- DASH LOGS

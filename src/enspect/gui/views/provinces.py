@@ -1,6 +1,5 @@
 import dash_bootstrap_components as dbc
 import dash_html_components as html
-
 from gui.assets.AEA_colors import provinces_color_table
 
 # from settings import *
@@ -13,7 +12,9 @@ def create_province_input_group(
         no_gutters=True,
         children=[
             dbc.Col(
-                style={"margin-right": 4, },
+                style={
+                    "margin-right": 4,
+                },
                 children=[
                     dbc.InputGroup(
                         [
@@ -52,7 +53,12 @@ def create_province_input_group(
                         # "padding-right": 20,
                         # "text-align": "right",
                     },
-                    options=[{"label": "", "value": 1, }, ],
+                    options=[
+                        {
+                            "label": "",
+                            "value": 1,
+                        },
+                    ],
                     value=[1 if checked else 0],
                     inline=True,
                     id="checklist-{}".format(province),

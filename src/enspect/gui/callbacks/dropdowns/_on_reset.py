@@ -5,7 +5,6 @@ import pandas as pd
 from dash import callback_context, no_update
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
-
 from gui.app import app
 from gui.utils import show_callback_context
 
@@ -54,7 +53,7 @@ def create_on_reset_dropdowns(graph_id: str):
             State(f"idx-res-0-{graph_id}", "disabled"),
             State(f"idx-res-1-{graph_id}", "disabled"),
             State(f"idx-res-2-{graph_id}", "disabled"),
-        ]
+        ],
     )
     def on_reset_dropdowns(
         n_clicks: int,
@@ -85,7 +84,7 @@ def create_on_reset_dropdowns(graph_id: str):
             # if len(idx_1_options) == 1:
             #     print('idx: ', idx_1_options)
             idx_values = ["Trigger plot"]
-            print('args: ', args)
+            print("args: ", args)
 
             for arg in args:
                 if arg == True:

@@ -1,6 +1,5 @@
 import dash_html_components as html
 
-
 setup_logo_A = html.Img(
     style={"margin-top": 0, "margin-bottom": -4},
     src="https://fontmeme.com/permalink/200726/5f639dfd6f8107b5c609bb6130265a27.png"

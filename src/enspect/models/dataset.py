@@ -1,46 +1,24 @@
-from typing import NewType
-import os
 import logging
+import os
 import pickle
-from typing import List, Union, Optional
 from copy import deepcopy
-from time import gmtime, strftime
-
-import pandas as pd
-import numpy as np
 from pathlib import Path
+from time import gmtime, strftime
+from typing import List, NewType, Optional, Union
+
+import numpy as np
+import pandas as pd
 from pandas.core.common import flatten
 
-from enspect.settings import (
-    file_paths,
-    provinces_hex,
-    provinces,
-    unit,
-)
-from enspect.files.energiebilanzen.data_structures import energy_aggregate_lookup
-from enspect.models.utils import (
-    # add_sums,
-    # add_means,
-    # get_shares,
-    # apply_single_index,
-    # convert,
-    # drop_eb_row_levels,
-    slice_eb_inputs,
-    add_row_total,
-    # get_eb_energy_aggregates,
-    # get_eb_energy_soures,
-    # get_eb_balance_aggregates,
-    # get_eb_over_all_years,
-    # post_process,
-)
-
+from enspect.conversion.energiebilanzen.data_structures import (
+    eev_aggregates, energy_aggregate_lookup, sector_energy, sectors)
 from enspect.models.data import Data, FilterData
-from enspect.files.energiebilanzen.data_structures import (
-    eev_aggregates,
-    sectors,
-    sector_energy,
+from enspect.settings import file_paths, provinces, provinces_hex, unit_converter
+
+from enspect.models.utils import (
+    add_row_total,
+    slice_eb_inputs,
 )
-from copy import deepcopy
 
 IDX = pd.IndexSlice
 
@@ -150,7 +128,8 @@ class DataSet:
             # TODO: Get rid of lambda - replace with loc
             # Filter sources
             df = df.groupby(level=["ET"], axis=1).filter(
-                lambda x: x.columns.get_level_values(1).unique() in energy_sources
+                lambda x: x.columns.get_level_values(
+                    1).unique() in energy_sources
             )
 
             if per_balance_aggregate:
@@ -173,7 +152,8 @@ class DataSet:
         # Get all energy sources for selected energy aggregates
         energy_sources = list(
             flatten(
-                [energy_aggregate_lookup[source] for source in data.energy_aggregates]
+                [energy_aggregate_lookup[source]
+                    for source in data.energy_aggregates]
             )
         )
 
@@ -190,7 +170,9 @@ class DataSet:
         for balance_aggregate in data.balance_aggregates:
 
             # Use lookup table for slicing
-            _df = df.groupby(level=["IDX_0"], axis=1).get_group(balance_aggregate)
+            _df = df.groupby(
+                level=["IDX_0"],
+                axis=1).get_group(balance_aggregate)
 
             _energy_aggregates = []
 
@@ -208,7 +190,10 @@ class DataSet:
 
                 # Create multiindex with energy_aggregate as first idx
                 __df.index = pd.MultiIndex.from_product(
-                    iterables=[[energy_aggregate], list(__df.index),],
+                    iterables=[
+                        [energy_aggregate],
+                        list(__df.index),
+                    ],
                     names=["ET_AGG", __df.index.name],
                 )
 
@@ -232,7 +217,9 @@ class DataSet:
             _df = pd.concat(_energy_aggregates, axis=0)
 
             # Swap
-            _df = _df.swaplevel("BL", "IDX_0", axis=1).sort_index(axis=1, level=0)
+            _df = _df.swaplevel(
+                "BL", "IDX_0", axis=1).sort_index(
+                axis=1, level=0)
 
             # Assign and rename
             _data.name, _data._id, _data.frame = (name, _id, _df)
@@ -251,7 +238,12 @@ class DataSet:
             _data.energy_aggregates = None
             _data.energy_sources = energy_source
 
-            name = "_".join([energy_source.replace(" ", "_"), "Bilanz_Aggregate",])
+            name = "_".join(
+                [
+                    energy_source.replace(" ", "_"),
+                    "Bilanz_Aggregate",
+                ]
+            )
 
             _id = "_".join(
                 [
@@ -278,7 +270,9 @@ class DataSet:
 
         name = "Year"
 
-        _id = "_".join(("YEARS", str(data.years[0])[-2:], str(data.years[-1])[-2:]))
+        _id = "_".join(("YEARS",
+                        str(data.years[0])[-2:],
+                        str(data.years[-1])[-2:]))
 
         _df = df.stack("YEAR").unstack("IDX_0")
 
@@ -359,7 +353,8 @@ class DataSet:
                         usage_category
                     )
                     for year in years:
-                        ___df = __df.groupby(level=["YEAR"], axis=1).get_group(year)
+                        ___df = __df.groupby(
+                            level=["YEAR"], axis=1).get_group(year)
                         print("___df: ", ___df)
 
             pass
@@ -374,9 +369,11 @@ class DataSet:
                         balance_aggregate
                     )
                     for year in years:
-                        ___df = __df.groupby(level=["YEAR"], axis=1).get_group(year)
+                        ___df = __df.groupby(
+                            level=["YEAR"], axis=1).get_group(year)
 
-                        index = ___df.columns.get_level_values(level="USAGE").unique()
+                        index = ___df.columns.get_level_values(
+                            level="USAGE").unique()
 
                         ___df = ___df.stack("USAGE").unstack("SECTOR")
 
@@ -391,7 +388,9 @@ class DataSet:
         elif per_balance_aggregate:
 
             for balance_aggregate in data.balance_aggregates:
-                _df = df.groupby(level=["SECTOR"], axis=0).get_group(balance_aggregate)
+                _df = df.groupby(
+                    level=["SECTOR"],
+                    axis=0).get_group(balance_aggregate)
 
                 # for energy_source in data.energy_sources:
                 #     __df = _df.groupby(level=["ET"], axis=1).get_group(energy_source)
@@ -402,7 +401,8 @@ class DataSet:
 
                     # CASE 3.1: X-Axis: SEC, Y-Axis: Stacked ET
                     if and_usage_category:
-                        index = __df.columns.get_level_values(level="USAGE").unique()
+                        index = __df.columns.get_level_values(
+                            level="USAGE").unique()
 
                         __df = __df.stack("USAGE").unstack("SECTOR")
 
@@ -441,7 +441,9 @@ class DataSet:
         elif per_usage_category:
 
             for usage_category in data.usage_categories:
-                _df = df.groupby(level=["USAGE"], axis=1).get_group(usage_category)
+                _df = df.groupby(
+                    level=["USAGE"],
+                    axis=1).get_group(usage_category)
 
                 # for energy_source in data.energy_sources:
                 #     __df = _df.groupby(level=["ET"], axis=1).get_group(energy_source)
@@ -452,7 +454,8 @@ class DataSet:
                     # CASE 3.1: X-Axis: SEC, Y-Axis: Stacked ET
                     if and_balance_aggregate:
 
-                        index = __df.columns.get_level_values(level="ET").unique()
+                        index = __df.columns.get_level_values(
+                            level="ET").unique()
 
                         __df = __df.stack("ET").unstack("SECTOR")
 

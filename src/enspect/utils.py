@@ -1,12 +1,12 @@
 import logging
 import pickle
-import pandas as pd
-
-# from files.energiebilanzen.convert.eb_sheets import eb_sheets
+# from enspect.conversion.energiebilanzen.convert.eb_sheets import eb_sheets
 from pathlib import Path
 from pprint import pformat
+from time import ctime, time
 from typing import List, Type, TypeVar
-from time import time, ctime
+
+import pandas as pd
 
 # _____________________________________________________________________________
 # /////////////////////////////////////////////////////////////////////// TYPES
@@ -69,7 +69,8 @@ def create_row_indices(_type: str, eb_indices: pd.DataFrame):
 
     for enum, col in enumerate(indices.columns):
         _indices = list(indices[col].unique())
-        _indices = [{"label": x, "value": x} for enum, x in enumerate(_indices)]
+        _indices = [{"label": x, "value": x}
+                    for enum, x in enumerate(_indices)]
         midx.append(_indices)
 
     return midx
@@ -93,13 +94,21 @@ def timeit(method):
         # else:
         logging.getLogger().debug(
             "{}\t\nExecution time of {}: {} min {} sec\n{}".format(
-                "|" * 79, method.__name__, int(minutes), round(seconds, 0), "|" * 79,
+                "|" * 79,
+                method.__name__,
+                int(minutes),
+                round(seconds, 0),
+                "|" * 79,
             )
         )
 
         print(
             "{}\t\nExecution time of {}: {} min {} sec\n{}".format(
-                "|" * 79, method.__name__, int(minutes), round(seconds, 0), "|" * 79,
+                "|" * 79,
+                method.__name__,
+                int(minutes),
+                round(seconds, 0),
+                "|" * 79,
             )
         )
         return result

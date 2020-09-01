@@ -1,7 +1,8 @@
-from openpyxl.styles import Border, Side, Font, Alignment, PatternFill, Fill, Color
+from openpyxl.styles import (
+    Alignment, Border, Color, Fill, Font, PatternFill, Side)
 from openpyxl.utils import get_column_letter
-from settings import provinces_hex, provinces
 from openpyxl.worksheet.dimensions import ColumnDimension, DimensionHolder
+from settings import provinces, provinces_hex
 
 COLOR_BACKGROUND = "DEE0F2"
 
@@ -17,41 +18,38 @@ BORDER_COLOR = "595959"
 
 def style_background(ws):
     cells = "{start_col}{start_row}:{end_col}{end_row}".format(
-        start_col=get_column_letter(
-            1),  # Letter
-        end_col=get_column_letter(
-            ws.max_column+1),  # Letter
+        start_col=get_column_letter(1),  # Letter
+        end_col=get_column_letter(ws.max_column + 1),  # Letter
         start_row=1,  # Number
-        end_row=ws.max_row+1,  # Number
+        end_row=ws.max_row + 1,  # Number
     )
     for row in ws[cells]:
         for cell in row:
-            cell.fill = PatternFill(
-                start_color=COLOR_BACKGROUND, fill_type="solid")
+            cell.fill = PatternFill(start_color=COLOR_BACKGROUND, fill_type="solid")
 
-    set_border(ws=ws, cell_range=cells,
-               border_style="medium")
+    set_border(ws=ws, cell_range=cells, border_style="medium")
 
 
 def style_info(ws, cell, width, height):
 
     cells = "{start_col}{start_row}:{end_col}{end_row}".format(
         start_col=get_column_letter(cell.column),  # Letter
-        end_col=get_column_letter(cell.column+width),  # Letter
+        end_col=get_column_letter(cell.column + width),  # Letter
         start_row=cell.row,  # Number
         end_row=cell.row + height - 1,  # Number
     )
 
     for row in ws[cells]:
-        set_border(ws=ws,
-                   cell_range=f"{row[0].coordinate}:{row[-1].coordinate}",
-                   border_style="thin")
+        set_border(
+            ws=ws,
+            cell_range=f"{row[0].coordinate}:{row[-1].coordinate}",
+            border_style="thin",
+        )
         for cell in row:
             cell.fill = PatternFill(start_color="FFFFFF", fill_type="solid")
             cell.font = Font(color="FF000000", bold=False)
 
-    set_border(ws=ws, cell_range=cells,
-               border_style="thin")
+    set_border(ws=ws, cell_range=cells, border_style="thin")
 
     return cell
 
@@ -67,8 +65,7 @@ def style_info_index(ws, cell, width, height):
 
     for row in ws[cells]:
         for cell in row:
-            cell.fill = PatternFill(
-                start_color=COLOR_INFO_IDX, fill_type="solid")
+            cell.fill = PatternFill(start_color=COLOR_INFO_IDX, fill_type="solid")
             cell.font = Font(color=FONT_BLUE, bold=False)
             cell.alignment = Alignment(horizontal="center")
             cell.border = Border(
@@ -78,10 +75,10 @@ def style_info_index(ws, cell, width, height):
                 bottom=Side(border_style="thin", color=BORDER_COLOR),
             )
 
-    set_border(ws=ws, cell_range=cells,
-               border_style="thin")
+    set_border(ws=ws, cell_range=cells, border_style="thin")
 
     return cell
+
 
 # def style_df(cell):
 
@@ -257,7 +254,11 @@ def fit_column_size(ws, index_column_nr, max_column_nr):
     # Fit column size
     for col in range(ws.min_column, ws.max_column):
         dim_holder[get_column_letter(col)] = ColumnDimension(
-            ws, min=col, max=col, auto_size=True, bestFit=True,
+            ws,
+            min=col,
+            max=col,
+            auto_size=True,
+            bestFit=True,
         )
 
     return dim_holder

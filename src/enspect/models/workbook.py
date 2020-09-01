@@ -1,22 +1,22 @@
-import openpyxl
-from openpyxl.utils import get_column_letter
+import datetime
+import os
+from itertools import chain
+from pathlib import Path
+from typing import Iterable, List, Union
 
+import openpyxl
+import pandas as pd
+import xlwings as xw
+from openpyxl import load_workbook
+from openpyxl.styles import (
+    Alignment, Border, Color, Fill, Font, PatternFill, Side)
+from openpyxl.utils import get_column_letter
+from openpyxl.utils.dataframe import dataframe_to_rows, expand_levels
 # from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
-from xlsx.styles import *
-from pathlib import Path
-import pandas as pd
-from typing import Union, List, Iterable
-import os
-from openpyxl.utils.dataframe import dataframe_to_rows, expand_levels
-from openpyxl import load_workbook
-from openpyxl.styles import Border, Side, Font, Alignment, PatternFill, Fill, Color
-from models.data import Data
-import datetime
-from itertools import chain
-from enspect.models.utils import add_row_total, add_col_total
 
-import xlwings as xw
+from enspect.models.data import Data
+from enspect.models.utils import add_col_total, add_row_total
 
 
 def concat_generators(*args):
@@ -131,7 +131,14 @@ class Workbook:
 
             for energy_source in [data.energy_sources]:
 
-                df = data.frame.loc[IDX[:], IDX[year, energy_source, :,]].stack([0, 1])
+                df = data.frame.loc[
+                    IDX[:],
+                    IDX[
+                        year,
+                        energy_source,
+                        :,
+                    ],
+                ].stack([0, 1])
 
                 df = add_col_total(df=df)
 
@@ -152,9 +159,14 @@ class Workbook:
             for balance_aggregate in [data.balance_aggregates]:
                 print("balance_aggregate: ", balance_aggregate)
 
-                df = data.frame.loc[IDX[:], IDX[year, balance_aggregate, :,]].stack(
-                    [0, 1]
-                )
+                df = data.frame.loc[
+                    IDX[:],
+                    IDX[
+                        year,
+                        balance_aggregate,
+                        :,
+                    ],
+                ].stack([0, 1])
 
                 df = add_col_total(df=df)
 
@@ -190,7 +202,12 @@ class Workbook:
             for balance_aggregate in data.balance_aggregates:
 
                 df = data.frame.loc[
-                    IDX[:], IDX[energy_source, balance_aggregate, :,]
+                    IDX[:],
+                    IDX[
+                        energy_source,
+                        balance_aggregate,
+                        :,
+                    ],
                 ].stack([0, 1])
 
                 df = add_col_total(df=df)
@@ -225,7 +242,9 @@ class Workbook:
 
     @staticmethod
     def update_next_empty_row(
-        ws: Worksheet, down_shift: int = None, up_shift: int = None,
+        ws: Worksheet,
+        down_shift: int = None,
+        up_shift: int = None,
     ):
 
         if down_shift is not None:
@@ -443,7 +462,8 @@ class Workbook:
 #         # self.book.save(filename="test.xlsx")
 
 #     @staticmethod
-#     def update_next_empty_row(ws: Worksheet, len_df: int, len_info: int = None):
+# def update_next_empty_row(ws: Worksheet, len_df: int, len_info: int =
+# None):
 
 #         # Store next row position
 #         ws.next_empty_row += len_df + len_info + 1
@@ -453,7 +473,8 @@ class Workbook:
 #         # ws.next_empty_col += len(df.columns) + 3
 #         # print("ws.next_empty_col: ", ws.next_empty_col)
 
-#     def add_data(self, data: Data, ws: Worksheet, dfs: pd.DataFrame, unit: str):
+# def add_data(self, data: Data, ws: Worksheet, dfs: pd.DataFrame, unit:
+# str):
 
 #         for energy_source, aggregates in dfs.items():
 

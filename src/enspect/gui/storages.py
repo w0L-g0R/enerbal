@@ -13,16 +13,12 @@ stores = html.Div(
         dcc.Store(id="graph-A-update", storage_type="memory"),
         dcc.Store(id="graph-B-update", storage_type="memory"),
         # dcc.Store(id="graph-C-update", storage_type="memory"),
-
         dcc.Store(id="graph-B-axes", storage_type="memory"),
         dcc.Store(id="graph-C-axes", storage_type="memory"),
-
         # dcc.Store(id="graph-A-updates-scale", storage_type="memory"),
         # dcc.Store(id="graph-B-updates-scale", storage_type="memory"),
-
         # dcc.Store(id="graph-A-absolute-values", storage_type="memory"),
         # dcc.Store(id="graph-B-absolute-values", storage_type="memory"),
-
         # dcc.Store(id="graph-B-clicked-eev-update", storage_type="memory"),
         # dcc.Store(id="graph-A-clicked-nea-update", storage_type="memory"),
         # dcc.Store(id="graph-B-clicked-nea-update", storage_type="memory"),

@@ -1,35 +1,33 @@
 import inspect
-import os
-from typing import List
-import dash_html_components as html
 import json
+import os
+import pickle
+from typing import List
+
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
+import dash_html_components as html
+import dash_table
+import dash_table.FormatTemplate as FormatTemplate
 import pandas as pd
 import plotly.graph_objects as go
-from dash import callback_context
+from dash import callback_context, no_update
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
-
-from gui.app import app
-from gui.utils import show_callback_context
-from dash import no_update
-import dash_table
-import pickle
-import dash_table.FormatTemplate as FormatTemplate
-from gui.assets.AEA_colors import provinces_color_table, provinces_color_table_rgba
-
-from files.energiebilanzen.convert.get_energy_source_aggregates import (
-    energy_source_aggregates,
-)
-
 from dash_table.Format import Format
+from enspect.conversion.energiebilanzen.convert.get_energy_source_aggregates import \
+    energy_source_aggregates
+from gui.app import app
+from gui.assets.AEA_colors import (provinces_color_table,
+                                   provinces_color_table_rgba)
+from gui.utils import show_callback_context
 
 IDX = pd.IndexSlice
 
 
 def callback_return_on_select_aggregate(
-    updates_scale: str = no_update, absolute_values: List = no_update,
+    updates_scale: str = no_update,
+    absolute_values: List = no_update,
 ):
     return [updates_scale, absolute_values]
 
@@ -41,8 +39,12 @@ def callback_return_on_select_aggregate(
 def create_on_select_aggregate(graph_id: str):
     @app.callback(
         Output(f"{graph_id}-energy-sources", "value"),
-        [Input(f"{graph_id}-aggregate-eb", "value"),],
-        [State(f"tabs-{graph_id}", "active_tab"),],
+        [
+            Input(f"{graph_id}-aggregate-eb", "value"),
+        ],
+        [
+            State(f"tabs-{graph_id}", "active_tab"),
+        ],
     )
     def on_select_aggregate(aggregate_eb, active_tab):
 

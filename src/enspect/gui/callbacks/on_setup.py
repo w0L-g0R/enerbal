@@ -1,25 +1,22 @@
-import dash_html_components as html
 import inspect
+import json
 import os
-from typing import List, Dict
+import pickle
+from pathlib import Path
+from typing import Dict, List
 
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
+import dash_html_components as html
+import dash_table
 import pandas as pd
 import plotly.graph_objects as go
-from dash import callback_context
+from dash import callback_context, no_update
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
-import dash_table
-import json
-
 from gui.app import app
 from gui.utils import show_callback_context
-from settings import provinces
-from dash import no_update
-import pickle
-from pathlib import Path
-from settings import chart_type_options, scale_options
+from settings import chart_type_options, provinces, scale_options
 
 IDX = pd.IndexSlice
 # _________________________________________________________________________
@@ -39,8 +36,12 @@ IDX = pd.IndexSlice
 
 def create_on_setup(graph_id: str):
     @app.callback(
-        [Output(f"{graph_id}-setup", "data"), ],
-        [Input(f"{graph_id}-btn-setup", "n_clicks"), ],
+        [
+            Output(f"{graph_id}-setup", "data"),
+        ],
+        [
+            Input(f"{graph_id}-btn-setup", "n_clicks"),
+        ],
         [  # TAB
             State(f"tabs-{graph_id}", "active_tab"),
             # DATA
@@ -48,35 +49,104 @@ def create_on_setup(graph_id: str):
             # TIME
             State(f"active-years", "value"),
             # PROVINCE ACTIVE
-            State(f"checklist-AT", "value",),
-            State(f"checklist-Bgd", "value",),
-            State(f"checklist-Ktn", "value",),
-            State(f"checklist-Noe", "value",),
-            State(f"checklist-Ooe", "value",),
-            State(f"checklist-Sbg", "value",),
-            State(f"checklist-Stk", "value",),
-            State(f"checklist-Tir", "value",),
-            State(f"checklist-Vbg", "value",),
-            State(f"checklist-Wie", "value",),
+            State(
+                f"checklist-AT",
+                "value",
+            ),
+            State(
+                f"checklist-Bgd",
+                "value",
+            ),
+            State(
+                f"checklist-Ktn",
+                "value",
+            ),
+            State(
+                f"checklist-Noe",
+                "value",
+            ),
+            State(
+                f"checklist-Ooe",
+                "value",
+            ),
+            State(
+                f"checklist-Sbg",
+                "value",
+            ),
+            State(
+                f"checklist-Stk",
+                "value",
+            ),
+            State(
+                f"checklist-Tir",
+                "value",
+            ),
+            State(
+                f"checklist-Vbg",
+                "value",
+            ),
+            State(
+                f"checklist-Wie",
+                "value",
+            ),
             # PROVINCE PLOT NAME
-            State(f"plot-name-AT", "value",),
-            State(f"plot-name-Bgd", "value",),
-            State(f"plot-name-Ktn", "value",),
-            State(f"plot-name-Noe", "value",),
-            State(f"plot-name-Ooe", "value",),
-            State(f"plot-name-Sbg", "value",),
-            State(f"plot-name-Stk", "value",),
-            State(f"plot-name-Tir", "value",),
-            State(f"plot-name-Vbg", "value",),
-            State(f"plot-name-Wie", "value",),
+            State(
+                f"plot-name-AT",
+                "value",
+            ),
+            State(
+                f"plot-name-Bgd",
+                "value",
+            ),
+            State(
+                f"plot-name-Ktn",
+                "value",
+            ),
+            State(
+                f"plot-name-Noe",
+                "value",
+            ),
+            State(
+                f"plot-name-Ooe",
+                "value",
+            ),
+            State(
+                f"plot-name-Sbg",
+                "value",
+            ),
+            State(
+                f"plot-name-Stk",
+                "value",
+            ),
+            State(
+                f"plot-name-Tir",
+                "value",
+            ),
+            State(
+                f"plot-name-Vbg",
+                "value",
+            ),
+            State(
+                f"plot-name-Wie",
+                "value",
+            ),
             # TITLE
             # State(f"{graph_id}-title", "value",),
             # SCALE
-            State(f"{graph_id}-scale", "value",),
+            State(
+                f"{graph_id}-scale",
+                "value",
+            ),
             # INDEX YEAR
-            State(f"{graph_id}-index-year", "value",),
+            State(
+                f"{graph_id}-index-year",
+                "value",
+            ),
             # AGGREGATE
-            State(f"{graph_id}-aggregate-eb", "value",),
+            State(
+                f"{graph_id}-aggregate-eb",
+                "value",
+            ),
             # ENERGY SOURCE
             State(f"{graph_id}-energy-sources", "value"),
             # UNIT
@@ -209,8 +279,7 @@ def create_on_setup(graph_id: str):
             setup["for_each"] = chart_options_1 if chart_options_1 == "Foreach" else []
             setup["unit"] = unit
             setup["chart_type"] = chart_type_options["Bar"]["label"]
-            setup["xaxis_type"] = "Jahre" if xaxis_type == [
-                0] else "Bundesländer"
+            setup["xaxis_type"] = "Jahre" if xaxis_type == [0] else "Bundesländer"
             # setup["chart_options_2"] = chart_options_2
 
             # =========================================================== YEARS
@@ -256,8 +325,7 @@ def create_on_setup(graph_id: str):
 
             if data_section == "EEV":
 
-                row_index = [idx_0_EEV, idx_1_EEV,
-                             idx_2_EEV, idx_3_EEV, idx_4_EEV]
+                row_index = [idx_0_EEV, idx_1_EEV, idx_2_EEV, idx_3_EEV, idx_4_EEV]
 
                 if idx_0_EEV in ["Umwandlungseinsatz", "Umwandlungsausstoß"]:
 
@@ -265,7 +333,7 @@ def create_on_setup(graph_id: str):
 
                         if idx == "Gesamt":
                             row_index = row_index[: enum + 2] + list(
-                                map(lambda x: "Gesamt", row_index[enum + 2:])
+                                map(lambda x: "Gesamt", row_index[enum + 2 :])
                             )
 
                 else:
@@ -306,8 +374,7 @@ def create_on_setup(graph_id: str):
 
                 for enum, idx in enumerate(row_index):
                     if idx == "Gesamt":
-                        row_index = list(
-                            map(lambda x: "Gesamt", row_index[enum + 1:]))
+                        row_index = list(map(lambda x: "Gesamt", row_index[enum + 1 :]))
 
                 setup["row_index"] = (idx_0_RES, idx_1_RES, idx_2_RES)
                 setup["data_path"] = Path(

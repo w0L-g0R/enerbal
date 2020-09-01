@@ -4,9 +4,10 @@ CWD = Path(__file__).parent.resolve()  # / ("src/enspect")
 
 file_paths = {
     "files_eb": CWD / Path("database/energiebilanzen"),
-    "files_nea": CWD / Path("database/nutzenergieanalyse"),
+    "files_nea": CWD / Path("database/nutzenergieanalysen"),
     "files_thg": CWD / Path("database/luftschadstoffinventur"),
     "db_pickles": CWD / Path("database/pickles"),
+    "conversion_logs": CWD / Path("conversion/logs"),
 }
 
 # balances_directory_path = Path.cwd() / "/files/energiebilanzen/data"

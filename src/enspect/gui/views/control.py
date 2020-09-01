@@ -1,48 +1,38 @@
-
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
+from gui.assets.styles import (buttons_style_chart_types, label_style,
+                               range_slider_style)
+from gui.views.setup.components import get_index_year, get_scale
+from gui.views.setup.rows import chart_type_row, data_scale_row
 from settings import DEFAULT_CHART_CONFIG
-from gui.views.setup.rows import data_scale_row, chart_type_row
-
-
-from gui.assets.styles import range_slider_style, label_style, buttons_style_chart_types
-
-from gui.views.setup.components import (
-    get_scale,
-    get_index_year,
-)
 
 
 def create_control_box_layout(graph_id: str):
 
     return dbc.Card(
-        style={"width": "100%", "margin-top": -
-               12, "border": "0px black solid"},
+        style={"width": "100%", "margin-top": -12, "border": "0px black solid"},
         children=[
-
             dbc.CardBody(
                 style={"width": "100%"},
                 id=f"{graph_id}-control",
                 children=[
-
                     dbc.CardFooter(
-                        style={"margin-left": 4,
-                               "margin-right": 4,
-                               "margin-bottom": 1,
-                               "border": "0px lightblue solid",
-                               "border-radius": 0},
+                        style={
+                            "margin-left": 4,
+                            "margin-right": 4,
+                            "margin-bottom": 1,
+                            "border": "0px lightblue solid",
+                            "border-radius": 0,
+                        },
                         children=[
-
                             dbc.Button(
                                 "SETUP",
                                 color="info",
                                 id=f"{graph_id}-btn-setup",
-                                block=True
+                                block=True,
                             ),
-                        ]
-
-
+                        ],
                     ),
                     dbc.CardFooter(
                         style={
@@ -51,58 +41,55 @@ def create_control_box_layout(graph_id: str):
                             "margin-right": 4,
                             "margin-left": 4,
                             "margin-bottom": 1,
-
                         },
                         children=[
                             dbc.Row(
                                 justify="center",
                                 no_gutters=True,
-
                                 children=[
-
                                     dbc.Col(
-                                        style={"margin-left": 20,
-                                               "margin-top": 12,
-                                               "margin-right": 32,
-                                               },
+                                        style={
+                                            "margin-left": 20,
+                                            "margin-top": 12,
+                                            "margin-right": 32,
+                                        },
                                         width=8,
-                                        children=[
-                                            get_scale(graph_id=graph_id)],),
-
+                                        children=[get_scale(graph_id=graph_id)],
+                                    ),
                                     dbc.Col(
                                         width=2,
                                         style={
                                             "margin-right": 12,
                                             "margin-top": 12,
                                         },
-                                        children=[
-                                            get_index_year(graph_id=graph_id)],),
-
-                                ]
+                                        children=[get_index_year(graph_id=graph_id)],
+                                    ),
+                                ],
                             ),
-                        ]
-
+                        ],
                     ),
                     dbc.CardFooter(
-                        style={"margin-left": 4,
-                               "margin-right": 4,
-                               "margin-bottom": 1,
-                               "border": "0px lightblue solid",
-                               "border-radius": 0},
+                        style={
+                            "margin-left": 4,
+                            "margin-right": 4,
+                            "margin-bottom": 1,
+                            "border": "0px lightblue solid",
+                            "border-radius": 0,
+                        },
                         children=[
-                            dbc.Label("Chart type",
-                                      style={
-                                          "margin-left": 12,
-                                          "font-family": "Quicksand, sans-serif",
-                                          "font-size": 16,
-                                          "color": "lightblue"
-                                      }
-                                      ),
+                            dbc.Label(
+                                "Chart type",
+                                style={
+                                    "margin-left": 12,
+                                    "font-family": "Quicksand, sans-serif",
+                                    "font-size": 16,
+                                    "color": "lightblue",
+                                },
+                            ),
                             dbc.Row(
                                 justify="center",
                                 no_gutters=True,
                                 children=[
-
                                     dbc.Col(
                                         style=buttons_style_chart_types,
                                         width=3,
@@ -111,11 +98,10 @@ def create_control_box_layout(graph_id: str):
                                                 "Bar",
                                                 color="secondary",
                                                 id=f"{graph_id}-btn-bar",
-                                                block=True
+                                                block=True,
                                             ),
                                         ],
                                     ),
-
                                     dbc.Col(
                                         style=buttons_style_chart_types,
                                         width=3,
@@ -124,11 +110,10 @@ def create_control_box_layout(graph_id: str):
                                                 "Line",
                                                 color="secondary",
                                                 id=f"{graph_id}-btn-line",
-                                                block=True
+                                                block=True,
                                             ),
                                         ],
                                     ),
-
                                     dbc.Col(
                                         style=buttons_style_chart_types,
                                         width=3,
@@ -137,7 +122,7 @@ def create_control_box_layout(graph_id: str):
                                                 "Pie",
                                                 color="secondary",
                                                 id=f"{graph_id}-btn-pie",
-                                                block=True
+                                                block=True,
                                             ),
                                         ],
                                     ),
@@ -149,19 +134,16 @@ def create_control_box_layout(graph_id: str):
                                                 "Map",
                                                 color="secondary",
                                                 id=f"{graph_id}-btn-map",
-                                                block=True
+                                                block=True,
                                             ),
                                         ],
                                     ),
-
-                                ]
+                                ],
                             ),
                             dbc.Row(
                                 justify="center",
                                 no_gutters=True,
                                 children=[
-
-
                                     dbc.Col(
                                         style=buttons_style_chart_types,
                                         width=3,
@@ -170,7 +152,7 @@ def create_control_box_layout(graph_id: str):
                                                 "Bar+",
                                                 color="secondary",
                                                 id=f"{graph_id}-btn-barplus",
-                                                block=True
+                                                block=True,
                                             ),
                                         ],
                                     ),
@@ -182,7 +164,7 @@ def create_control_box_layout(graph_id: str):
                                                 "Area",
                                                 color="secondary",
                                                 id=f"{graph_id}-btn-area",
-                                                block=True
+                                                block=True,
                                             ),
                                         ],
                                     ),
@@ -194,11 +176,10 @@ def create_control_box_layout(graph_id: str):
                                                 "Sun",
                                                 color="secondary",
                                                 id=f"{graph_id}-btn-sunburst",
-                                                block=True
+                                                block=True,
                                             ),
                                         ],
                                     ),
-
                                     dbc.Col(
                                         style=buttons_style_chart_types,
                                         width=3,
@@ -207,7 +188,7 @@ def create_control_box_layout(graph_id: str):
                                                 "Sankey",
                                                 color="secondary",
                                                 id=f"{graph_id}-btn-sankey",
-                                                block=True
+                                                block=True,
                                             ),
                                         ],
                                     ),
@@ -238,13 +219,9 @@ def create_control_box_layout(graph_id: str):
                                                 style={
                                                     "margin-top": 12,
                                                     # "margin-bottom": 12,
-
                                                     "margin-right": 12,
-
                                                 },
-
                                                 children=[
-
                                                     dbc.Checklist(
                                                         labelStyle={
                                                             "font-family": "Quicksand, sans-serif",
@@ -254,36 +231,32 @@ def create_control_box_layout(graph_id: str):
                                                             "margin-top": 12,
                                                             "margin-bottom": 12,
                                                         },
-
-                                                        inputStyle={
-                                                            "size": 64},
+                                                        inputStyle={"size": 64},
                                                         options=[
-                                                            {"label": "Rotate",
-                                                             "value": "Rotate"},
-                                                            {"label": "Foreach",
-                                                             "value": "Foreach"},
+                                                            {
+                                                                "label": "Rotate",
+                                                                "value": "Rotate",
+                                                            },
+                                                            {
+                                                                "label": "Foreach",
+                                                                "value": "Foreach",
+                                                            },
                                                         ],
                                                         value=[],
                                                         id=f"{graph_id}-options-1",
                                                         switch=True,
                                                         # inline=True,
-
                                                     ),
-                                                ]
+                                                ],
                                             ),
-
                                             dbc.Col(
                                                 width=5,
                                                 style={
                                                     "margin-top": 12,
                                                     # "margin-bottom": 12,
-
                                                     # "margin-left": 124,
-
                                                 },
-
                                                 children=[
-
                                                     dbc.Checklist(
                                                         labelStyle={
                                                             "font-family": "Quicksand, sans-serif",
@@ -293,35 +266,34 @@ def create_control_box_layout(graph_id: str):
                                                             "margin-top": 12,
                                                             "margin-bottom": 12,
                                                         },
-
                                                         # inputStyle={
                                                         #     "margin-bottom": 12, },
                                                         options=[
-                                                            {"label": "Stack",
-                                                             "value": "Stack"},
-                                                            {"label": "Group",
-                                                             "value": "Group"},
+                                                            {
+                                                                "label": "Stack",
+                                                                "value": "Stack",
+                                                            },
+                                                            {
+                                                                "label": "Group",
+                                                                "value": "Group",
+                                                            },
                                                         ],
                                                         value=[],
                                                         id=f"{graph_id}-options-2",
                                                         switch=True,
                                                         # inline=True,
-
                                                     ),
-                                                ]
+                                                ],
                                             ),
-                                        ]
+                                        ],
                                     ),
-                                ]
+                                ],
                             ),
-
                             # dbc.Row(
                             #     justify="center",
                             #     no_gutters=True,
                             #     children=[
-
                             #         dbc.Col(
-
                             #             width=12,
                             #             children=[
                             #                 dbc.Button(
@@ -342,17 +314,16 @@ def create_control_box_layout(graph_id: str):
                             #         ),
                             #     ]
                             # ),
-                        ]
+                        ],
                     ),
-
-
-
                     dbc.CardFooter(
-                        style={"margin-left": 4,
-                               "margin-right": 4,
-                               "margin-bottom": 1,
-                               "border": "0px lightblue solid",
-                               "border-radius": 0},
+                        style={
+                            "margin-left": 4,
+                            "margin-right": 4,
+                            "margin-bottom": 1,
+                            "border": "0px lightblue solid",
+                            "border-radius": 0,
+                        },
                         children=[
                             dbc.Row(
                                 justify="center",
@@ -386,7 +357,7 @@ def create_control_box_layout(graph_id: str):
                                                 "Save",
                                                 color="info",
                                                 id=f"{graph_id}-btn-save",
-                                                block=True
+                                                block=True,
                                             ),
                                         ],
                                     ),
@@ -398,7 +369,7 @@ def create_control_box_layout(graph_id: str):
                                                 "Image",
                                                 color="info",
                                                 id=f"{graph_id}-btn-image",
-                                                block=True
+                                                block=True,
                                             ),
                                         ],
                                     ),
@@ -409,13 +380,13 @@ def create_control_box_layout(graph_id: str):
                                                 "Excel",
                                                 color="info",
                                                 id=f"{graph_id}-btn-xlsx",
-                                                block=True
+                                                block=True,
                                             ),
                                         ],
                                     ),
-                                ]
+                                ],
                             )
-                        ]
+                        ],
                     ),
                 ],
             )

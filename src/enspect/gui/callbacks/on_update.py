@@ -1,26 +1,24 @@
-import numpy as np
-from settings import DEFAULT_CHART_CONFIG, scale_options
 import inspect
 import os
-from typing import List
-import dash_html_components as html
-from gui.layouts import get_graph_layout
+import pickle
+from pprint import pprint
+from typing import Dict, List
 
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
+import dash_html_components as html
+import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
-from dash import callback_context
+from dash import callback_context, no_update
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
-
-from gui.app import app
-from gui.utils import show_callback_context
-from dash import no_update
-import pickle
-from pprint import pprint
-from typing import List, Dict
 from dash_table.Format import Format
+from gui.app import app
+from gui.layouts import get_graph_layout
+from gui.utils import show_callback_context
+from settings import DEFAULT_CHART_CONFIG, scale_options
+
 IDX = pd.IndexSlice
 
 
@@ -47,12 +45,10 @@ def create_on_update(graph_id: str):
             Input(f"{graph_id}-btn-xlsx", "n_clicks"),
             Input(f"{graph_id}-btn-image", "n_clicks"),
             Input(f"{graph_id}-btn-ratio", "n_clicks"),
-
         ],
         # [
         # State(f"{graph_id}-unit", "value"),
         # ]
-
     )
     def on_update(
         setup: Dict,
@@ -70,7 +66,7 @@ def create_on_update(graph_id: str):
         save,
         xlsx,
         image,
-        ratio
+        ratio,
     ):
 
         # Log callback information

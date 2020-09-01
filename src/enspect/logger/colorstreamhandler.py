@@ -50,16 +50,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import platform
 import logging
+import platform
 
 
 class _AnsiColorStreamHandler(logging.StreamHandler):
-    DEFAULT = '\x1b[0m'
-    RED = '\x1b[31m'
-    GREEN = '\x1b[32m'
-    YELLOW = '\x1b[33m'
-    CYAN = '\x1b[36m'
+    DEFAULT = "\x1b[0m"
+    RED = "\x1b[31m"
+    GREEN = "\x1b[32m"
+    YELLOW = "\x1b[33m"
+    CYAN = "\x1b[36m"
 
     CRITICAL = RED
     ERROR = RED
@@ -69,7 +69,7 @@ class _AnsiColorStreamHandler(logging.StreamHandler):
 
     @property
     def is_tty(self):
-        isatty = getattr(self.stream, 'isatty', None)
+        isatty = getattr(self.stream, "isatty", None)
         return isatty and isatty()
 
     @classmethod
@@ -123,7 +123,9 @@ class _WinColorStreamHandler(logging.StreamHandler):
     BACKGROUND_INTENSITY = 0x0080  # background color is intensified.
 
     DEFAULT = FOREGROUND_WHITE
-    CRITICAL = BACKGROUND_YELLOW | FOREGROUND_RED | FOREGROUND_INTENSITY | BACKGROUND_INTENSITY
+    CRITICAL = (
+        BACKGROUND_YELLOW | FOREGROUND_RED | FOREGROUND_INTENSITY | BACKGROUND_INTENSITY
+    )
     ERROR = FOREGROUND_RED | FOREGROUND_INTENSITY
     WARNING = FOREGROUND_YELLOW | FOREGROUND_INTENSITY
     INFO = FOREGROUND_GREEN
@@ -146,6 +148,7 @@ class _WinColorStreamHandler(logging.StreamHandler):
 
     def _set_color(self, code):
         import ctypes
+
         ctypes.windll.kernel32.SetConsoleTextAttribute(self._outhdl, code)
 
     def __init__(self, stream=None):
@@ -153,6 +156,7 @@ class _WinColorStreamHandler(logging.StreamHandler):
         # get file handle for the stream
         import ctypes
         import ctypes.util
+
         # for some reason find_msvcrt() sometimes doesn't find msvcrt.dll on my system?
         crtname = ctypes.util.find_msvcrt()
         if not crtname:
@@ -169,7 +173,7 @@ class _WinColorStreamHandler(logging.StreamHandler):
 
 # select ColorStreamHandler based on platform
 
-if platform.system() == 'Windows':
+if platform.system() == "Windows":
     ColorStreamHandler = _WinColorStreamHandler
 else:
     ColorStreamHandler = _AnsiColorStreamHandler

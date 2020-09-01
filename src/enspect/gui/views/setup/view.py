@@ -1,20 +1,11 @@
-
 import dash_bootstrap_components as dbc
 import dash_html_components as html
-
-
-from gui.views.setup.rows import (
-    eb_aggregate_row,
-    xaxis_type_row,
-    chart_type_row,
-    eb_data_section_row,
-    eev_idx_rows,
-    sectors_idx_rows,
-    sector_energy_idx_rows,
-    renewables_idx_rows
-)
-from gui.views.setup.rows import data_scale_row, chart_type_row
 from gui.views.control import create_control_box_layout
+from gui.views.setup.rows import (chart_type_row, data_scale_row,
+                                  eb_aggregate_row, eb_data_section_row,
+                                  eev_idx_rows, renewables_idx_rows,
+                                  sector_energy_idx_rows, sectors_idx_rows,
+                                  xaxis_type_row)
 
 
 def create_eb_graph_view(graph_id: str):
@@ -26,23 +17,18 @@ def create_eb_graph_view(graph_id: str):
             # "margin-top": 12,
             # "margin-bottom": -12,
             "border": "0px lightblue solid",
-            "border-radius": 4},
+            "border-radius": 4,
+        },
         # fluid=True,
         children=[
-
             xaxis_type_row(graph_id=graph_id),
             html.Br(),
-
-
             dbc.CardFooter(
-
                 children=[
                     eb_aggregate_row(graph_id=graph_id),
                 ]
             ),
-
             dbc.CardFooter(
-
                 children=[
                     eb_data_section_row(graph_id=graph_id),
                     # idx
@@ -52,7 +38,8 @@ def create_eb_graph_view(graph_id: str):
                             "margin-top": 12,
                             # "margin-bottom": -12,
                             "border": "0px lightblue solid",
-                            "border-radius": 4},
+                            "border-radius": 4,
+                        },
                         id=f"idx-eev-{graph_id}",
                         # style={"display": "none"},
                         children=eev_idx_rows(graph_id=graph_id),
@@ -67,21 +54,17 @@ def create_eb_graph_view(graph_id: str):
                     html.Div(
                         id=f"idx-sector-energy-{graph_id}",
                         style={"display": "none"},
-                        children=sector_energy_idx_rows(
-                            graph_id=graph_id),
+                        children=sector_energy_idx_rows(graph_id=graph_id),
                     ),
                     # idx
                     html.Div(
                         id=f"idx-renewables-{graph_id}",
                         style={"display": "none"},
-                        children=renewables_idx_rows(
-                            graph_id=graph_id),
+                        children=renewables_idx_rows(graph_id=graph_id),
                     ),
                 ]
             ),
-
-
-        ]
+        ],
     )
 
 
@@ -98,9 +81,7 @@ def create_setup_layout(graph_id: str, title: str):
                         children=[
                             dbc.Col(
                                 # width=2,
-                                children=[
-                                    title
-                                ],
+                                children=[title],
                             ),
                             dbc.Col(
                                 # style={"margin-left": 64},
@@ -109,13 +90,16 @@ def create_setup_layout(graph_id: str, title: str):
                                     dbc.Tabs(
                                         [
                                             dbc.Tab(
-                                                label="EB", tab_id=f"tab-eb-{graph_id}",
+                                                label="EB",
+                                                tab_id=f"tab-eb-{graph_id}",
                                             ),
                                             dbc.Tab(
-                                                label="NEA", tab_id=f"tab-nea-{graph_id}",
+                                                label="NEA",
+                                                tab_id=f"tab-nea-{graph_id}",
                                             ),
                                             dbc.Tab(
-                                                label="THG", tab_id=f"tab-thg-{graph_id}",
+                                                label="THG",
+                                                tab_id=f"tab-thg-{graph_id}",
                                             ),
                                             dbc.Tab(
                                                 label="STATS",
@@ -132,9 +116,10 @@ def create_setup_layout(graph_id: str, title: str):
                     ),
                 ]
             ),
-            dbc.CardBody(id=f"{graph_id}-content",),
-
-            create_control_box_layout(graph_id=graph_id)
+            dbc.CardBody(
+                id=f"{graph_id}-content",
+            ),
+            create_control_box_layout(graph_id=graph_id),
         ],
     )
 

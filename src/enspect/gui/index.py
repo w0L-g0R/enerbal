@@ -1,5 +1,4 @@
 import dash_bootstrap_components as dbc
-
 from gui.storages import stores
 from gui.view import layout
 

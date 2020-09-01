@@ -1,30 +1,30 @@
-from gui.callbacks.plots.rotate_axes import rotate_axes
-from gui.callbacks.plots.rescale import rescale
-from gui.callbacks.plots.create_eev_figures import create_eev_figures
-from settings import DEFAULT_CHART_CONFIG
-import pickle
-from gui.assets.AEA_colors import provinces_color_table
-from gui.layouts import get_graph_layout
-import dash_html_components as html
-from pandas.core.common import flatten
 import inspect
+import json
 import os
-from typing import List, Dict
+import pickle
 from pathlib import Path
+from time import time
+from typing import Dict, List
+
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
+import dash_html_components as html
+import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
-from dash import callback_context
+from dash import callback_context, no_update
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
-from utils import multiplicator
-import json
 from gui.app import app
+from gui.assets.AEA_colors import provinces_color_table
+from gui.callbacks.plots.create_eev_figures import create_eev_figures
+from gui.callbacks.plots.rescale import rescale
+from gui.callbacks.plots.rotate_axes import rotate_axes
+from gui.layouts import get_graph_layout
 from gui.utils import show_callback_context
-from dash import no_update
-import numpy as np
-from time import time
+from pandas.core.common import flatten
+from settings import DEFAULT_CHART_CONFIG
+from utils import multiplicator
 
 IDX = pd.IndexSlice
 
@@ -35,7 +35,9 @@ def create_on_plot(graph_id: str):
         Output(f"{graph_id}-box", "children"),
         # Output(f"{graph_id}-plots", "data"),
         # ],
-        [Input(f"{graph_id}-update", "data"),],
+        [
+            Input(f"{graph_id}-update", "data"),
+        ],
         [
             # ]
             State(f"{graph_id}-setup", "data"),
@@ -80,7 +82,9 @@ def create_on_plot(graph_id: str):
             with open(setup["graph_id"] + ".p", "rb") as file:
                 setup = pickle.load(file)
 
-            graphs, setup = rotate_axes(setup=setup,)
+            graphs, setup = rotate_axes(
+                setup=setup,
+            )
 
         if update["type"] == "scale":
 

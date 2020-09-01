@@ -1,13 +1,13 @@
-
-from xlsx.styles import *
-from openpyxl import load_workbook
-from openpyxl.utils import get_column_letter
-import openpyxl as opx
-from typing import Union, List
 import re
 from pathlib import Path
+from typing import List, Union
+
+import openpyxl as opx
 import pandas as pd
 from models.data import Data
+from openpyxl import load_workbook
+from openpyxl.utils import get_column_letter
+from xlsx.styles import *
 
 
 def excel_tuple(address):
@@ -188,14 +188,12 @@ def write_df(
 
     if "Sum" in df.columns:
         # Swap AT and sum columns, add AT minus Sum
-        df = df.reindex(columns=list(
-            df.columns[:-3]) + ["Sum", "AT", "AT-Sum"])
+        df = df.reindex(columns=list(df.columns[:-3]) + ["Sum", "AT", "AT-Sum"])
         df["AT-Sum"] = df["AT"] - df["Sum"]
 
     elif "Mean" in df.columns:
         # Swap AT and mean columns, add AT minus mean
-        df = df.reindex(columns=list(
-            df.columns[:-3]) + ["Mean", "AT", "AT-Mean"])
+        df = df.reindex(columns=list(df.columns[:-3]) + ["Mean", "AT", "AT-Mean"])
         df["AT-Mean"] = df["AT"] - df["Mean"]
 
     max_column_nr = index_column_nr + len(df.columns)
@@ -261,8 +259,7 @@ def write_df(
     style_unit(ws, index_column_nr, index_row_nr, data.unit)
 
     # Df column borders
-    set_column_borders(ws, index_column_nr, index_row_nr,
-                       max_column_nr, max_row_nr)
+    set_column_borders(ws, index_column_nr, index_row_nr, max_column_nr, max_row_nr)
 
     # Specific borders
     for cells in [
@@ -276,8 +273,7 @@ def write_df(
         set_border(ws=ws, cell_range=cells, border_style="medium")
 
     # Column Width
-    ws.column_dimensions = fit_column_size(
-        ws, index_column_nr, max_column_nr)
+    ws.column_dimensions = fit_column_size(ws, index_column_nr, max_column_nr)
 
     # index_column_nr = ws.max_column_nr
     # max_row_nr + 3

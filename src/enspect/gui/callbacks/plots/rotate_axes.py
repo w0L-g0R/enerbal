@@ -1,27 +1,27 @@
-from settings import DEFAULT_CHART_CONFIG
-import pickle
-from gui.assets.AEA_colors import provinces_color_table
-from gui.layouts import get_graph_layout
-import dash_html_components as html
-from pandas.core.common import flatten
 import inspect
+import json
 import os
-from typing import List, Dict
+import pickle
 from pathlib import Path
+from time import time
+from typing import Dict, List
+
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
+import dash_html_components as html
+import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
-from dash import callback_context
+from dash import callback_context, no_update
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
-from utils import multiplicator
-import json
 from gui.app import app
+from gui.assets.AEA_colors import provinces_color_table
+from gui.layouts import get_graph_layout
 from gui.utils import show_callback_context
-from dash import no_update
-import numpy as np
-from time import time
+from pandas.core.common import flatten
+from settings import DEFAULT_CHART_CONFIG
+from utils import multiplicator
 
 IDX = pd.IndexSlice
 
@@ -56,7 +56,10 @@ def rotate_axes(setup: dict):
         # fig = go.Figure(dict_of_fig)
 
         fig.update_layout(
-            xaxis=dict(title=figure["layout"]["yaxis"]["title"]["text"], tickangle=0,),
+            xaxis=dict(
+                title=figure["layout"]["yaxis"]["title"]["text"],
+                tickangle=0,
+            ),
             yaxis=dict(
                 title=figure["layout"]["xaxis"]["title"]["text"],
                 # categoryorder="array",

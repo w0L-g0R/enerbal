@@ -1,10 +1,9 @@
-from settings import provinces
-from pathlib import Path
-import pandas as pd
 import pickle
-import xlwings as xw
-from typing import List, Union, Dict
+from pathlib import Path
+from typing import Dict, List, Union
+
 import pandas as pd
+import xlwings as xw
 from settings import provinces
 
 

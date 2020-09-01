@@ -1,9 +1,11 @@
 from dataclasses import dataclass, field
-import pandas as pd
 from datetime import datetime
-from typing import List, Dict
-from pprint import pprint, pformat
-from enspect.models.utils import add_row_total, add_col_total
+from pprint import pformat, pprint
+from typing import Dict, List
+
+import pandas as pd
+
+from enspect.models.utils import add_col_total, add_row_total
 
 # NOTE:code_source=https://stackoverflow.com/questions/58309731/doing-class-objects-filter-pattern-in-python
 IDX = pd.IndexSlice

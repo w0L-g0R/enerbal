@@ -1,17 +1,17 @@
-import sys
+import functools
 import logging
+import sys
 from logging import FileHandler
 from logging.handlers import RotatingFileHandler
-import functools
-from typing import Union
 from pprint import pprint
+from typing import Union
 
 
 class RootLogger(object):
 
     """A tiny python root log decorator
 
-    .. seealso:: 
+    .. seealso::
     https://dev.to/mandrewcito/a-tiny-python-log-decorator-1o5m
 
     """

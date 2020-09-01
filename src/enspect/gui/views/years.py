@@ -5,7 +5,9 @@ checklist = dbc.FormGroup(
     [
         dbc.Checklist(
             labelStyle={"margin-right": 24, "padding": 0, "font-size": 17},
-            style={"margin-left": 88, },
+            style={
+                "margin-left": 88,
+            },
             options=[
                 {"label": "1988", "value": 1},
                 {"label": "1989", "value": 2},
@@ -57,7 +59,8 @@ layout = dbc.Card(
                         dbc.Col(
                             # width=9,
                             children=[
-                                html.H5("Years", className="card-title"), ],
+                                html.H5("Years", className="card-title"),
+                            ],
                         ),
                         dbc.Col(
                             width=10,

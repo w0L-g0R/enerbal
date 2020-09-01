@@ -5,7 +5,6 @@ import pandas as pd
 from dash import callback_context, no_update
 from dash.dependencies import Input, Output
 from dash.exceptions import PreventUpdate
-
 from gui.app import app
 from gui.utils import show_callback_context
 
@@ -40,7 +39,6 @@ def callback_on_select_renewables_dropdown(
 def create_on_select_renewables_dropdowns(graph_id: str):
     @app.callback(
         [
-
             Output(f"idx-res-0-{graph_id}", "options"),
             Output(f"idx-res-1-{graph_id}", "options"),
             Output(f"idx-res-2-{graph_id}", "options"),
@@ -49,7 +47,6 @@ def create_on_select_renewables_dropdowns(graph_id: str):
             Output(f"idx-res-2-{graph_id}", "disabled"),
             Output(f"{graph_id}-unit", "value"),
             Output(f"{graph_id}-unit", "disabled"),
-
         ],
         [
             Input(f"idx-res-0-{graph_id}", "value"),
@@ -61,7 +58,6 @@ def create_on_select_renewables_dropdowns(graph_id: str):
         idx_0_value: str,
         idx_1_value: str,
         idx_2_value: str,
-
     ):
 
         show_callback_context(
@@ -113,7 +109,6 @@ def create_on_select_renewables_dropdowns(graph_id: str):
                 "Solarwärme",
                 "Geothermie",
                 "Umgebungswärme",
-
             ]
 
             ee_produktion = [
@@ -136,14 +131,13 @@ def create_on_select_renewables_dropdowns(graph_id: str):
                 "Laugen",
                 "Sonstige Biogene fest",
                 "Geothemie",
-
             ]
             ee_verbrauch = [{"label": x, "value": x} for x in ee_verbrauch]
             ee_produktion = [{"label": x, "value": x} for x in ee_produktion]
             ee_fernwärme = [{"label": x, "value": x} for x in ee_fernwärme]
 
             # print()
-            print('idx_0_value: ', idx_0_value)
+            print("idx_0_value: ", idx_0_value)
 
             if "Energetischer Endverbrauch Erneuerbare (TJ)" == idx_0_value:
 
@@ -160,30 +154,32 @@ def create_on_select_renewables_dropdowns(graph_id: str):
 
                 if "Wasserkraft ohne Pumpe normalisiert (GWh)" == idx_1_value:
 
-                    categories = ["Installierte Kapazität ohne Pumpe (MW)",
-                                  "Ausnutzungsdauer (h)",
-                                  "Primärstrom Wasser real (GWh)",
-                                  "Gesamt",
-                                  ]
+                    categories = [
+                        "Installierte Kapazität ohne Pumpe (MW)",
+                        "Ausnutzungsdauer (h)",
+                        "Primärstrom Wasser real (GWh)",
+                        "Gesamt",
+                    ]
 
                 elif "Wasserkraft mit Pumpe normalisiert (GWh)" in idx_1_value:
 
-                    categories = ["Installierte Kapazität mit Pumpe (MW)",
-                                  "Erzeugung aus natürlichem Zufluß (GWh)",
-                                  "Ausnutzungsdauer (h)",
-                                  "Primärstrom Wasser real (GWh)",
-                                  "Erzeugung aus gepumptem Zufluß (GWh)",
-                                  "Gesamt",
-
-                                  ]
+                    categories = [
+                        "Installierte Kapazität mit Pumpe (MW)",
+                        "Erzeugung aus natürlichem Zufluß (GWh)",
+                        "Ausnutzungsdauer (h)",
+                        "Primärstrom Wasser real (GWh)",
+                        "Erzeugung aus gepumptem Zufluß (GWh)",
+                        "Gesamt",
+                    ]
 
                 elif "Primärstrom Wind normalisiert (GWh)" in idx_1_value:
 
-                    categories = ["Installierte Kapazität real (MW)",
-                                  "Installierte Kapazität normalisiert (MW)",
-                                  "Primärstrom Wind real (GWh)",
-                                  "Gesamt",
-                                  ]
+                    categories = [
+                        "Installierte Kapazität real (MW)",
+                        "Installierte Kapazität normalisiert (MW)",
+                        "Primärstrom Wind real (GWh)",
+                        "Gesamt",
+                    ]
 
                 elif "Sekundärstrom erneuerbar (GWh)" == idx_1_value:
 
@@ -206,9 +202,7 @@ def create_on_select_renewables_dropdowns(graph_id: str):
                         idx_1_disabled=False,
                         idx_2_disabled=True,
                         idx_1=ee_produktion,
-                        idx_2=[
-                            {"label": x, "value": x} for x in categories
-                        ],
+                        idx_2=[{"label": x, "value": x} for x in categories],
                         units_value=units_value,
                         units_disabled=units_disabled,
                     )
@@ -217,9 +211,7 @@ def create_on_select_renewables_dropdowns(graph_id: str):
                     idx_1_disabled=False,
                     idx_2_disabled=False,
                     idx_1=ee_produktion,
-                    idx_2=[
-                        {"label": x, "value": x} for x in categories
-                    ],
+                    idx_2=[{"label": x, "value": x} for x in categories],
                     units_value=units_value,
                     units_disabled=units_disabled,
                 )

@@ -1,16 +1,14 @@
 import logging
 import pickle
 import webbrowser
-
-# from files.energiebilanzen.convert.eb_sheets import eb_sheets
+# from enspect.conversion.energiebilanzen.convert.eb_sheets import eb_sheets
 from pathlib import Path
 from pprint import pformat
 from typing import List, Type, TypeVar
 
 from dash import callback_context
-from waitress import serve
-
 from settings import file_paths
+from waitress import serve
 
 # _____________________________________________________________________________
 # /////////////////////////////////////////////////////////////////////// TYPES
@@ -56,7 +54,8 @@ def open_webbrowser(connection: dict, new: int):
 # //////////////////////////////////////////////////////////// CALLBACK CONTEXT
 
 
-def show_callback_context(func_name: str, file_name: str, verbose: bool = False):
+def show_callback_context(
+        func_name: str, file_name: str, verbose: bool = False):
 
     # Switch to debug in order to surpress console output
     logging.getLogger().debug(f"{func_name} @ {file_name}")

@@ -1,16 +1,16 @@
-import pandas as pd
-import numpy as np
-from copy import deepcopy
-from enspect.settings import unit
-from typing import List, Union
-from pprint import pprint
 import logging
+import os
 import pickle
+from copy import deepcopy
+from pprint import pprint
+from typing import List, Union
+
+import numpy as np
+import pandas as pd
+from pandas.core.common import flatten
 
 from enspect.paths import file_paths
-
-from pandas.core.common import flatten
-import os
+from enspect.settings import unit_converter
 
 
 def close_xlsx():
@@ -86,7 +86,8 @@ def reduce_eb_row_index(balance_aggregates: List):
     return "_".join([x for x in aggregate if x != "Gesamt"])
 
 
-# def drop_eb_row_levels(balance_aggregates: Union[List, str], df: pd.DataFrame):
+# def drop_eb_row_levels(balance_aggregates: Union[List, str], df:
+# pd.DataFrame):
 
 #     return df
 
@@ -101,7 +102,8 @@ def add_row_total(df: pd.DataFrame):
 
 def add_col_total(df: pd.DataFrame):
     # Add colum_total row
-    df.loc[:, "SUM"] = df.sum(numeric_only=True, axis=1).subtract(df[df.columns[0]])
+    df.loc[:, "SUM"] = df.sum(
+        numeric_only=True, axis=1).subtract(df[df.columns[0]])
 
     col_list = list(df.columns)
     col_list.remove("AT")
@@ -121,12 +123,12 @@ def slice_eb_inputs(df: pd.DataFrame, balance_aggregates: List, years=List):
         if "Umwandlungsausstoß" in aggregate:
             try:
                 ua_indices = len(aggregate.split("_"))
-            except:
+            except BaseException:
                 pass
         if "Umwandlungseinsatz" in aggregate:
             try:
                 ue_indices = len(aggregate.split("_"))
-            except:
+            except BaseException:
                 pass
 
     cutoff_indices = list(range(4, max(ua_indices, ue_indices), -1))
@@ -224,10 +226,12 @@ def slice_eb_inputs(df: pd.DataFrame, balance_aggregates: List, years=List):
 #     This way one don't have to specify all five levels of the row multiindex.
 
 #     add_all:
-#         Adds ":" (without quotation marks!) for the missing indices[balance_aggregate, :, : , : , :]
+# Adds ":" (without quotation marks!) for the missing
+# indices[balance_aggregate, :, : , : , :]
 
 #     add_total:
-#         Adds "Gesamt" (without quotation marks!) for the missing indices[balance_aggregate, "Gesamt", "Gesamt" , "Gesamt" , "Gesamt"]
+# Adds "Gesamt" (without quotation marks!) for the missing
+# indices[balance_aggregate, "Gesamt", "Gesamt" , "Gesamt" , "Gesamt"]
 
 #     """
 #     # balance_aggregates_extended = []

@@ -1,15 +1,14 @@
-import logging
-from logger.setup import setup_logging
 import inspect
+import logging
 import os
 from pathlib import Path
 from typing import List
 
-from gui.utils import run_server
-from gui.index import layout
-from gui.controller import register_callbacks
-
 from gui.app import app
+from gui.controller import register_callbacks
+from gui.index import layout
+from gui.utils import run_server
+from logger.setup import setup_logging
 
 # /////////////////////////////////////////////////////////// PRE-RUNTIME SETUP
 

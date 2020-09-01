@@ -1,4 +1,3 @@
-
 import dash_bootstrap_components as dbc
 import dash_html_components as html
 
@@ -32,13 +31,16 @@ def create_graph_setup_layout(graph_id: str, title: str):
                                     dbc.Tabs(
                                         [
                                             dbc.Tab(
-                                                label="EB", tab_id=f"tab-eb-{graph_id}",
+                                                label="EB",
+                                                tab_id=f"tab-eb-{graph_id}",
                                             ),
                                             dbc.Tab(
-                                                label="NEA", tab_id=f"tab-nea-{graph_id}",
+                                                label="NEA",
+                                                tab_id=f"tab-nea-{graph_id}",
                                             ),
                                             dbc.Tab(
-                                                label="THG", tab_id=f"tab-thg-{graph_id}",
+                                                label="THG",
+                                                tab_id=f"tab-thg-{graph_id}",
                                             ),
                                             dbc.Tab(
                                                 label="STATS",
@@ -55,7 +57,9 @@ def create_graph_setup_layout(graph_id: str, title: str):
                     ),
                 ]
             ),
-            dbc.CardBody(id=f"{graph_id}-content",),
+            dbc.CardBody(
+                id=f"{graph_id}-content",
+            ),
         ],
     )
 
@@ -73,10 +77,8 @@ title_B = html.Img(
 )
 
 
-graph_setup_A_layout = create_graph_setup_layout(
-    graph_id="graph-A", title=title_A)
-graph_setup_B_layout = create_graph_setup_layout(
-    graph_id="graph-B", title=title_B)
+graph_setup_A_layout = create_graph_setup_layout(graph_id="graph-A", title=title_A)
+graph_setup_B_layout = create_graph_setup_layout(graph_id="graph-B", title=title_B)
 
 
 # @app.callback(

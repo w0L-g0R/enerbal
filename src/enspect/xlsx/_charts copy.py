@@ -1,13 +1,12 @@
-from settings import provinces
-from pathlib import Path
-import pandas as pd
 import pickle
-import xlwings as xw
-from xlwings.Chart import ChartType
+from pathlib import Path
 from typing import List, Union
+
 import pandas as pd
-from settings import provinces
+import xlwings as xw
 from gui.assets.AEA_colors import provinces_color_table_rgb
+from settings import provinces
+from xlwings.Chart import ChartType
 
 
 def rgb_to_int(rgb):

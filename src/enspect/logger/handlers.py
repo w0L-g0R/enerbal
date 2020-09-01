@@ -1,14 +1,13 @@
-
-import platform
 import logging
+import platform
 
 # ///////////////////////////////////////////////////////////////////// CLASSES
 
 
 class DashHandler(logging.StreamHandler):
-    '''
+    """
     Saves logger streams temporarily, in order to display them in the GUI
-    '''
+    """
 
     def __init__(self, stream=None):
         super().__init__(stream=stream)

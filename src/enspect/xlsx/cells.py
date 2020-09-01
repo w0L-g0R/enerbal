@@ -1,4 +1,3 @@
-
 from openpyxl.utils import get_column_letter
 
 
@@ -35,7 +34,6 @@ def get_cells_address(
             start_row=index_row_nr + 1,  # Number
             end_row=max_row_nr,  # Number
         ),
-
         "sum_vert": "{start_col}{start_row}:{end_col}{end_row}".format(
             start_col=get_column_letter(max_column_nr - 2),  # Letter
             end_col=get_column_letter(max_column_nr - 2),  # Letter

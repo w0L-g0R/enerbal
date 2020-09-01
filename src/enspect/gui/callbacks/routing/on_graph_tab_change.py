@@ -2,7 +2,6 @@ import inspect
 import os
 
 from dash.dependencies import Input, Output
-
 from gui.app import app
 from gui.utils import show_callback_context
 from gui.views.setup.view import eb_setup_views

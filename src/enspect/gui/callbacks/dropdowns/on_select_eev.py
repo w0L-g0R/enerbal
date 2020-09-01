@@ -5,7 +5,6 @@ import pandas as pd
 from dash import callback_context, no_update
 from dash.dependencies import Input, Output
 from dash.exceptions import PreventUpdate
-
 from gui.app import app
 from gui.utils import show_callback_context
 from settings import eev_indices
@@ -53,7 +52,6 @@ def create_on_select_eev_dropdowns(graph_id: str):
             Output(f"idx-eev-2-{graph_id}", "disabled"),
             Output(f"idx-eev-3-{graph_id}", "disabled"),
             Output(f"idx-eev-4-{graph_id}", "disabled"),
-
         ],
         [
             Input(f"idx-eev-0-{graph_id}", "value"),
@@ -90,26 +88,31 @@ def create_on_select_eev_dropdowns(graph_id: str):
             {"label": "aus Gichtgas", "value": "aus Gichtgas"},
         ]
 
-        biogene = ["aus Hausmüll-Bioanteil",
-                   "aus Scheitholz",
-                   "aus Holzpellets",
-                   "aus Holzabfall",
-                   "aus Ablauge",
-                   "aus Deponiegas",
-                   "aus Klärgas",
-                   "aus Biogas",
-                   "aus flüssigen Biogenen",
-                   "aus sonst. festen Biogenen",
-                   ]
+        biogene = [
+            "aus Hausmüll-Bioanteil",
+            "aus Scheitholz",
+            "aus Holzpellets",
+            "aus Holzabfall",
+            "aus Ablauge",
+            "aus Deponiegas",
+            "aus Klärgas",
+            "aus Biogas",
+            "aus flüssigen Biogenen",
+            "aus sonst. festen Biogenen",
+        ]
 
         biogene = [{"label": x, "value": x} for x in biogene]
 
         abfälle = [
             {"label": "Gesamt", "value": "Gesamt"},
-            {"label": "aus Industriabfall n. erneuer.",
-             "value": "aus Industriabfall n. erneuer."},
-            {"label": "aus Hausmüll n. erneuerbar",
-             "value": "aus Hausmüll n. erneuerbar"},
+            {
+                "label": "aus Industriabfall n. erneuer.",
+                "value": "aus Industriabfall n. erneuer.",
+            },
+            {
+                "label": "aus Hausmüll n. erneuerbar",
+                "value": "aus Hausmüll n. erneuerbar",
+            },
         ]
 
         if triggered:
@@ -119,8 +122,8 @@ def create_on_select_eev_dropdowns(graph_id: str):
             triggered_value = triggered[0]["value"]
 
             if "Umwandlungseinsatz" in idx_0_value:
-                print('idx_0_value: ', idx_0_value)
-                print('idx_1_value: ', idx_1_value)
+                print("idx_0_value: ", idx_0_value)
+                print("idx_1_value: ", idx_1_value)
                 # if idx_1_value in [
                 #     "Gesamt",
                 #     "davon:  Kokerei",
@@ -142,15 +145,19 @@ def create_on_select_eev_dropdowns(graph_id: str):
                         idx_4=only_total,
                     )
 
-                if "Kraftwerke" in idx_1_value or "KWK" in idx_1_value or "Heizwerke" in idx_1_value:
-                    print('sushi')
+                if (
+                    "Kraftwerke" in idx_1_value
+                    or "KWK" in idx_1_value
+                    or "Heizwerke" in idx_1_value
+                ):
+                    print("sushi")
                     return callback_on_select_eev_dropdowns(
                         idx_1_disabled=False,
                         idx_2_disabled=False,
                         idx_1=eev_indices[1],
                         idx_2=eev_indices[2],
                         idx_3=only_total,
-                        idx_4=only_total
+                        idx_4=only_total,
                     )
 
                 else:
@@ -162,7 +169,7 @@ def create_on_select_eev_dropdowns(graph_id: str):
                         idx_4_disabled=True,
                         # idx_2=only_total,
                         idx_3=only_total,
-                        idx_4=only_total
+                        idx_4=only_total,
                     )
 
                 return callback_on_select_eev_dropdowns(
@@ -172,7 +179,7 @@ def create_on_select_eev_dropdowns(graph_id: str):
                     idx_4_disabled=True,
                     # idx_2=only_total,
                     idx_3=only_total,
-                    idx_4=only_total
+                    idx_4=only_total,
                 )
 
             if "Umwandlungsausstoß" in idx_0_value:
@@ -183,7 +190,7 @@ def create_on_select_eev_dropdowns(graph_id: str):
                     "Hochofen",
                     "Raffinerie",
                     "Holzkohlenproduktion",
-                    "Gaserzeugung"
+                    "Gaserzeugung",
                 ]:
 
                     print("CASE 1")
@@ -199,7 +206,11 @@ def create_on_select_eev_dropdowns(graph_id: str):
                         idx_4=only_total,
                     )
 
-                if "Kraftwerke" in idx_1_value or "KWK" in idx_1_value or "Heizwerke" in idx_1_value:
+                if (
+                    "Kraftwerke" in idx_1_value
+                    or "KWK" in idx_1_value
+                    or "Heizwerke" in idx_1_value
+                ):
 
                     print("CASE 2")
 

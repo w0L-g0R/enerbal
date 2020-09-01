@@ -10,7 +10,6 @@ def create_table_layout(graph_id: str):
         style={"width": "100%", "border": "1px lightblue solid"},
         children=[
             dbc.CardHeader(
-
                 children=[
                     dbc.Row(
                         # justify="end",
@@ -19,13 +18,13 @@ def create_table_layout(graph_id: str):
                             dbc.Col(
                                 # width=7,
                                 children=[
-                                    html.H5(graph_id, className="card-title"), ],
+                                    html.H5(graph_id, className="card-title"),
+                                ],
                             ),
                             dbc.Col(
                                 # width={"offset": 7, "size": 5},
                                 # width=2,
                                 children=[
-
                                     dbc.ButtonGroup(
                                         # style={"margin-right": 32},
                                         children=[
@@ -54,8 +53,7 @@ def create_table_layout(graph_id: str):
                                                 color="success",
                                                 id=f"show-{graph_id}",
                                             ),
-                                            dbc.Button(
-                                                "Excel", color="success"),
+                                            dbc.Button("Excel", color="success"),
                                         ],
                                     )
                                 ],
@@ -65,10 +63,8 @@ def create_table_layout(graph_id: str):
                 ]
             ),
             dbc.CardBody(
-
                 id=f"table-{graph_id}",
-                children=[
-                ],
+                children=[],
             ),
         ],
     )

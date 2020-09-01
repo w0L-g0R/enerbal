@@ -6,7 +6,6 @@ import pandas as pd
 from dash import callback_context, no_update
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
-
 from gui.app import app
 from gui.utils import show_callback_context
 
@@ -19,12 +18,11 @@ def create_on_select_index_year(graph_id: str):
         [
             Input(f"{graph_id}-index-year", "value"),
         ],
-        [State(f"active-years", "value"), ]
+        [
+            State(f"active-years", "value"),
+        ],
     )
-    def on_select_index_year(
-        index_year: str,
-        active_years: List
-    ):
+    def on_select_index_year(index_year: str, active_years: List):
 
         show_callback_context(
             verbose=True,
@@ -41,12 +39,14 @@ def create_on_select_index_year(graph_id: str):
 
             active_years = [1987 + int(x) for x in active_years]
 
-            if int(index_year) >= min(active_years) and int(index_year) <= max(active_years):
+            if int(index_year) >= min(active_years) and int(index_year) <= max(
+                active_years
+            ):
 
-                print('active_years: ', active_years)
-                print('min(active_years): ', min(active_years))
-                print('max(active_years):: ', max(active_years))
-                print('int(index_year): ', int(index_year))
+                print("active_years: ", active_years)
+                print("min(active_years): ", min(active_years))
+                print("max(active_years):: ", max(active_years))
+                print("int(index_year): ", int(index_year))
 
                 return {
                     {

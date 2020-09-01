@@ -1,11 +1,13 @@
-from pprint import pprint
-import pytest
-from pathlib import Path
 import os
-from enspect.paths import file_paths
+import time
+from pathlib import Path
+from pprint import pprint
+
+import pytest
+
 from enspect.models.dataset import DataSet
 from enspect.models.workbook import Workbook
-import time
+from enspect.paths import file_paths
 
 CWD = Path(__file__).parent.resolve()
 
@@ -69,7 +71,8 @@ def test_workbooks_eb():
                 del workbooks[name].book[sheet]
 
         workbooks[name].add_sheets(
-            ["EGGS_PER_YEAR", "BAGGS_PER_YEAR", "ESRC_OVER_YEARS"])
+            ["EGGS_PER_YEAR", "BAGGS_PER_YEAR", "ESRC_OVER_YEARS"]
+        )
 
         workbooks[name].save()
 

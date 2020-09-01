@@ -1,27 +1,21 @@
-import sys
+import io
 import logging
+import sys
 from pathlib import Path
 from pprint import pprint
 
-from enspect.settings import file_paths, provinces
-from enspect.models.dataset import DataSet
-from enspect.models.workbook import Workbook
-
-# from enspect.models.workbook import xlsx
-from enspect.models.utils import close_xlsx
-
-from enspect.logger.setup import setup_logging
+import pandas as pd
+import xlwings as xw
 
 # from enspect.xlsx.workbook import xlsx
-from enspect.files.energiebilanzen.data_structures import (
-    eev_aggregates,
-    eev_generation,
-    energy_aggregate_lookup,
-)
-import pandas as pd
-import io
-
-import xlwings as xw
+from enspect.conversion.energiebilanzen.data_structures import (
+    eev_aggregates, eev_generation, energy_aggregate_lookup)
+from enspect.logger.setup import setup_logging
+from enspect.models.dataset import DataSet
+# from enspect.models.workbook import xlsx
+from enspect.models.utils import close_xlsx
+from enspect.models.workbook import Workbook
+from enspect.settings import file_paths, provinces
 
 pd.set_option("display.max_columns", 6)  # or 1000
 pd.set_option("display.max_rows", None)  # or 1000
@@ -35,7 +29,9 @@ pd.set_option("display.precision", 2)  # or 1000
 # ////////////////////////////////////////////////////////////////////// INPUTS
 
 setup_logging(
-    console_log_actived=True, console_log_filter=None, console_out_level=logging.DEBUG,
+    console_log_actived=True,
+    console_log_filter=None,
+    console_out_level=logging.DEBUG,
 )
 
 balances_aggregates = [

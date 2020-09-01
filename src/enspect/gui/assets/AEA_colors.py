@@ -97,7 +97,7 @@ provinces_color_table_rgba = {
     "Stk": (84, 130, 53, 0.5),
     "Tir": (31, 76, 120, 0.5),
     "Vbg": (123, 123, 123, 0.5),
-    "Wie": (144, 183, 107, 0.5)
+    "Wie": (144, 183, 107, 0.5),
 }
 
 provinces_color_table_rgb = {

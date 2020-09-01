@@ -1,4 +1,3 @@
-
 # %%
 
 import dash_bootstrap_components as dbc
@@ -40,8 +39,7 @@ def create_graph_layout(graph_id: str):
                     color="success",
                     id=f"show-{graph_id}",
                 ),
-                dbc.Button(
-                    "Excel", color="success"),
+                dbc.Button("Excel", color="success"),
             ],
         )
     else:
@@ -61,7 +59,6 @@ def create_graph_layout(graph_id: str):
         style={"width": "100%", "border": "1px lightblue solid"},
         children=[
             dbc.CardHeader(
-
                 children=[
                     dbc.Row(
                         # justify="end",
@@ -70,7 +67,8 @@ def create_graph_layout(graph_id: str):
                             dbc.Col(
                                 # width=7,
                                 children=[
-                                    html.H5(graph_id, className="card-title"), ],
+                                    html.H5(graph_id, className="card-title"),
+                                ],
                             ),
                             dbc.Col(
                                 # width={"offset": 7, "size": 5},
@@ -79,7 +77,6 @@ def create_graph_layout(graph_id: str):
                                     # dbc.ButtonGroup(
                                     # style={"margin": 0},
                                     # children=[
-
                                     # dbc.Button(
                                     #     "Update",
                                     #     color="success",

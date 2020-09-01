@@ -1,8 +1,8 @@
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
+from gui.views.setup.rows import chart_type_row, data_scale_row
 from settings import DEFAULT_CHART_CONFIG
-from gui.views.setup.rows import data_scale_row, chart_type_row
 
 
 def create_plots_dropdown(graph_id: str):
@@ -11,11 +11,7 @@ def create_plots_dropdown(graph_id: str):
         style={"margin-bottom": 0},
         children=[
             # dbc.Label("Einheit", style=label_style),
-            dcc.Dropdown(
-                id=f"{graph_id}-plots",
-                placeholder="Select ... "
-
-            ),
+            dcc.Dropdown(id=f"{graph_id}-plots", placeholder="Select ... "),
         ],
     )
 
@@ -23,19 +19,13 @@ def create_plots_dropdown(graph_id: str):
 def create_graph_box_layout(graph_id: str):
 
     return dbc.Row(
-
         children=[
-
             dbc.Container(
                 fluid=True,
                 id=f"{graph_id}-container",
-                style={
-                    "min-height": "100vh",
-                    "width": "100%"},
+                style={"min-height": "100vh", "width": "100%"},
                 children=[
-
                     # dcc.Graph(
-
                     # )
                 ],
             ),

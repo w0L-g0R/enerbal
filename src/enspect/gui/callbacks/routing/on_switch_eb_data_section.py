@@ -5,7 +5,6 @@ import pandas as pd
 from dash import callback_context
 from dash.dependencies import Input, Output
 from dash.exceptions import PreventUpdate
-
 from gui.app import app
 from gui.utils import show_callback_context
 
@@ -19,18 +18,22 @@ def callback_return_on_switch_eb_data_section(
     display_res_idx: str = {"display": "none"},
 ):
 
-    return [display_eev_idx,
-            display_sectors_idx,
-            display_sector_energy_idx,
-            display_res_idx]
+    return [
+        display_eev_idx,
+        display_sectors_idx,
+        display_sector_energy_idx,
+        display_res_idx,
+    ]
 
 
 def create_on_switch_eb_data_section(graph_id: str):
     @app.callback(
-        [Output(f"idx-eev-{graph_id}", "style"),
-         Output(f"idx-sectors-{graph_id}", "style"),
-         Output(f"idx-sector-energy-{graph_id}", "style"),
-         Output(f"idx-renewables-{graph_id}", "style"), ],
+        [
+            Output(f"idx-eev-{graph_id}", "style"),
+            Output(f"idx-sectors-{graph_id}", "style"),
+            Output(f"idx-sector-energy-{graph_id}", "style"),
+            Output(f"idx-renewables-{graph_id}", "style"),
+        ],
         [
             Input(f"{graph_id}-data-section", "value"),
         ],

@@ -1,51 +1,35 @@
-# from files.energiebilanzen.convert.get_eb_data_structures import eb_sheets
-from enspect.utils import create_row_indices
-from enspect.paths import file_paths
-from enspect.gui.assets.styles import range_slider_style, label_style
+# from enspect.conversion.energiebilanzen.convert.get_eb_data_structures import eb_sheets
 import pickle
-import pandas as pd
 from pathlib import Path
 
+import pandas as pd
 
-# # Row indices for eev, sec and sec_energy saved in file "indices.p"
-# eb_indices = pickle.load(open(file_paths["eb_indices"], "rb"))
-# # Get the multiindex for eev data from "indices.p"
-# eev_indices = create_row_indices(_type="EEV", eb_indices=eb_indices)
-# # Get the single index for sector eev consumption data from "indices.p"
-# sectors_indices = create_row_indices(_type="Sektoren", eb_indices=eb_indices)
-# # Get the single index for sector energy data from "indices.p"
-# sector_energy_indices = create_row_indices(
-#     _type="Sektor Energie", eb_indices=eb_indices
-# )
-# renewables_indices = create_row_indices(_type="ErnRL", eb_indices=eb_indices)
+from enspect.gui.assets.styles import label_style, range_slider_style
+from enspect.paths import file_paths
+from enspect.utils import create_row_indices
 
 
-chart_type_options = {
-    "Bar": {"label": "Bar", "style": range_slider_style},
-    "Bar+": {"label": "Bar+", "style": range_slider_style},
-    "Line": {"label": "Line", "style": range_slider_style},
-    "Area": {"label": "Map", "style": range_slider_style},
-    "Pie": {"label": "Pie", "style": range_slider_style},
-    "Sun": {"label": "Sun", "style": range_slider_style},
-    "Map": {"label": "Map", "style": range_slider_style},
-    "Sankey": {"label": "Sankey", "style": range_slider_style},
-    "Ratio": {"label": "Sankey", "style": range_slider_style},
+def set_pd_options():
+    pd.set_option("display.max_columns", 10)  # or 1000
+    pd.set_option("display.max_rows", None)  # or 1000
+    pd.set_option("display.width", None)  # or 1000
+    pd.set_option("max_colwidth", 20)  # or 1000
+    return
+
+
+provinces_hex = {
+    "AT": "161716",
+    "Bgl": "64BDF5",  # hellblau
+    "Ktn": "DCE374",  # dunkelrot
+    "Noe": "AB5554",  # rot
+    "Ooe": "D19F5A",  # orange
+    "Sbg": "435694",  # limette
+    "Stk": "32A852",  # grün
+    "Tir": "9A5FBA",  # dunkelgrün
+    "Vor": "59C7CF",  # braun
+    "Wie": "2A6E3B",  # deeppink
 }
 
-aggregates_eb = [
-    {"label": "Hauptaggregate", "value": "Hauptaggregate"},
-    {"label": "Elektrische Energie", "value": "Elektrische Energie"},
-    {"label": "Erneuerbare", "value": "Erneuerbare"},
-    {"label": "Fossil-fest", "value": "Fossil-fest"},
-    {"label": "Fossil-flüssig", "value": "Fossil-flüssig"},
-    {"label": "Fossil-gasförmig", "value": "Fossil-gasförmig"},
-    {"label": "Biogen-fest", "value": "Biogen-fest"},
-    {"label": "Biogen-flüssig", "value": "Biogen-flüssig"},
-    {"label": "Biogen-gasförmig", "value": "Biogen-gasförmig"},
-    {"label": "Umgebungswärme", "value": "Umgebungswärme"},
-    {"label": "Wasserkraft", "value": "Wasserkraft"},
-    {"label": "Abfall", "value": "Abfall"},
-]
 
 units = [
     {"label": "TJ", "value": "TJ"},
@@ -63,44 +47,21 @@ scale_options = {
     2: {"label": "Index", "style": range_slider_style},
 }
 
-unit = {
+unit_converter = {
     "MWh_2_GWh": 0.001,
     "GWh_2_TJ": (1 / 0.27778),
-    "TJ_2_PJ": 0.001,
     "GWh_2_MWh": 1000,
+    "TJ_2_PJ": 0.001,
+    "PJ_2_TJ": 1000,
     "TJ_2_GWh": 0.27778,
     "TJ_2_TWh": 0.27778 / 1000,
-    "PJ_2_TJ": 1000,
 }
 
-provinces = [
-    "Bgd",
-    "Ktn",
-    "Noe",
-    "Ooe",
-    "Sbg",
-    "Stk",
-    "Tir",
-    "Vbg",
-    "Wie",
-    "AT",
-]
-
-provinces_hex = {
-    "AT": "161716",
-    "Bgd": "64BDF5",  # hellblau
-    "Ktn": "DCE374",  # dunkelrot
-    "Noe": "AB5554",  # rot
-    "Ooe": "D19F5A",  # orange
-    "Sbg": "435694",  # limette
-    "Stk": "32A852",  # grün
-    "Tir": "9A5FBA",  # dunkelgrün
-    "Vbg": "59C7CF",  # braun
-    "Wie": "2A6E3B",  # deeppink
-}
 
 DEFAULT_CHART_CONFIG = {
-    "edits": {"titleText": True,},
+    "edits": {
+        "titleText": True,
+    },
     "modeBarButtons": [
         [
             "toImage",
@@ -136,3 +97,32 @@ DEFAULT_CHART_CONFIG = {
         "scale": 1,  # Multiply title/legend/axis/canvas sizes by this factor
     },
 }
+
+
+# //////////////////////////////////////////////////////////////////// GUI STUFF
+# aggregates_eb = [
+#     {"label": "Hauptaggregate", "value": "Hauptaggregate"},
+#     {"label": "Elektrische Energie", "value": "Elektrische Energie"},
+#     {"label": "Erneuerbare", "value": "Erneuerbare"},
+#     {"label": "Fossil-fest", "value": "Fossil-fest"},
+#     {"label": "Fossil-flüssig", "value": "Fossil-flüssig"},
+#     {"label": "Fossil-gasförmig", "value": "Fossil-gasförmig"},
+#     {"label": "Biogen-fest", "value": "Biogen-fest"},
+#     {"label": "Biogen-flüssig", "value": "Biogen-flüssig"},
+#     {"label": "Biogen-gasförmig", "value": "Biogen-gasförmig"},
+#     {"label": "Umgebungswärme", "value": "Umgebungswärme"},
+#     {"label": "Wasserkraft", "value": "Wasserkraft"},
+#     {"label": "Abfall", "value": "Abfall"},
+# ]
+
+# chart_type_options = {
+#     "Bar": {"label": "Bar", "style": range_slider_style},
+#     "Bar+": {"label": "Bar+", "style": range_slider_style},
+#     "Line": {"label": "Line", "style": range_slider_style},
+#     "Area": {"label": "Map", "style": range_slider_style},
+#     "Pie": {"label": "Pie", "style": range_slider_style},
+#     "Sun": {"label": "Sun", "style": range_slider_style},
+#     "Map": {"label": "Map", "style": range_slider_style},
+#     "Sankey": {"label": "Sankey", "style": range_slider_style},
+#     "Ratio": {"label": "Sankey", "style": range_slider_style},
+# }

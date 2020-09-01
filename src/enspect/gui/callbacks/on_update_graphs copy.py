@@ -1,26 +1,24 @@
-import numpy as np
-from settings import DEFAULT_CHART_CONFIG
 import inspect
 import os
+import pickle
+from pprint import pprint
 from typing import List
-import dash_html_components as html
-from gui.layouts import get_graph_layout
 
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
+import dash_html_components as html
+import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
-from dash import callback_context
+from dash import callback_context, no_update
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
-
-from gui.app import app
-from gui.utils import show_callback_context
-from dash import no_update
-import pickle
-from pprint import pprint
-
 from dash_table.Format import Format
+from gui.app import app
+from gui.layouts import get_graph_layout
+from gui.utils import show_callback_context
+from settings import DEFAULT_CHART_CONFIG
+
 IDX = pd.IndexSlice
 
 
@@ -34,7 +32,6 @@ def create_on_update(graph_id: str):
         # [
         # State(f"{graph_id}-unit", "value"),
         # ]
-
     )
     def on_update(
         is_plot_data,
@@ -64,8 +61,7 @@ def create_on_update(graph_id: str):
             if "graph-B" in triggered_prop_id:
                 graph_id = "graph-B"
 
-            setup = pickle.load(
-                open(graph_id + ".p", "rb"))
+            setup = pickle.load(open(graph_id + ".p", "rb"))
 
             graphs = []
             # print('setup: ', setup)
@@ -82,9 +78,7 @@ def create_on_update(graph_id: str):
                             responsive=True,
                             # responsive=False,
                             config=DEFAULT_CHART_CONFIG,
-                            style={
-                                "height": "100%",
-                                "width": "100%"},
+                            style={"height": "100%", "width": "100%"},
                             figure=figure,
                         )
                     )
@@ -104,16 +98,13 @@ def create_on_update(graph_id: str):
                     trace["x"], trace["y"] = trace["y"], trace["x"]
 
                     trace["orientation"] = "h"
-                    trace["hovertemplate"] = '%{x: .0f}'
+                    trace["hovertemplate"] = "%{x: .0f}"
 
                     # df = pd.DataFrame(index=trace["x"], data=trace["y"])
 
                     # fig.layout = figures_layout
 
-                    dict_of_fig = dict({
-                        "data": data,
-                        "layout": layout
-                    })
+                    dict_of_fig = dict({"data": data, "layout": layout})
 
                     fig = go.Figure(dict_of_fig)
                     # pprint(fig)
@@ -127,21 +118,21 @@ def create_on_update(graph_id: str):
                             # zeroline=True,
                             showgrid=True,
                             gridwidth=0.5,
-                            gridcolor='#444444',
+                            gridcolor="#444444",
                             # zerolinewidth=3,
                             # zerolinecolor='red',
-                            autorange=True
+                            autorange=True,
                         ),
                         yaxis=dict(
                             title=setup["xaxis_type"],
                             showgrid=True,
                             gridwidth=0.5,
-                            gridcolor='#444444',
+                            gridcolor="#444444",
                             autorange=True,
                             categoryorder="array",
-                            categoryarray=[x for _, x in sorted(
-                                zip(trace["y"], trace["x"]))]
-
+                            categoryarray=[
+                                x for _, x in sorted(zip(trace["y"], trace["x"]))
+                            ]
                             # ticks="outside",
                             # tickcolor="#444444",
                             # ticklen=2,
@@ -155,7 +146,6 @@ def create_on_update(graph_id: str):
                             # ),
                         ),
                         legend=dict(x=0, y=-0.24),
-
                     )
 
                     fig.add_shape(
@@ -209,9 +199,7 @@ def create_on_update(graph_id: str):
                             responsive=True,
                             # responsive=False,
                             config=DEFAULT_CHART_CONFIG,
-                            style={
-                                "height": "100%",
-                                "width": "100%"},
+                            style={"height": "100%", "width": "100%"},
                             figure=fig,
                         )
                         #     ]

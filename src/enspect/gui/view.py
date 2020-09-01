@@ -1,5 +1,4 @@
 import dash_bootstrap_components as dbc
-
 from gui.controller import views
 
 layout = dbc.Container(
@@ -13,11 +12,12 @@ layout = dbc.Container(
             no_gutters=True,
             children=[
                 dbc.Col(
-                    style={"margin-bottom": 12, },
+                    style={
+                        "margin-bottom": 12,
+                    },
                     width=12,
                     children=views["header"],
                 ),
-
                 # html.Div(style={"border-top": "1px solid #2A2A57"}),
                 # dbc.Col(width=12, children=[]),
                 dbc.Row(
@@ -39,7 +39,9 @@ layout = dbc.Container(
                             lg=6,
                             xl=6,
                             children=views["provinces"],
-                            style={"padding": 6, },
+                            style={
+                                "padding": 6,
+                            },
                         ),
                     ],
                 ),
@@ -62,7 +64,9 @@ layout = dbc.Container(
                             lg=6,
                             xl=6,
                             children=views["setup_B"],
-                            style={"padding": 6, },
+                            style={
+                                "padding": 6,
+                            },
                         ),
                         # dbc.Col(
                         #     xs=12,
@@ -75,7 +79,6 @@ layout = dbc.Container(
                         # ),
                     ],
                 ),
-
                 # dbc.Row(
                 #     style={"height": "100%", "width": "100%"},
                 #     no_gutters=True,
@@ -88,8 +91,6 @@ layout = dbc.Container(
                 #             xl=6,
                 #             children=views["control_A"],
                 #             style={"padding": 6, },
-
-
                 #             # style={"margin-left": -9, "padding-right": -24},
                 #         ),
                 #         dbc.Col(
@@ -100,7 +101,6 @@ layout = dbc.Container(
                 #             xl=6,
                 #             children=views["control_B"],
                 #             style={"padding": 6, },
-
                 #             # style={"margin-left": 12, "padding-right": -6},
                 #         ),
                 #         # dbc.Col(
@@ -114,7 +114,6 @@ layout = dbc.Container(
                 #         # ),
                 #     ],
                 # ),
-
                 dbc.Row(
                     style={"width": "100%"},
                     children=[
@@ -134,7 +133,9 @@ layout = dbc.Container(
                             lg=6,
                             xl=6,
                             children=views["graph_B"],
-                            style={"padding": 6, },
+                            style={
+                                "padding": 6,
+                            },
                         ),
                         # dbc.Col(
                         #     xs=12,
@@ -147,7 +148,6 @@ layout = dbc.Container(
                         # ),
                     ],
                 ),
-
                 dbc.Row(
                     no_gutters=True,
                     style={"width": 1164},

@@ -1,18 +1,19 @@
-import openpyxl as opx
-from openpyxl.utils import get_column_letter
+import datetime
+import os
+from pathlib import Path
+from typing import List, Union
 
+import openpyxl as opx
+import pandas as pd
+from models.data import Data
+from openpyxl import load_workbook
+from openpyxl.styles import (
+    Alignment, Border, Color, Fill, Font, PatternFill, Side)
+from openpyxl.utils import get_column_letter
+from openpyxl.utils.dataframe import dataframe_to_rows
 # from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from xlsx.styles import *
-from pathlib import Path
-import pandas as pd
-from typing import Union, List
-import os
-from openpyxl.utils.dataframe import dataframe_to_rows
-from openpyxl import load_workbook
-from openpyxl.styles import Border, Side, Font, Alignment, PatternFill, Fill, Color
-from models.data import Data
-import datetime
 
 
 class xlsx:

@@ -5,7 +5,6 @@ import pandas as pd
 from dash import callback_context, no_update
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
-
 from gui.app import app
 from gui.utils import show_callback_context
 
@@ -16,9 +15,7 @@ IDX = pd.IndexSlice
 
 def callback_return_on_click_update(_type: object = no_update):
 
-    return [
-        _type
-    ]
+    return [_type]
 
 
 def create_on_click_update(graph_id: str):
@@ -33,16 +30,15 @@ def create_on_click_update(graph_id: str):
             # Output(f"{graph_id}-clicked-thg-update", "data"),
             # Output(f"{graph_id}-clicked-stats-update", "data"),
         ],
-        [Input(f"btn-plot-{graph_id}", "n_clicks"), ],
-        [State(f"tabs-{graph_id}", "active_tab"),
-         State(f"data-section-{graph_id}", "value"),
-         ],
+        [
+            Input(f"btn-plot-{graph_id}", "n_clicks"),
+        ],
+        [
+            State(f"tabs-{graph_id}", "active_tab"),
+            State(f"data-section-{graph_id}", "value"),
+        ],
     )
-    def on_click_update(
-        n_clicks_update,
-        active_tab,
-        eb_data_type
-    ):
+    def on_click_update(n_clicks_update, active_tab, eb_data_type):
 
         # Log callback information
         show_callback_context(
@@ -54,7 +50,7 @@ def create_on_click_update(graph_id: str):
         # Get callback information to define the triggered input
         ctx = callback_context
         triggered = ctx.triggered
-        print('eb_data_type: ', eb_data_type)
+        print("eb_data_type: ", eb_data_type)
         if triggered:
 
             # Store the selected dropdown item in a variable
