@@ -15,12 +15,13 @@ from dash import callback_context, no_update
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 from dash_table.Format import Format
-from enspect.conversion.energiebilanzen.convert.get_energy_source_aggregates import \
-    energy_source_aggregates
 from gui.app import app
-from gui.assets.AEA_colors import (provinces_color_table,
-                                   provinces_color_table_rgba)
+from gui.assets.AEA_colors import provinces_color_table, provinces_color_table_rgba
 from gui.utils import show_callback_context
+
+from enspect.conversion.energiebilanzen.convert.get_energy_source_aggregates import (
+    energy_source_aggregates,
+)
 
 IDX = pd.IndexSlice
 

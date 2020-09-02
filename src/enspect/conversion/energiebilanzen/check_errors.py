@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Dict, List
 
 import pandas as pd
+
 from enspect.aggregates.eb import eb_sheet_names
 from enspect.utils import timeit
 
@@ -12,8 +13,7 @@ def check_sheetname_errors(energy_sources_sheets: Dict, years: List):
 
     # CHECK 2: Find unintended sheets in the excel file
     fetched_sheets = list(energy_sources_sheets.keys())
-    unintended_sheets = set(
-        eb_sheet_names).symmetric_difference(fetched_sheets)
+    unintended_sheets = set(eb_sheet_names).symmetric_difference(fetched_sheets)
 
     mismatches = [
         energy_source
@@ -48,7 +48,7 @@ def check_column_errors(
 
             # Replace missing years in column index
             add_on_columns = pd.DataFrame(
-                index=range(len(df.index)), columns=years[len(df.columns) - 1:]
+                index=range(len(df.index)), columns=years[len(df.columns) - 1 :]
             )
 
             energy_sources_sheets[sheet] = pd.concat(
@@ -71,8 +71,7 @@ def check_index_errors(
 
         logging.getLogger().warning("\n\t{} WARNING {}".format("*" * 33, "*" * 33))
 
-        devs_idx = [list(data.index.get_indexer_for([i]) + 5)
-                    for i in index_deviations]
+        devs_idx = [list(data.index.get_indexer_for([i]) + 5) for i in index_deviations]
 
         index_deviations = dict(zip(index_deviations, devs_idx))
 

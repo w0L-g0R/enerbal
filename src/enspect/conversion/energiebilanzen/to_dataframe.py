@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 from utils import timeit
 
+from enspect.aggregates.common import provinces
 from enspect.aggregates.eb import eb_sheet_names
 from enspect.conversion.energiebilanzen.check_errors import check_index_errors
 from enspect.conversion.energiebilanzen.utils import (
@@ -22,7 +23,6 @@ from enspect.conversion.energiebilanzen.utils import (
     write_to_log_file,
 )
 from enspect.paths import file_paths
-from enspect.aggregates.common import provinces
 
 IDX = pd.IndexSlice
 
@@ -30,7 +30,9 @@ IDX = pd.IndexSlice
 
 
 @timeit
-def convert_energy_balances_to_dataframe(last_year: int,):
+def convert_energy_balances_to_dataframe(
+    last_year: int,
+):
     """
     Make sure energy balance files follow the name convention: prefix "EB" + provinces_name + year_start(last two digits only) + year_end(last two digits only) , connected with underlines, eg. EB_Bgl_88_18. Use the province abbrevations as given in enspect.settings!
     """

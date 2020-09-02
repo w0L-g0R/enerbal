@@ -1,11 +1,17 @@
 import dash_bootstrap_components as dbc
 import dash_html_components as html
 from gui.views.control import create_control_box_layout
-from gui.views.setup.rows import (chart_type_row, data_scale_row,
-                                  eb_aggregate_row, eb_data_section_row,
-                                  eev_idx_rows, renewables_idx_rows,
-                                  sector_energy_idx_rows, sectors_idx_rows,
-                                  xaxis_type_row)
+from gui.views.setup.rows import (
+    chart_type_row,
+    data_scale_row,
+    eb_aggregate_row,
+    eb_data_section_row,
+    eev_idx_rows,
+    renewables_idx_rows,
+    sector_energy_idx_rows,
+    sectors_idx_rows,
+    xaxis_type_row,
+)
 
 
 def create_eb_graph_view(graph_id: str):

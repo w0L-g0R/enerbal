@@ -1,8 +1,7 @@
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
-from gui.assets.styles import (buttons_style_chart_types, label_style,
-                               range_slider_style)
+from gui.assets.styles import buttons_style_chart_types, label_style, range_slider_style
 from gui.views.setup.components import get_index_year, get_scale
 from gui.views.setup.rows import chart_type_row, data_scale_row
 from settings import DEFAULT_CHART_CONFIG

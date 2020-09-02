@@ -5,16 +5,28 @@ import dash_core_components as dcc
 import dash_daq as daq
 import dash_html_components as html
 from gui.assets.styles import label_style, range_slider_style
-from gui.views.setup.components import (get_aggregate_eb, get_chart_options,
-                                        get_chart_type, get_data_section,
-                                        get_energy_source,
-                                        get_energy_source_index,
-                                        get_energy_unit, get_index_select,
-                                        get_index_year, get_scale,
-                                        get_xaxis_type)
-from settings import (aggregates_eb, chart_type_options, eev_indices,
-                      renewables_indices, sector_energy_indices,
-                      sectors_indices, units)
+from gui.views.setup.components import (
+    get_aggregate_eb,
+    get_chart_options,
+    get_chart_type,
+    get_data_section,
+    get_energy_source,
+    get_energy_source_index,
+    get_energy_unit,
+    get_index_select,
+    get_index_year,
+    get_scale,
+    get_xaxis_type,
+)
+from settings import (
+    aggregates_eb,
+    chart_type_options,
+    eev_indices,
+    renewables_indices,
+    sector_energy_indices,
+    sectors_indices,
+    units,
+)
 
 # def create_sectors_graph_view(graph_id: str):
 

@@ -10,26 +10,41 @@ from enspect.paths import file_paths
 
 CWD = Path(__file__).parent.resolve()
 
-# /////////////////////////////////////////////////////////////////// PROVINCES
+# /////////////////////////////////////////////////////////////////// WB
+
+
 @pytest.fixture(scope="session")
-def test_provinces():
-    return [
-        "Bgd",
-        "Ktn",
-        "Noe",
-        "Ooe",
-        "Sbg",
-        "Stk",
-        "Tir",
-        "Vbg",
-        "Wie",
-        "AT",
-    ]
+def test_eb_workbook():
+
+    os.system("TASKKILL /F /IM excel.exe")
+
+    time.sleep(2)
+
+    filename = CWD / "unit_tests/results/test_eb.xlsx"
+
+    if Path(filename).exists():
+        os.remove(filename)
+
+    wb = Workbook(name="WB_TEST", filename=filename)
+
+    for sheet in wb.book.sheetnames:
+        if sheet in ["Sheet", "Tabelle1"]:
+            pass
+        else:
+            del wb.book[sheet]
+
+    wb.add_sheets(["EGGS_PER_YEAR", "BAGGS_PER_YEAR", "ES_OVER_YEARS"])
+
+    wb.save()
+
+    return wb
 
 
 # /////////////////////////////////////////////////////////////////// E-SOURCES
+
+
 @pytest.fixture(scope="session")
-def test_main_energy_sources():
+def test_eb_main_energy_sources():
     return [
         "Gesamtenergiebilanz",
         "Elektrische Energie",
@@ -43,14 +58,14 @@ def test_main_energy_sources():
 
 
 @pytest.fixture(scope="session")
-def test_energy_source_gesamtbilanz():
+def test_eb_energy_source_gesamtbilanz():
     return [
         "Gesamtenergiebilanz",
     ]
 
 
 @pytest.fixture(scope="session")
-def test_energy_source_elektrische_energie():
+def test_eb_energy_source_elektrische_energie():
     return [
         "Elektrische Energie",
     ]
@@ -58,7 +73,7 @@ def test_energy_source_elektrische_energie():
 
 # ////////////////////////////////////////////////////////////////////// E-AGGS
 @pytest.fixture(scope="session")
-def test_energy_aggregates():
+def test_eb_energy_aggregates():
     return [
         "Elektrische",
         "Fernwärme",
@@ -74,7 +89,7 @@ def test_energy_aggregates():
 
 # ////////////////////////////////////////////////////////////////////// B-AGGS
 @pytest.fixture(scope="session")
-def test_balance_aggregates_inputs_output():
+def test_eb_balance_aggregates_inputs_output():
     return [
         "Inländ. Erzeugung v. Rohenergie",
         "Importe",
@@ -92,7 +107,7 @@ def test_balance_aggregates_inputs_output():
 
 
 @pytest.fixture(scope="session")
-def test_balance_aggregates_energetischer():
+def test_eb_balance_aggregates_energetischer():
     return [
         "Energetischer Endverbrauch",
     ]
@@ -100,7 +115,7 @@ def test_balance_aggregates_energetischer():
 
 # ////////////////////////////////////////////////////////////////// B-SECTORS
 @pytest.fixture(scope="session")
-def test_balance_aggregates_sectors():
+def test_eb_balance_aggregates_sectors():
     return [
         "Energetischer Endverbrauch",
         "Produzierender Bereich",

@@ -4,18 +4,18 @@ from pprint import pformat, pprint
 from typing import Dict, List
 
 import pandas as pd
+from openpyxl.utils.dataframe import dataframe_to_rows, expand_levels
 
-from enspect.models.utils import add_col_total, add_row_total
+from enspect.models.utils import add_total_per_col, add_total_per_row
 
 # NOTE:code_source=https://stackoverflow.com/questions/58309731/doing-class-objects-filter-pattern-in-python
 IDX = pd.IndexSlice
-
-from openpyxl.utils.dataframe import dataframe_to_rows, expand_levels
 
 
 @dataclass
 class Data:
 
+    # __slots__ = ['name', 'key', 'frame', "energy_sources", "usage_categories"]
     # Shown as chart name
     name: str = None
     key: str = None
@@ -49,9 +49,9 @@ class Data:
     per_energy_source: bool = False
     per_energy_aggregate: bool = False
     per_usage_category: bool = False
-    stacked_usage_category: bool = False
-    stacked_balance_aggregate: bool = False
-    stacked_energy_source: bool = False
+    stacked_usage_categories: bool = False
+    stacked_balance_aggregates: bool = False
+    stacked_energy_sources: bool = False
 
     per_years: bool = False
     show_source_values_for_energy_aggregates: bool = False
@@ -134,13 +134,13 @@ class Data:
         #                 # .sort_values(["ET_AGG",])
         #             )
 
-        #             df = add_col_total(df=df)
+        #             df = add_total_per_col(df=df)
 
         #             df.reset_index(inplace=True)
 
         #             # df_sums = df.groupby("ES").get_group("SUM")
         #             df.drop(["ES", "YEAR"], inplace=True, axis=1)
-        #             df = add_row_total(df=df)
+        #             df = add_total_per_row(df=df)
         #             df.iloc[-1, 0] = "SUM"
 
         #             dfs[year][energy_source] = df
@@ -160,13 +160,13 @@ class Data:
         #                 # .sort_values(["ET_AGG",])
         #             )
 
-        #             df = add_col_total(df=df)
+        #             df = add_total_per_col(df=df)
 
         #             df.reset_index(inplace=True)
 
         #             df_sums = df.groupby("ES").get_group("SUM")
         #             df_sums.drop(["ES", "BAGG_0", "YEAR"], inplace=True, axis=1)
-        #             df_sums = add_row_total(df=df_sums)
+        #             df_sums = add_total_per_row(df=df_sums)
         #             df_sums.iloc[-1, 0] = "SUM"
 
         #             _dfs = []

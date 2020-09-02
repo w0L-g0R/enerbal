@@ -1,11 +1,13 @@
-import logging
 import datetime
+import logging
 import pickle
 from pathlib import Path
 from typing import List, Union
 
 import numpy as np
 import pandas as pd
+
+from enspect.aggregates.common import provinces
 from enspect.aggregates.nea import *
 from enspect.conversion.nea.utils import (
     create_nea_col_midx,
@@ -14,13 +16,14 @@ from enspect.conversion.nea.utils import (
 )
 from enspect.paths import file_paths
 from enspect.utils import timeit
-from enspect.aggregates.common import provinces
 
 IDX = pd.IndexSlice
 
 
 @timeit
-def convert_nea_to_dataframe(last_year: int,):
+def convert_nea_to_dataframe(
+    last_year: int,
+):
 
     # //////////////////////////////////////////////////// CREATE MULTI INDEX
 
@@ -41,7 +44,8 @@ def convert_nea_to_dataframe(last_year: int,):
     files = list(file_paths["files_nea"].glob("*.xlsx"))
 
     write_to_log_file(
-        log_file=file_paths["conversion_logs"] / "nutzenergieanalyse.log", files=files,
+        log_file=file_paths["conversion_logs"] / "nutzenergieanalyse.log",
+        files=files,
     )
 
     for file in files:
@@ -91,7 +95,11 @@ def convert_nea_to_dataframe(last_year: int,):
                     _sector = sheets[nea_year].iloc[starting_row, 0]
 
                     logging.getLogger().warning(
-                        "{}{}-Sector: {}".format("\t" * 4, province, sector,)
+                        "{}{}-Sector: {}".format(
+                            "\t" * 4,
+                            province,
+                            sector,
+                        )
                     )
 
                     # Extract sector data from sheet

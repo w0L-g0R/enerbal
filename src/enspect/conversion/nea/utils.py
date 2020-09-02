@@ -4,8 +4,9 @@ from pathlib import Path
 from typing import List, Union
 
 import pandas as pd
-from enspect.logger.setup import setup_logging
+
 from enspect.aggregates.common import provinces
+from enspect.logger.setup import setup_logging
 
 
 def create_nea_col_midx(
@@ -61,8 +62,7 @@ def write_to_log_file(log_file: str, files: List):
     )
 
     logging.getLogger().warning(
-        "{}\n\n{}FILE CONVERSION NEA \n{}\n".format(
-            "_" * 79, "\t" * 7, "_" * 79)
+        "{}\n\n{}FILE CONVERSION NEA \n{}\n".format("_" * 79, "\t" * 7, "_" * 79)
     )
 
     logging.getLogger().debug(

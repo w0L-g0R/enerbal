@@ -5,12 +5,13 @@ from typing import Dict, List, Union
 
 import numpy as np
 import pandas as pd
+
+from enspect.aggregates.eb import eb_sheet_names
 from enspect.conversion.energiebilanzen.check_errors import (
     check_column_errors,
     check_index_errors,
-    check_sheetname_errors
+    check_sheetname_errors,
 )
-from enspect.aggregates.eb import eb_sheet_names
 from enspect.logger.setup import setup_logging
 from enspect.paths import file_paths
 from enspect.utils import timeit
@@ -53,8 +54,7 @@ def create_indices(provinces: List, last_year: int):
             res_row_midx = midx
 
     # Extract and round column with unit conversions (pre-processed manually)
-    res_conversion_factors = np.around(
-        res_row_midx.get_level_values("BAGG_4"), 8)
+    res_conversion_factors = np.around(res_row_midx.get_level_values("BAGG_4"), 8)
 
     # Drop conversion unit and factors
     res_row_midx = res_row_midx.droplevel([-1, -2])
@@ -186,9 +186,7 @@ def fetch_from_xlsx(file: str, years: pd.Series):
         del energy_sources_sheets["Erneuerbare EU-Richtlinie"]
 
     # Perform data checks and correct errors
-    check_sheetname_errors(
-        energy_sources_sheets=energy_sources_sheets,
-        years=years)
+    check_sheetname_errors(energy_sources_sheets=energy_sources_sheets, years=years)
 
     energy_sources_sheets = check_column_errors(
         energy_sources_sheets=energy_sources_sheets, years=years
@@ -210,8 +208,7 @@ def add_missing_row_indices(
     if data_type == "sectors":
 
         logging.getLogger().debug(
-            "\t* Missing last index {}".format(province,
-                                               energy_source, "Sonstige")
+            "\t* Missing last index {}".format(province, energy_source, "Sonstige")
         )
 
         # Add the missing index
@@ -231,7 +228,7 @@ def add_missing_row_indices(
     elif data_type == "sectors_data":
 
         # Extract missing indices from template
-        missing_indices = template_index[len(data.index):]
+        missing_indices = template_index[len(data.index) :]
 
         # Return original data if no differences in length
         if len(missing_indices) == 0:
@@ -257,8 +254,7 @@ def get_sectors_data(df: pd.DataFrame, energy_source: str, province: str):
     sectors_index = df.index.get_indexer_for(["Sektoraler Energetischer Endverbrauch"])[
         0
     ]
-    sector_energy_index = df.index.get_indexer_for(
-        ["Verbrauch Sektor Energie"])[0]
+    sector_energy_index = df.index.get_indexer_for(["Verbrauch Sektor Energie"])[0]
 
     # Iter over indices
     for enum, idx in enumerate([sectors_index, sector_energy_index]):
@@ -291,7 +287,7 @@ def get_sectors_data(df: pd.DataFrame, energy_source: str, province: str):
 
                 # Extract data from sheet
                 sectors_data = df.iloc[
-                    sectors_index + 3: sectors_index + 27, : len(df.columns)
+                    sectors_index + 3 : sectors_index + 27, : len(df.columns)
                 ]
 
                 # Check if data ends with wrong index
@@ -316,7 +312,7 @@ def get_sectors_data(df: pd.DataFrame, energy_source: str, province: str):
 
                 # Extract data from sheet
                 sector_energy_data = df.iloc[
-                    sector_energy_index + 3: sector_energy_index + 10,
+                    sector_energy_index + 3 : sector_energy_index + 10,
                     : len(df.columns),
                 ]
 
@@ -361,8 +357,7 @@ def copy_eb_data(
 
         # for energy_source in ["ÖL"]:
         logging.getLogger().debug(
-            "{}\n{}-{}\n{}\n".format("_" * 79, enum + 1,
-                                     energy_source, "_" * 79)
+            "{}\n{}-{}\n{}\n".format("_" * 79, enum + 1, energy_source, "_" * 79)
         )
 
         # Reassign current dataframe for better readibility
@@ -378,10 +373,7 @@ def copy_eb_data(
             # Extract relevant eev rows, convert to numeric and round
             df.iloc[3:193, : len(df.columns)],
             # Extract energetic end use data of sectors
-            get_sectors_data(
-                df=df,
-                energy_source=energy_source,
-                province=province),
+            get_sectors_data(df=df, energy_source=energy_source, province=province),
         )
 
         # Combine data
@@ -429,7 +421,7 @@ def preprocess_res_sheet(
     sheet_index = pd.Index(res_sheet.iloc[:, 0])
 
     # Exclude empty prevailing columns
-    res_sheet = res_sheet.iloc[:, 19: 19 + len(years)]
+    res_sheet = res_sheet.iloc[:, 19 : 19 + len(years)]
     res_sheet.columns = years
 
     # Check for differences amongst indices
@@ -518,8 +510,7 @@ def write_to_log_file(log_file: str, files: List, filename: str):
     )
 
     logging.getLogger().warning(
-        "{}\n\n{} FILE CONVERSION EB \n{}\n".format(
-            "_" * 79, "\t" * 8, "_" * 79)
+        "{}\n\n{} FILE CONVERSION EB \n{}\n".format("_" * 79, "\t" * 8, "_" * 79)
     )
 
     logging.getLogger().debug(

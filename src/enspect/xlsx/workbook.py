@@ -7,10 +7,10 @@ import openpyxl as opx
 import pandas as pd
 from models.data import Data
 from openpyxl import load_workbook
-from openpyxl.styles import (
-    Alignment, Border, Color, Fill, Font, PatternFill, Side)
+from openpyxl.styles import Alignment, Border, Color, Fill, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 from openpyxl.utils.dataframe import dataframe_to_rows
+
 # from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from xlsx.styles import *

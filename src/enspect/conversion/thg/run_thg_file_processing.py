@@ -1,7 +1,7 @@
 # from settings import file_paths
 
-from enspect.settings import set_pd_options
 from enspect.conversion.thg.to_dataframe import convert_thg_to_dataframe
+from enspect.settings import set_pd_options
 
 setup_logging(
     console_log_actived=True,

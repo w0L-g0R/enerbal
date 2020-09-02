@@ -10,102 +10,72 @@ from enspect.paths import file_paths
 
 CWD = Path(__file__).parent.resolve()
 
-# /////////////////////////////////////////////////////////////////// PROVINCES
+
+# /////////////////////////////////////////////////////////////////// WB
+
+
 @pytest.fixture(scope="session")
-def test_provinces():
-    return [
-        "Bgd",
-        "Ktn",
-        "Noe",
-        "Ooe",
-        "Sbg",
-        "Stk",
-        "Tir",
-        "Vbg",
-        "Wie",
-        "AT",
-    ]
+def test_nea_workbook():
+
+    os.system("TASKKILL /F /IM excel.exe")
+
+    time.sleep(2)
+
+    filename = CWD / "unit_tests/results/test_nea.xlsx"
+
+    if Path(filename).exists():
+        os.remove(filename)
+
+    wb = Workbook(name="WB_TEST", filename=filename)
+
+    for sheet in wb.book.sheetnames:
+        sheet
+        if sheet in ["Sheet", "Tabelle1"]:
+            pass
+        else:
+            del wb.book[sheet]
+
+    wb.add_sheets(["ES_BAGGS_STACKED_UC", "ES_UC_STACKED_BAGGS",
+                   "BAGGS_ES_STACKED_UC", "BAGGS_UC_STACKED_ES"])
+
+    wb.save()
+
+    return wb
 
 
 # /////////////////////////////////////////////////////////////////// E-SOURCES
+
+
 @pytest.fixture(scope="session")
-def test_main_energy_sources():
+def test_nea_energy_sources():
     return [
-        "Gesamtenergiebilanz",
-        "Elektrische Energie",
-        "Fernwärme",
-        "Brennbare Abfälle",
-        "ERNEUERBARE",
-        "KOHLE",
-        "ÖL",
-        "GAS",
+        "Steinkohle",
+        "Insgesamt",
     ]
 
 
 @pytest.fixture(scope="session")
-def test_energy_source_gesamtbilanz():
+def test_nea_usage_categories():
     return [
-        "Gesamtenergiebilanz",
-    ]
-
-
-@pytest.fixture(scope="session")
-def test_energy_source_elektrische_energie():
-    return [
-        "Elektrische Energie",
-    ]
-
-
-# ////////////////////////////////////////////////////////////////////// E-AGGS
-@pytest.fixture(scope="session")
-def test_energy_aggregates():
-    return [
-        "Elektrische",
-        "Fernwärme",
-        "Erneuerbare",
-        "Fossil-fest",
-        "Fossil-flüssig",
-        "Fossil-gasförmig",
-        "Biogen-fest",
-        "Biogen-flüssig",
-        "Biogen-gasförmig",
-    ]
-
-
-# ////////////////////////////////////////////////////////////////////// B-AGGS
-@pytest.fixture(scope="session")
-def test_balance_aggregates_inputs_output():
-    return [
-        "Inländ. Erzeugung v. Rohenergie",
-        "Importe",
-        "Lager",
-        "Recycling/Prod. Trans.",
-        "Exporte",
-        "Bruttoinlandsverbrauch",
-        "Umwandlungseinsatz",
-        "Umwandlungsausstoß",
-        "Verbrauch des Sektors Energie",
-        "Transportverluste",
-        "Nichtenergetischer Verbrauch",
-        "Energetischer Endverbrauch",
-    ]
-
-
-@pytest.fixture(scope="session")
-def test_balance_aggregates_energetischer():
-    return [
-        "Energetischer Endverbrauch",
+        "Raumheizung und Klimaanlagen",
+        "Dampferzeugung",
+        # "Industrieöfen",
+        # "Standmotoren",
+        # "Traktion",
+        # "Beleuchtung und EDV",
+        # "Elektrochemische Zwecke",
+        # "Summe",
     ]
 
 
 # ////////////////////////////////////////////////////////////////// B-SECTORS
 @pytest.fixture(scope="session")
-def test_balance_aggregates_sectors():
+def test_nea_balance_aggregates():
     return [
-        "Energetischer Endverbrauch",
-        "Produzierender Bereich",
-        "Verkehr",
-        "Öffentliche und Private Dienstleistungen",
+        "Gesamt (ohne E1 - E7)",
+        "Produzierender Bereich Gesamt",
+        "Transport Gesamt",
+        "Offentliche und Private Dienstleistungen",
         "Private Haushalte",
         "Landwirtschaft",
     ]

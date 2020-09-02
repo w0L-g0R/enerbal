@@ -4,8 +4,7 @@
 import plotly.graph_objects as go
 
 
-def get_graph_layout(y_unit: str, x_unit: str, title: str,
-                     barmode: str = "relative"):
+def get_graph_layout(y_unit: str, x_unit: str, title: str, barmode: str = "relative"):
 
     top_margin_factor = title.count(" <br> ")
     top_margin = 32 + 24 * top_margin_factor

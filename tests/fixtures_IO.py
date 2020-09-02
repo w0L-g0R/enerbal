@@ -35,51 +35,6 @@ def test_dataset():
 
 
 @pytest.fixture(scope="session")
-def test_workbook():
-
-    os.system("TASKKILL /F /IM excel.exe")
-
-    time.sleep(2)
-
-    workbooks = dict.fromkeys(
-        [
-            # "test_eaggs_for_sectors_per_year",
-            # "test_add_multiple_baggs_per_year",
-            # "test_yearly_data",
-            "test_eb"
-        ]
-    )
-
-    files_path = CWD / "unit_tests/test_eb_data/result_files"
-
-    for name in workbooks.keys():
-
-        filename = files_path / Path(name + ".xlsx")
-
-        if Path(filename).exists():
-            os.remove(filename)
-
-        workbooks[name] = Workbook(
-            name="WB_TEST", filename=files_path / Path(name + ".xlsx")
-        )
-
-        for sheet in workbooks[name].book.sheetnames:
-            sheet
-            if sheet in ["Sheet", "Tabelle1"]:
-                pass
-            else:
-                del workbooks[name].book[sheet]
-
-        workbooks[name].add_sheets(
-            ["EGGS_PER_YEAR", "BAGGS_PER_YEAR", "ESRC_OVER_YEARS"]
-        )
-
-        workbooks[name].save()
-
-    return workbooks
-
-
-@pytest.fixture(scope="session")
 def test_write_to_xlsx():
     def _write(wb, data_objects, sheet_name):
         # data_objects = [_data for _data in ds.objects.filter()]
@@ -107,8 +62,17 @@ def test_close_xlsx():
 @pytest.fixture()
 def test_launch_xlsx(scope="session"):
     def _launch(wb):
+
+        if len(wb.book.sheetnames) > 1:
+
+            for sheet in wb.book.sheetnames:
+
+                if sheet in ["Sheet", "Tabelle1"]:
+                    del wb.book[sheet]
+                    wb.save()
+
         wb.launch()
-        time.sleep(25)
+        time.sleep(10)
 
         return
 

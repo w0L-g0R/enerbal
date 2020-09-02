@@ -1,23 +1,27 @@
 # /////////////////////////////////////////////////////////////////////// VIEWS
 from gui.assets.logos import setup_logo_A, setup_logo_B
+
 # from gui.callbacks.dropdowns.on_reset import create_on_reset_dropdowns
 # //////////////////////////////////////////////////////////////// CB DROPDOWNS
-from gui.callbacks.dropdowns.on_select_eev import \
-    create_on_select_eev_dropdowns
-from gui.callbacks.dropdowns.on_select_renewables import \
-    create_on_select_renewables_dropdowns
+from gui.callbacks.dropdowns.on_select_eev import create_on_select_eev_dropdowns
+from gui.callbacks.dropdowns.on_select_renewables import (
+    create_on_select_renewables_dropdowns,
+)
+
 # ////////////////////////////////////////////////////////////////// CB SELECTS
 # from gui.callbacks.on_select_index_year import create_on_select_index_year
 from gui.callbacks.on_select_aggregate import create_on_select_aggregate
 from gui.callbacks.on_setup import create_on_setup
+
 # ////////////////////////////////////////////////////////////////// CB UPDATES
 from gui.callbacks.on_update import create_on_update
 from gui.callbacks.plots.on_plot import create_on_plot
+
 # ////////////////////////////////////////////////////////////////// CB ROUTING
-from gui.callbacks.routing.on_graph_tab_change import \
-    create_on_graph_tab_change
-from gui.callbacks.routing.on_switch_eb_data_section import \
-    create_on_switch_eb_data_section
+from gui.callbacks.routing.on_graph_tab_change import create_on_graph_tab_change
+from gui.callbacks.routing.on_switch_eb_data_section import (
+    create_on_switch_eb_data_section,
+)
 from gui.views.control import create_control_box_layout
 from gui.views.graph import create_graph_box_layout
 from gui.views.header import layout as header

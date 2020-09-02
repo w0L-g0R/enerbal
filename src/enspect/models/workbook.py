@@ -162,7 +162,9 @@ class Workbook:
 
     @staticmethod
     def update_next_empty_row(
-        ws: Worksheet, down_shift: int = None, up_shift: int = None,
+        ws: Worksheet,
+        down_shift: int = None,
+        up_shift: int = None,
     ):
 
         if down_shift is not None:

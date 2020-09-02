@@ -1,5 +1,6 @@
 import logging
 import pickle
+
 # from enspect.conversion.energiebilanzen.convert.eb_sheets import eb_sheets
 from pathlib import Path
 from pprint import pformat
@@ -69,8 +70,7 @@ def create_row_indices(_type: str, eb_indices: pd.DataFrame):
 
     for enum, col in enumerate(indices.columns):
         _indices = list(indices[col].unique())
-        _indices = [{"label": x, "value": x}
-                    for enum, x in enumerate(_indices)]
+        _indices = [{"label": x, "value": x} for enum, x in enumerate(_indices)]
         midx.append(_indices)
 
     return midx

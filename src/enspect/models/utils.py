@@ -11,6 +11,7 @@ from pandas.core.common import flatten
 
 from enspect.paths import file_paths
 from enspect.settings import unit_converter
+from enspect.aggregates.eb import energy_aggregate_lookup
 
 
 def close_xlsx():
@@ -25,17 +26,17 @@ def close_xlsx():
 IDX = pd.IndexSlice
 
 
-# def add_sums(df: pd.DataFrame):
+def add_sums(df: pd.DataFrame, drop_cols: List):
 
-#     # Create provinces sum column and years sum row
-#     # print("df sums: ", df)
-#     df["Sum"] = df.iloc[:, :-1].sum(axis=1)
-#     # print("df sums col: ", df)
-#     df = df.T
-#     # print("df sums T: ", df)
-#     df["Sum"] = df.sum(axis=1)
+    df = add_total_per_col(df=df)
 
-#     return df.T
+    df.reset_index(inplace=True)
+
+    df.drop(drop_cols, inplace=True, axis=1)
+
+    df = add_total_per_row(df=df)
+
+    return df
 
 
 # def add_means(df: pd.DataFrame):
@@ -51,34 +52,34 @@ IDX = pd.IndexSlice
 #     return df.T
 
 
-def switch_sum_and_AT_col(df: pd.DataFrame):
+# def switch_sum_and_AT_col(df: pd.DataFrame):
 
-    # get a list of the columns
-    col_list = list(df)
-    # use this handy way to swap the elements
-    col_list[0], col_list[1] = col_list[1], col_list[0]
-    # assign back, the order will now be swapped
-    df.columns = col_list
+#     # get a list of the columns
+#     col_list = list(df)
+#     # use this handy way to swap the elements
+#     col_list[0], col_list[1] = col_list[1], col_list[0]
+#     # assign back, the order will now be swapped
+#     df.columns = col_list
 
-    return df
+#     return df
 
 
-def make_AT_last_midx_col(df: pd.DataFrame):
+# def make_AT_last_midx_col(df: pd.DataFrame):
 
-    col_list = list(df.columns.get_level_values(level="PROV").unique())
-    col_list.append(col_list[0])
-    col_list.pop(0)
+#     col_list = list(df.columns.get_level_values(level="PROV").unique())
+#     col_list.append(col_list[0])
+#     col_list.pop(0)
 
-    df.columns = pd.MultiIndex.from_product(
-        iterables=[
-            df.columns.get_level_values(level="YEAR").unique(),
-            df.columns.get_level_values(level="BAGG_0").unique(),
-            col_list,
-        ],
-        names=["YEAR", "BAGG_0", "PROV"],
-    )
+#     df.columns = pd.MultiIndex.from_product(
+#         iterables=[
+#             df.columns.get_level_values(level="YEAR").unique(),
+#             df.columns.get_level_values(level="BAGG_0").unique(),
+#             col_list,
+#         ],
+#         names=["YEAR", "BAGG_0", "PROV"],
+#     )
 
-    return df
+#     return df
 
 
 def reduce_eb_row_index(balance_aggregates: List):
@@ -92,17 +93,18 @@ def reduce_eb_row_index(balance_aggregates: List):
 #     return df
 
 
-def add_row_total(df: pd.DataFrame):
-    # Sum over columns
-    df.loc["SUM", :] = df.sum(numeric_only=True, axis=0)
+def add_total_per_row(df: pd.DataFrame):
+    # Sum over column values per row
+    df.loc["SUM", :] = df.sum(axis=0)
 
     df.iloc[-1, 0] = "SUM"
     return df
 
 
-def add_col_total(df: pd.DataFrame):
+def add_total_per_col(df: pd.DataFrame):
 
-    df.loc[:, "SUM"] = df.sum(numeric_only=True, axis=1).subtract(df[df.columns[0]])
+    s = df.drop("AT", axis=1)
+    df.loc[:, "SUM"] = s.sum(axis=1)
 
     col_list = list(df.columns)
     col_list.remove("AT")
@@ -112,7 +114,22 @@ def add_col_total(df: pd.DataFrame):
     return df
 
 
-def slice_eb_inputs(df: pd.DataFrame, balance_aggregates: List, years=List):
+def slice_pickled_df(df: pd.DataFrame,
+                     energy_sources: List,
+                     energy_aggregates: List,
+                     balance_aggregates: List,
+                     years=List
+                     ):
+
+    # Filter energy sources for energy aggregates if necessary
+    if energy_sources is None:
+
+        energy_sources = list(
+            flatten(
+                [energy_aggregate_lookup[aggregate]
+                 for aggregate in energy_aggregates]
+            )
+        )
 
     ua_indices = 0
     ue_indices = 0
@@ -134,9 +151,23 @@ def slice_eb_inputs(df: pd.DataFrame, balance_aggregates: List, years=List):
 
     df = df.droplevel(level=cutoff_indices[::-1], axis=0)
 
-    df = df.loc[IDX[balance_aggregates], IDX[:, :, years]]
+    df = df.loc[IDX[balance_aggregates], IDX[:, energy_sources, years]]
 
     return df
+
+
+def get_name_and_key(*args, **kwargs):
+    name = "_".join((kwargs["data_type"], *args, str(kwargs["year"])))
+
+    key = "_".join(
+        [
+            kwargs["key"],
+            *[arg[:3].upper() for arg in args],
+            str(kwargs["year"])[-2:],
+        ]
+    )
+
+    return name, key
 
     # new_cols is a single item tuple
     # assign back, the order will now be swapped

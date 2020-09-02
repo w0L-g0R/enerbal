@@ -4,13 +4,13 @@ import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_daq as daq
 import dash_html_components as html
-from enspect.conversion.energiebilanzen.convert.get_eb_data_structures import eb_sheets
 from gui.assets.styles import label_style, range_slider_style
 from settings import aggregates_eb, chart_type_options, units
 from utils import create_eev_energy_source_options
 
-energy_sources_options = create_eev_energy_source_options(
-    energy_sources=eb_sheets)
+from enspect.conversion.energiebilanzen.convert.get_eb_data_structures import eb_sheets
+
+energy_sources_options = create_eev_energy_source_options(energy_sources=eb_sheets)
 
 # ////////////////////////////////////////////////////////////////////// GETTER
 

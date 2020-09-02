@@ -1,10 +1,11 @@
-from utils import timeit
-from paths import file_paths
-from enspect.conversion.thg.utils import fetch_from_xlsx
 import pickle
 from pathlib import Path
 
 import pandas as pd
+from paths import file_paths
+from utils import timeit
+
+from enspect.conversion.thg.utils import fetch_from_xlsx
 
 IDX = pd.IndexSlice
 
@@ -53,7 +54,8 @@ def convert_thg_to_dataframe():
 
     # Add two-level midx
     df.columns = pd.MultiIndex.from_product(
-        [provinces, thg_sources], names=["PROV", "SRC"],
+        [provinces, thg_sources],
+        names=["PROV", "SRC"],
     )
 
     for province in provinces:
@@ -65,7 +67,10 @@ def convert_thg_to_dataframe():
             ]
 
     for df, source in zip(
-        [thg_sheets["AT_THG_ETS_ENERGY"], thg_sheets["AT_THG_ETS_INDUSTRY"],],
+        [
+            thg_sheets["AT_THG_ETS_ENERGY"],
+            thg_sheets["AT_THG_ETS_INDUSTRY"],
+        ],
         ["Energie", "Industrie"],
     ):
         for province in provinces:

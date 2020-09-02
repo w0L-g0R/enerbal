@@ -19,7 +19,9 @@ def fetch_from_xlsx(file: str):
 
 
 def create_thg_col_midx(
-    last_year: int, sectors: List, energy_usage_types: List,
+    last_year: int,
+    sectors: List,
+    energy_usage_types: List,
 ) -> pd.MultiIndex:
 
     provinces = [
@@ -38,7 +40,8 @@ def create_thg_col_midx(
     years = [x for x in range(1993, last_year + 1, 1)]
 
     midx = pd.MultiIndex.from_product(
-        [provinces, sectors, energy_usage_types, years], names=["PROV", "SRC", "CLS"],
+        [provinces, sectors, energy_usage_types, years],
+        names=["PROV", "SRC", "CLS"],
     )
 
     return midx

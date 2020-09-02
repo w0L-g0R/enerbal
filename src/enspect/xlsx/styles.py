@@ -1,5 +1,4 @@
-from openpyxl.styles import (
-    Alignment, Border, Color, Fill, Font, PatternFill, Side)
+from openpyxl.styles import Alignment, Border, Color, Fill, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.dimensions import ColumnDimension, DimensionHolder
 from settings import provinces, provinces_hex
