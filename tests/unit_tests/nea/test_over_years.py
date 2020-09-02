@@ -4,7 +4,7 @@ import pytest
 
 
 @pytest.mark.dependency()
-def test_per_energy_source_and_usage_category_stacked_balance_aggregates(
+def test_over_years(
     test_dataset,
     test_nea_workbook,
     test_provinces,
@@ -15,7 +15,7 @@ def test_per_energy_source_and_usage_category_stacked_balance_aggregates(
     test_write_to_xlsx,
 ):
 
-    years = [2000, 2018]
+    years = list(range(2000, 2019))
 
     ds = test_dataset
 
@@ -26,32 +26,19 @@ def test_per_energy_source_and_usage_category_stacked_balance_aggregates(
         years=years,
         provinces=test_provinces,
         # per_usage_category=True,
-        per_balance_aggregate=True,
+        # per_balance_aggregate=True,
         # per_energy_source=True,
-        stacked_usage_categories=True,
-        # stacked_balance_aggregates=True,
-        # stacked_energy_sources=True,
-        # per_years=True,
+        per_years=True,
     )
 
-    data_objects = [
-        _data
-        for _data in ds.objects.filter(
-            per_energy_source=True,
-            stacked_=True,
-        )
-    ]
+    data_objects = [_data for _data in ds.objects.filter(per_years=True,)]
 
     test_write_to_xlsx(
-        wb=test_nea_workbook,
-        data_objects=data_objects,
-        sheet_name="ES_UC_STACKED_BAGGS",
+        wb=test_nea_workbook, data_objects=data_objects, sheet_name="YEARS",
     )
 
 
-@pytest.mark.dependency(
-    depends=["test_per_energy_source_and_usage_category_stacked_balance_aggregates"]
-)
+@pytest.mark.dependency(depends=["test_over_years"])
 def test_launch(test_launch_xlsx, test_nea_workbook):
 
     test_launch_xlsx(wb=test_nea_workbook)

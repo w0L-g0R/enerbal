@@ -305,9 +305,6 @@ class DataSet:
         per_usage_category: bool = False,
         per_balance_aggregate: bool = False,
         per_energy_source: bool = False,
-        stacked_usage_categories: bool = False,
-        stacked_balance_aggregates: bool = False,
-        stacked_energy_sources: bool = False,
         per_years: bool = False,
     ):
 
@@ -339,76 +336,17 @@ class DataSet:
             per_usage_category=per_usage_category,
             per_balance_aggregate=per_balance_aggregate,
             per_energy_source=per_energy_source,
-            stacked_usage_categories=stacked_usage_categories,
-            stacked_balance_aggregates=stacked_balance_aggregates,
-            stacked_energy_sources=stacked_energy_sources,
             per_years=per_years,
         )
 
-        # /////////////////////////////////////////////////////////// PER E-SRC
-
-        if per_energy_source:
-
-            self.add_nea_per_energy_source(
-                df=df,
-                data=data,
-                energy_sources=energy_sources,
-                usage_categories=usage_categories,
-                balance_aggregates=balance_aggregates,
-                years=years,
-                stacked_balance_aggregates=stacked_balance_aggregates,
-                stacked_usage_categories=stacked_usage_categories,
-            )
-
+        # CASE 1.1: X-Axis: ES-UC-PROV, Y-Axis: Stacked BAGGS
         if per_balance_aggregate:
 
-            self.add_nea_per_balance_aggregate(
-                df=df,
-                data=data,
-                energy_sources=energy_sources,
-                usage_categories=usage_categories,
-                years=years,
-                balance_aggregates=balance_aggregates,
-                stacked_energy_sources=stacked_energy_sources,
-                stacked_usage_categories=stacked_usage_categories,
-            )
+            for energy_source in data.energy_sources:
 
-    def add_data_per_year(self, data: Data, **kwargs):
+                for usage_category in data.usage_categories:
 
-        # Copy
-        _data = deepcopy(data)
-
-        # Assign keyword arguments to _data instance's attributes
-        for attr_name, attr_value in kwargs.items():
-            if attr_name != "data":
-                setattr(_data, attr_name, attr_value)
-
-        # pprint(vars(_data))
-
-        self.objects = _data
-
-        return
-
-    def add_nea_per_energy_source(
-        self,
-        df: pd.DataFrame,
-        data: Data,
-        energy_sources: List,
-        years: List,
-        stacked_balance_aggregates: bool = False,
-        stacked_usage_categories: bool = False,
-        usage_categories: List = None,
-        balance_aggregates: List = None,
-    ):
-
-        # CASE 1.1: X-Axis: ES-UC-PROV, Y-Axis: Stacked BAGGS
-        if stacked_balance_aggregates:
-
-            for energy_source in energy_sources:
-
-                for usage_category in usage_categories:
-
-                    for year in years:
+                    for year in data.years:
 
                         name, key = get_name_and_key(
                             energy_source.replace(" ", "_"),
@@ -436,13 +374,13 @@ class DataSet:
                         )
 
         # CASE 1.2: X-Axis: ES-SEC-PROV, Y-Axis: Stacked ES
-        if stacked_usage_categories:
+        if per_usage_category:
 
-            for energy_source in energy_sources:
+            for energy_source in data.energy_sources:
 
-                for balance_aggregate in balance_aggregates:
+                for balance_aggregate in data.balance_aggregates:
 
-                    for year in years:
+                    for year in data.years:
 
                         name, key = get_name_and_key(
                             balance_aggregate.replace(" ", "_"),
@@ -458,6 +396,7 @@ class DataSet:
                         ].unstack("PROV")
 
                         df_I = add_sums(df=df_I, drop_cols=["ES", "YEAR"])
+                        print("df_I: ", df_I)
 
                         self.add_data_per_year(
                             data=data,
@@ -469,13 +408,13 @@ class DataSet:
                             years=year,
                         )
 
-        if stacked_energy_sources:
+        if per_energy_source:
 
-            for usage_category in usage_categories:
+            for usage_category in data.usage_categories:
 
-                for balance_aggregate in balance_aggregates:
+                for balance_aggregate in data.balance_aggregates:
 
-                    for year in years:
+                    for year in data.years:
 
                         name, key = get_name_and_key(
                             balance_aggregate.replace(" ", "_"),
@@ -487,10 +426,10 @@ class DataSet:
 
                         # Unstack col idx to row idx, except provinces
                         df_I = df.loc[
-                            IDX[balance_aggregate], IDX[:, :, usage_category, year]
+                            IDX[balance_aggregate], IDX[:, :, usage_category, year],
                         ].unstack("PROV")
 
-                        df_I = add_sums(df=df_I, drop_cols=["ES", "YEAR"])
+                        df_I = add_sums(df=df_I, drop_cols=["UC", "YEAR"])
 
                         self.add_data_per_year(
                             data=data,
@@ -498,338 +437,401 @@ class DataSet:
                             key=key,
                             frame=df_I,
                             balance_aggregates=balance_aggregate,
-                            energy_sources=energy_source,
+                            usage_category=usage_category,
                             years=year,
                         )
 
-    def add_nea_per_balance_aggregate(
-        self,
-        df: pd.DataFrame,
-        data: Data,
-        energy_sources: List,
-        years: List,
-        usage_categories: List = None,
-        balance_aggregates: List = None,
-        stacked_usage_categories: bool = False,
-        stacked_energy_sources: bool = False,
-    ):
+        if per_years:
 
-        for balance_aggregate in balance_aggregates:
+            for balance_aggregate in data.balance_aggregates:
 
-            # CASE 1.1: X-Axis: ES-UC-PROV, Y-Axis: Stacked BAGGS
-            if stacked_usage_categories:
+                for energy_source in data.energy_sources:
 
-                for energy_source in energy_sources:
-
-                    for year in years:
+                    for usage_category in data.usage_categories:
 
                         name, key = get_name_and_key(
                             balance_aggregate.replace(" ", "_"),
+                            usage_category.replace(" ", "_"),
                             energy_source.replace(" ", "_"),
-                            data_type="Sektoranteile",
-                            year=str(year),
-                            key="BAGGS_ES_STACKED_UC",
+                            str(data.years[0])[2:],
+                            str(data.years[-1])[2:],
+                            data_type="Entwicklung",
+                            year="",
+                            key="YEARS",
                         )
 
                         # Unstack col idx to row idx, except provinces
                         df_I = df.loc[
-                            IDX[balance_aggregate], IDX[:, energy_source, :, year]
-                        ].unstack(
-                            "PROV"
-                        )  # .to_frame().stack([1, 2, 3])
+                            IDX[balance_aggregate],
+                            IDX[:, energy_source, usage_category, data.years],
+                        ].unstack("PROV")
 
-                        print("df_I: ", df_I)
-                        df_I = add_sums(df=df_I, drop_cols=["ES", "UC", "YEAR"])
+                        df_I = add_sums(df=df_I, drop_cols=["UC", "ES"])
 
                         self.add_data_per_year(
                             data=data,
                             name=name,
-                            key=key,
+                            key=key[:-1],
                             frame=df_I,
                             balance_aggregates=balance_aggregate,
-                            energy_sources=energy_source,
-                            years=year,
+                            usage_category=usage_category,
+                            energy_source=energy_source,
                         )
 
-            # CASE 1.2: X-Axis: ES-SEC-PROV, Y-Axis: Stacked ES
-            # if stacked_usage_categories:
-
-            #     for balance_aggregate in balance_aggregates:
-
-            #         for year in years:
-
-            #             name, key = get_name_and_key(
-            #                 balance_aggregate.replace(" ", "_"),
-            #                 energy_source.replace(" ", "_"),
-            #                 data_type="Nutzenergieanteile",
-            #                 year=str(year),
-            #                 key="ES_BAGGS_STACKED_UC",
-            #             )
-
-            #             # Unstack col idx to row idx, except provinces
-            #             df_I = df.loc[
-            #                 IDX[balance_aggregate],
-            #                 IDX[:, energy_source, :, year]
-            #             ].unstack("PROV")
-
-            #             df_I = add_sums(
-            #                 df=df_I,
-            #                 drop_cols=[
-            #                     "ES",
-            #                     "YEAR"])
-
-            #             self.add_data_per_year(
-            #                 data=data,
-            #                 name=name,
-            #                 key=key,
-            #                 frame=df_I,
-            #                 balance_aggregates=balance_aggregate,
-            #                 energy_sources=energy_source,
-            #                 years=year
-            #             )
-
-            # index = df.columns.get_level_values(
-            #     level="UC").unique()
-
-            # df = df.stack("UC").unstack("BAGG_0")
-
-            # df = df.reindex(index)
-
-            # df = add_sums(
-            #     df=df, drop_cols=drop_cols)
-
-            # self.add_data_per_year(
-            #     data=data,
-            #     df=df,
-            #     joint_1=energy_source,
-            #     joint_2=balance_aggregate,
-            #     data_type="Sektoranteile",
-            #     year=year,
-            #     key="ES_BAGGS_STACKED_UC",
-            #     drop_cols=[
-            #         "ES",
-            #         "UC",
-            #         "YEAR"],
-            #     aggregation="per_energy_source",
-            #     stacked="usage_categories"
-            # )
-            # # name, key = get_name_and_key(
-            #     energy_source.replace(" ", "_"),
-            #     usage_category.replace(" ", "_"),
-            #     data_type="Sektoranteile",
-            #     year=str(year),
-            #     key="ES_UC_STACKED_BAGGS",
-            # )
-
-            # # Unstack column indices to row indices, except
-            # # provinces
-            # df_I = df.loc[
-            #     IDX[:],
-            #     IDX[:, energy_source, usage_category, year]
-            # ].stack([1, 2, 3])
-
-            # df_I = add_sums(
-            #     df=df_I, drop_cols=[
-            #         "ES",
-            #         "UC",
-            #         "YEAR"])
-
-            # # Copy
-            # _data = deepcopy(data)
-
-            # (
-            #     _data.name,
-            #     _data.key,
-            #     _data.frame,
-            #     _data.energy_sources,
-            #     _data.usage_categories,
-            # ) = (name, key, df_I, energy_source, usage_category)
-
-            # # self.add_object(data=_data)
-            # self.objects = _data
-
-            # elif stacked_balance_aggregates:
-
-            #     for balance_aggregate in data.balance_aggregates:
-            #         df_II = df_I.groupby(level=["BAGG_0"], axis=0).get_group(
-            #             balance_aggregate
-            #         )
+        return
+
+    def add_data_per_year(self, data: Data, **kwargs):
+
+        # Copy
+        _data = deepcopy(data)
+
+        # Assign keyword arguments to _data instance's attributes
+        for attr_name, attr_value in kwargs.items():
+            if attr_name != "data":
+                setattr(_data, attr_name, attr_value)
+
+        # pprint(vars(_data))
+
+        self.objects = _data
+
+        return
+
+    # def add_nea_per_energy_source(
+    #     self,
+    #     df: pd.DataFrame,
+    #     data: Data,
+    #     per_energy_source: bool = False,
+    #     per_balance_aggregate: bool = False,
+    #     per_usage_category: bool = False,
+    # ):
+
+    # def add_nea_per_balance_aggregate(
+    #     self,
+    #     df: pd.DataFrame,
+    #     data: Data,
+    #     energy_sources: List,
+    #     years: List,
+    #     usage_categories: List = None,
+    #     balance_aggregates: List = None,
+    #     stacked_usage_categories: bool = False,
+    #     stacked_energy_sources: bool = False,
+    # ):
+
+    #     for balance_aggregate in balance_aggregates:
+
+    #         # CASE 1.1: X-Axis: ES-UC-PROV, Y-Axis: Stacked BAGGS
+    #         if stacked_usage_categories:
+
+    #             for energy_source in energy_sources:
+
+    #                 for year in years:
+
+    #                     name, key = get_name_and_key(
+    #                         balance_aggregate.replace(" ", "_"),
+    #                         energy_source.replace(" ", "_"),
+    #                         data_type="Sektoranteile",
+    #                         year=str(year),
+    #                         key="BAGGS_ES_STACKED_UC",
+    #                     )
+
+    #                     # Unstack col idx to row idx, except provinces
+    #                     df_I = df.loc[
+    #                         IDX[balance_aggregate], IDX[:, energy_source, :, year]
+    #                     ].unstack(
+    #                         "PROV"
+    #                     )  # .to_frame().stack([1, 2, 3])
+
+    #                     print("df_I: ", df_I)
+    #                     df_I = add_sums(df=df_I, drop_cols=["ES", "UC", "YEAR"])
+
+    #                     self.add_data_per_year(
+    #                         data=data,
+    #                         name=name,
+    #                         key=key,
+    #                         frame=df_I,
+    #                         balance_aggregates=balance_aggregate,
+    #                         energy_sources=energy_source,
+    #                         years=year,
+    #                     )
+
+    # CASE 1.2: X-Axis: ES-SEC-PROV, Y-Axis: Stacked ES
+    # if stacked_usage_categories:
+
+    #     for balance_aggregate in balance_aggregates:
+
+    #         for year in years:
+
+    #             name, key = get_name_and_key(
+    #                 balance_aggregate.replace(" ", "_"),
+    #                 energy_source.replace(" ", "_"),
+    #                 data_type="Nutzenergieanteile",
+    #                 year=str(year),
+    #                 key="ES_BAGGS_STACKED_UC",
+    #             )
+
+    #             # Unstack col idx to row idx, except provinces
+    #             df_I = df.loc[
+    #                 IDX[balance_aggregate],
+    #                 IDX[:, energy_source, :, year]
+    #             ].unstack("PROV")
+
+    #             df_I = add_sums(
+    #                 df=df_I,
+    #                 drop_cols=[
+    #                     "ES",
+    #                     "YEAR"])
+
+    #             self.add_data_per_year(
+    #                 data=data,
+    #                 name=name,
+    #                 key=key,
+    #                 frame=df_I,
+    #                 balance_aggregates=balance_aggregate,
+    #                 energy_sources=energy_source,
+    #                 years=year
+    #             )
+
+    # index = df.columns.get_level_values(
+    #     level="UC").unique()
+
+    # df = df.stack("UC").unstack("BAGG_0")
+
+    # df = df.reindex(index)
+
+    # df = add_sums(
+    #     df=df, drop_cols=drop_cols)
+
+    # self.add_data_per_year(
+    #     data=data,
+    #     df=df,
+    #     joint_1=energy_source,
+    #     joint_2=balance_aggregate,
+    #     data_type="Sektoranteile",
+    #     year=year,
+    #     key="ES_BAGGS_STACKED_UC",
+    #     drop_cols=[
+    #         "ES",
+    #         "UC",
+    #         "YEAR"],
+    #     aggregation="per_energy_source",
+    #     stacked="usage_categories"
+    # )
+    # # name, key = get_name_and_key(
+    #     energy_source.replace(" ", "_"),
+    #     usage_category.replace(" ", "_"),
+    #     data_type="Sektoranteile",
+    #     year=str(year),
+    #     key="ES_UC_STACKED_BAGGS",
+    # )
+
+    # # Unstack column indices to row indices, except
+    # # provinces
+    # df_I = df.loc[
+    #     IDX[:],
+    #     IDX[:, energy_source, usage_category, year]
+    # ].stack([1, 2, 3])
+
+    # df_I = add_sums(
+    #     df=df_I, drop_cols=[
+    #         "ES",
+    #         "UC",
+    #         "YEAR"])
+
+    # # Copy
+    # _data = deepcopy(data)
+
+    # (
+    #     _data.name,
+    #     _data.key,
+    #     _data.frame,
+    #     _data.energy_sources,
+    #     _data.usage_categories,
+    # ) = (name, key, df_I, energy_source, usage_category)
+
+    # # self.add_object(data=_data)
+    # self.objects = _data
+
+    # elif stacked_balance_aggregates:
+
+    #     for balance_aggregate in data.balance_aggregates:
+    #         df_II = df_I.groupby(level=["BAGG_0"], axis=0).get_group(
+    #             balance_aggregate
+    #         )
+
+    #         for year in years:
+    #             # Convert column indices to row indices, except
+    #             name, key = get_name_and_key(
+    #                 energy_source.replace(" ", "_"),
+    #                 usage_category.replace(" ", "_"),
+    #                 data_type="Sektoranteile",
+    #                 year=str(year),
+    #                 key="ES_UC_STACKED_BAGGS",
+    #             )
+
+    #             # Unstack column indices to row indices, except
+    #             # provinces
+    #             df_I = df.loc[
+    #                 IDX[:],
+    #                 IDX[:, energy_source, usage_category, year]
+    #             ].stack([1, 2, 3])
+
+    #             df_I = add_sums(
+    #                 df=df_I, drop_cols=[
+    #                     "ES",
+    #                     "UC",
+    #                     "YEAR"])
+
+    #             # Copy
+    #             _data = deepcopy(data)
+
+    #             (
+    #                 _data.name,
+    #                 _data.key,
+    #                 _data.frame,
+    #                 _data.energy_sources,
+    #                 _data.usage_categories,
+    #             ) = (name, key, df_I, energy_source, usage_category)
+
+    #             # self.add_object(data=_data)
+    #             self.objects = _data
+
+    # CASE 1.2: X-Axis: SEC, Y-Axis: Stacked UC
+    # elif int(per_energy_source) + int(stacked_balance_aggregate) == 2:
+
+    #     for energy_source in data.energy_sources:
+    #         df_I = df.groupby(
+    #             level=["ES"], axis=1).get_group(energy_source)
+
+    #         for balance_aggregate in data.balance_aggregates:
+    #             df_II = df_I.groupby(level=["BAGG_0"], axis=0).get_group(
+    #                 balance_aggregate
+    #             )
+    #             for year in years:
+    #                 df_III = df_II.groupby(
+    #                     level=["YEAR"], axis=1).get_group(year)
+
+    #                 index = df_III.columns.get_level_values(
+    #                     level="UC").unique()
+
+    #                 df_III = df_III.stack("UC").unstack("BAGG_0")
 
-            #         for year in years:
-            #             # Convert column indices to row indices, except
-            #             name, key = get_name_and_key(
-            #                 energy_source.replace(" ", "_"),
-            #                 usage_category.replace(" ", "_"),
-            #                 data_type="Sektoranteile",
-            #                 year=str(year),
-            #                 key="ES_UC_STACKED_BAGGS",
-            #             )
+    #                 df_III = df_III.reindex(index)
 
-            #             # Unstack column indices to row indices, except
-            #             # provinces
-            #             df_I = df.loc[
-            #                 IDX[:],
-            #                 IDX[:, energy_source, usage_category, year]
-            #             ].stack([1, 2, 3])
+    #                 print("df_III: ", df_III)
+    #                 print()
+
+    # # /////////////////////////////////////////////////////////// PER B-AGG
 
-            #             df_I = add_sums(
-            #                 df=df_I, drop_cols=[
-            #                     "ES",
-            #                     "UC",
-            #                     "YEAR"])
+    # # CASE 2.1: X-Axis: ET, Y-Axis: Stacked UC
+    # elif per_balance_aggregate:
 
-            #             # Copy
-            #             _data = deepcopy(data)
+    #     for balance_aggregate in data.balance_aggregates:
+    #         df_I = df.groupby(
+    #             level=["BAGG_0"],
+    #             axis=0).get_group(balance_aggregate)
 
-            #             (
-            #                 _data.name,
-            #                 _data.key,
-            #                 _data.frame,
-            #                 _data.energy_sources,
-            #                 _data.usage_categories,
-            #             ) = (name, key, df_I, energy_source, usage_category)
+    #         # for energy_source in data.energy_sources:
+    #         #     df_II = _df.groupby(level=["ES"], axis=1).get_group(energy_source)
 
-            #             # self.add_object(data=_data)
-            #             self.objects = _data
+    #         for year in years:
 
-        # CASE 1.2: X-Axis: SEC, Y-Axis: Stacked UC
-        # elif int(per_energy_source) + int(stacked_balance_aggregate) == 2:
+    #             df_II = df_I.groupby(
+    #                 level=["YEAR"], axis=1).get_group(year)
 
-        #     for energy_source in data.energy_sources:
-        #         df_I = df.groupby(
-        #             level=["ES"], axis=1).get_group(energy_source)
+    #             # CASE 3.1: X-Axis: SEC, Y-Axis: Stacked ET
+    #             if and_UC_category:
+    #                 index = df_II.columns.get_level_values(
+    #                     level="UC").unique()
 
-        #         for balance_aggregate in data.balance_aggregates:
-        #             df_II = df_I.groupby(level=["BAGG_0"], axis=0).get_group(
-        #                 balance_aggregate
-        #             )
-        #             for year in years:
-        #                 df_III = df_II.groupby(
-        #                     level=["YEAR"], axis=1).get_group(year)
+    #                 df_II = df_II.stack("UC").unstack("SECTOR")
 
-        #                 index = df_III.columns.get_level_values(
-        #                     level="UC").unique()
+    #                 df_II = df_II.reindex(index)
 
-        #                 df_III = df_III.stack("UC").unstack("BAGG_0")
+    #                 print("_df: ", _df)
 
-        #                 df_III = df_III.reindex(index)
+    #             if and_energy_source:
 
-        #                 print("df_III: ", df_III)
-        #                 print()
+    #                 print("df_II: ", df_II)
 
-        # # /////////////////////////////////////////////////////////// PER B-AGG
+    # CASE 2.2: X-Axis: UC, Y-Axis: Stacked ET
+    # elif int(per_balance_aggregate) + int(and_usage_category) == 2:
 
-        # # CASE 2.1: X-Axis: ET, Y-Axis: Stacked UC
-        # elif per_balance_aggregate:
+    #     for balance_aggregate in data.balance_aggregates:
+    # _df = df.groupby(level=["SECTOR"],
+    # axis=0).get_group(balance_aggregate)
 
-        #     for balance_aggregate in data.balance_aggregates:
-        #         df_I = df.groupby(
-        #             level=["BAGG_0"],
-        #             axis=0).get_group(balance_aggregate)
+    #         # for usage_category in data.usage_categories:
+    #         #     df_II = _df.groupby(level=["USAGE"], axis=1).get_group(
+    #         #         usage_category
+    #         #     )
+    #         for year in years:
+    # _df_II = df_II.groupby(level=["YEAR"], axis=1).get_group(year)
 
-        #         # for energy_source in data.energy_sources:
-        #         #     df_II = _df.groupby(level=["ES"], axis=1).get_group(energy_source)
+    # index = _df_II.columns.get_level_values(level="ES").unique()
 
-        #         for year in years:
+    #             _df_II = _df_II.stack("ES").unstack("SECTOR")
 
-        #             df_II = df_I.groupby(
-        #                 level=["YEAR"], axis=1).get_group(year)
+    #             _df_II = _df_II.reindex(index)
 
-        #             # CASE 3.1: X-Axis: SEC, Y-Axis: Stacked ET
-        #             if and_UC_category:
-        #                 index = df_II.columns.get_level_values(
-        #                     level="UC").unique()
+    #             print("_df_II: ", _df_II)
+    #             print()
 
-        #                 df_II = df_II.stack("UC").unstack("SECTOR")
+    # /////////////////////////////////////////////////////////// PER UC
 
-        #                 df_II = df_II.reindex(index)
+    # elif per_usage_category:
 
-        #                 print("_df: ", _df)
+    #     for usage_category in data.usage_categories:
+    #         df_I = df.groupby(
+    #             level=["USAGE"],
+    #             axis=1).get_group(usage_category)
 
-        #             if and_energy_source:
+    #         # for energy_source in data.energy_sources:
+    #         # df_II = df_I.groupby(level=["ES"],
+    #         # axis=1).get_group(energy_source)
 
-        #                 print("df_II: ", df_II)
+    #         for year in data.years:
+    #             df_II = df_I.groupby(
+    #                 level=["YEAR"], axis=1).get_group(year)
 
-        # CASE 2.2: X-Axis: UC, Y-Axis: Stacked ET
-        # elif int(per_balance_aggregate) + int(and_usage_category) == 2:
+    #             # CASE 3.1: X-Axis: SEC, Y-Axis: Stacked ET
+    #             if and_balance_aggregate:
 
-        #     for balance_aggregate in data.balance_aggregates:
-        # _df = df.groupby(level=["SECTOR"],
-        # axis=0).get_group(balance_aggregate)
+    #                 index = df_II.columns.get_level_values(
+    #                     level="ES").unique()
 
-        #         # for usage_category in data.usage_categories:
-        #         #     df_II = _df.groupby(level=["USAGE"], axis=1).get_group(
-        #         #         usage_category
-        #         #     )
-        #         for year in years:
-        # _df_II = df_II.groupby(level=["YEAR"], axis=1).get_group(year)
+    #                 df_II = df_II.stack("ES").unstack("SECTOR")
 
-        # index = _df_II.columns.get_level_values(level="ES").unique()
+    #                 df_II = df_II.reindex(index)
 
-        #             _df_II = _df_II.stack("ES").unstack("SECTOR")
+    #                 print("df_I_II: ", df_II)
 
-        #             _df_II = _df_II.reindex(index)
+    #             # CASE 3.2: X-Axis: ET, Y-Axis: Stacked SEC
 
-        #             print("_df_II: ", _df_II)
-        #             print()
+    #             elif and_energy_source:
+    #                 print("df_II: ", df_II)
 
-        # /////////////////////////////////////////////////////////// PER UC
+    # CASE 2.2: X-Axis: ET, Y-Axis: Stacked UC
+    # elif int(per_usage_category) + int(and_energy_source) == 2:
 
-        # elif per_usage_category:
+    #     for usage_category in data.usage_categories:
+    # _df = df.groupby(level=["USAGE"], axis=1).get_group(usage_category)
 
-        #     for usage_category in data.usage_categories:
-        #         df_I = df.groupby(
-        #             level=["USAGE"],
-        #             axis=1).get_group(usage_category)
+    #         for balance_aggregate in data.balance_aggregates:
+    #             df_II = _df.groupby(level=["SECTOR"], axis=0).get_group(
+    #                 balance_aggregate
+    #             )
 
-        #         # for energy_source in data.energy_sources:
-        #         # df_II = df_I.groupby(level=["ES"],
-        #         # axis=1).get_group(energy_source)
+    #             for year in years:
+    # _df_II = df_II.groupby(level=["YEAR"], axis=1).get_group(year)
 
-        #         for year in data.years:
-        #             df_II = df_I.groupby(
-        #                 level=["YEAR"], axis=1).get_group(year)
+    #                 # index = _df_II.columns.get_level_values(level="ES").unique()
 
-        #             # CASE 3.1: X-Axis: SEC, Y-Axis: Stacked ET
-        #             if and_balance_aggregate:
+    #                 # _df_II = _df_II.stack("ES").unstack("SECTOR")
 
-        #                 index = df_II.columns.get_level_values(
-        #                     level="ES").unique()
+    #                 # _df_II = _df_II.reindex(index)
 
-        #                 df_II = df_II.stack("ES").unstack("SECTOR")
-
-        #                 df_II = df_II.reindex(index)
-
-        #                 print("df_I_II: ", df_II)
-
-        #             # CASE 3.2: X-Axis: ET, Y-Axis: Stacked SEC
-
-        #             elif and_energy_source:
-        #                 print("df_II: ", df_II)
-
-        # CASE 2.2: X-Axis: ET, Y-Axis: Stacked UC
-        # elif int(per_usage_category) + int(and_energy_source) == 2:
-
-        #     for usage_category in data.usage_categories:
-        # _df = df.groupby(level=["USAGE"], axis=1).get_group(usage_category)
-
-        #         for balance_aggregate in data.balance_aggregates:
-        #             df_II = _df.groupby(level=["SECTOR"], axis=0).get_group(
-        #                 balance_aggregate
-        #             )
-
-        #             for year in years:
-        # _df_II = df_II.groupby(level=["YEAR"], axis=1).get_group(year)
-
-        #                 # index = _df_II.columns.get_level_values(level="ES").unique()
-
-        #                 # _df_II = _df_II.stack("ES").unstack("SECTOR")
-
-        #                 # _df_II = _df_II.reindex(index)
-
-        #                 print("_df_II: ", _df_II)
-        #                 print()
-
+    #                 print("_df_II: ", _df_II)
+    #                 print()
     # def slice_data_per_year(
     #     self,
     #     data: Data,
@@ -1098,76 +1100,76 @@ class DataSet:
 
     #     return
 
-    def add_indicator(
-        self,
-        aggregate: str,
-        numerator: Data,
-        denominator: Data,
-        # years: List,
-        # provinces: List,
-    ):
+    # def add_indicator(
+    #     self,
+    #     aggregate: str,
+    #     numerator: Data,
+    #     denominator: Data,
+    #     # years: List,
+    #     # provinces: List,
+    # ):
 
-        logging.getLogger().error("/" * 80)
+    #     logging.getLogger().error("/" * 80)
 
-        assert numerator != [], "No data for numerator."
-        assert denominator != [], "No data for denominator."
-        # print('denominator: ', denominator)
-        # print('numerator: ', numerator)
+    #     assert numerator != [], "No data for numerator."
+    #     assert denominator != [], "No data for denominator."
+    #     # print('denominator: ', denominator)
+    #     # print('numerator: ', numerator)
 
-        name = "_pro_".join([numerator[0].name, denominator[0].name])
-        unit = " / ".join([numerator[0].unit, denominator[0].unit])
+    #     name = "_pro_".join([numerator[0].name, denominator[0].name])
+    #     unit = " / ".join([numerator[0].unit, denominator[0].unit])
 
-        # Select first year
-        # years_start = max(denominator.years[0], numerator.years[0], years[0])
-        # years_end = min(denominator.years[-1], numerator.years[-1], years[-1])
-        # years = list(range(years_start, years_end + 1, 1))
-        # NOTE: years index of stats gets adapted in add_stats functions!
-        # years.append("Sum")
-        df_numerator = numerator[0].frame
-        df_denominator = denominator[0].frame
+    #     # Select first year
+    #     # years_start = max(denominator.years[0], numerator.years[0], years[0])
+    #     # years_end = min(denominator.years[-1], numerator.years[-1], years[-1])
+    #     # years = list(range(years_start, years_end + 1, 1))
+    #     # NOTE: years index of stats gets adapted in add_stats functions!
+    #     # years.append("Sum")
+    #     df_numerator = numerator[0].frame
+    #     df_denominator = denominator[0].frame
 
-        assert len(df_numerator) == len(
-            df_numerator
-        ), "Dataframe index length mismatch!"
+    #     assert len(df_numerator) == len(
+    #         df_numerator
+    #     ), "Dataframe index length mismatch!"
 
-        df = df_numerator / df_denominator
+    #     df = df_numerator / df_denominator
 
-        df = df.drop("Sum", axis=1)
-        df = df.drop("Sum", axis=0)
+    #     df = df.drop("Sum", axis=1)
+    #     df = df.drop("Sum", axis=0)
 
-        # Compute sums on rows axis (years) and on col axis (provinces)
-        df = add_means(df=df)
+    #     # Compute sums on rows axis (years) and on col axis (provinces)
+    #     df = add_means(df=df)
 
-        # Create shares
-        # Share of each year over total years per province
-        df_shares_per_year = get_shares(df=df, years=True)
-        # print("df_shares_years: ", df_shares_per_year)
+    #     # Create shares
+    #     # Share of each year over total years per province
+    #     df_shares_per_year = get_shares(df=df, years=True)
+    #     # print("df_shares_years: ", df_shares_per_year)
 
-        # Share of each province over total provinces per year
-        df_shares_per_province = get_shares(df=df, provinces=True)
-        # print("df_shares_provinces: ", df_shares_per_province)
+    #     # Share of each province over total provinces per year
+    #     df_shares_per_province = get_shares(df=df, provinces=True)
+    #     # print("df_shares_provinces: ", df_shares_per_province)
 
-        logging.getLogger().info(
-            f"Added KPI with {name} with unit {unit} to {self.name}.data_manager as KPI"
-        )
+    #     logging.getLogger().info(
+    #         f"Added KPI with {name} with unit {unit} to {self.name}.data_manager as KPI"
+    #     )
 
-        self.data.append(
-            Data(
-                name=name,
-                frame=df,
-                aggregate=aggregate,
-                shares_over_rows=df_shares_per_year,
-                shares_over_columns=df_shares_per_province,
-                unit=unit,
-                provinces=provinces,
-                years=[x for x in df.index if not isinstance(x, str)],
-                denominator=denominator[0],
-                numerator=numerator[0],
-                is_KPI=True,
-                order="per_years",
-            )
-        )
-        return
+    #     self.data.append(
+    #         Data(
+    #             name=name,
+    #             frame=df,
+    #             aggregate=aggregate,
+    #             shares_over_rows=df_shares_per_year,
+    #             shares_over_columns=df_shares_per_province,
+    #             unit=unit,
+    #             provinces=provinces,
+    #             years=[x for x in df.index if not isinstance(x, str)],
+    #             denominator=denominator[0],
+    #             numerator=numerator[0],
+    #             is_KPI=True,
+    #             order="per_years",
+    #         )
+    #     )
+    #     return
 
     # def add_nea_per_years(
     #     self,

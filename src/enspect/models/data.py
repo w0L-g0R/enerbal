@@ -49,10 +49,6 @@ class Data:
     per_energy_source: bool = False
     per_energy_aggregate: bool = False
     per_usage_category: bool = False
-    stacked_usage_categories: bool = False
-    stacked_balance_aggregates: bool = False
-    stacked_energy_sources: bool = False
-
     per_years: bool = False
     show_source_values_for_energy_aggregates: bool = False
 

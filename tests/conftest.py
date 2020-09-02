@@ -9,9 +9,9 @@ from src.enspect.models.dataset import DataSet
 from src.enspect.models.workbook import Workbook
 from src.enspect.paths import file_paths
 from src.enspect.settings import set_pd_options
-from tests.fixtures_eb import *
-from tests.fixtures_IO import *
-from tests.fixtures_nea import *
+from tests.fixtures.eb import *
+from tests.fixtures.IO import *
+from tests.fixtures.nea import *
 
 
 @pytest.fixture(scope="session")

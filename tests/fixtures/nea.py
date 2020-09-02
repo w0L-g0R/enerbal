@@ -8,7 +8,7 @@ from enspect.models.dataset import DataSet
 from enspect.models.workbook import Workbook
 from enspect.paths import file_paths
 
-CWD = Path(__file__).parent.resolve()
+CWD = Path(__file__).parents[1].resolve()
 
 
 # /////////////////////////////////////////////////////////////////// WB
@@ -35,8 +35,7 @@ def test_nea_workbook():
         else:
             del wb.book[sheet]
 
-    wb.add_sheets(["ES_BAGGS_STACKED_UC", "ES_UC_STACKED_BAGGS",
-                   "BAGGS_ES_STACKED_UC", "BAGGS_UC_STACKED_ES"])
+    wb.add_sheets(["STACKED_UC", "STACKED_BAGGS", "STACKED_ES", "YEARS"])
 
     wb.save()
 
