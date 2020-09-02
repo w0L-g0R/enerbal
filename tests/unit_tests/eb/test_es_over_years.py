@@ -3,6 +3,7 @@ import os
 import pytest
 
 
+@pytest.mark.dependency()
 def test_es_over_years(
     test_dataset,
     test_provinces,
@@ -30,6 +31,7 @@ def test_es_over_years(
     )
 
 
+@pytest.mark.dependency(depends=["test_es_over_years"])
 def test_launch(test_launch_xlsx, test_eb_workbook):
 
     test_launch_xlsx(wb=test_eb_workbook)
