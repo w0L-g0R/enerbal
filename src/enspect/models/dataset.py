@@ -32,9 +32,9 @@ IDX = pd.IndexSlice
 
 class DataSet:
 
-    '''
+    """
         balance_aggregates: List of list
-    '''
+    """
 
     def __init__(self, name: str, file_paths=file_paths):
         self._objects = []
@@ -97,29 +97,60 @@ class DataSet:
         per_energy_aggregate: bool = False,
         per_years: bool = False,
         show_source_values_for_energy_aggregates: bool = False,
+        is_res: bool = False,
     ):
+
+        """
+            NOTE:
+            Balance aggregates come as list of list, where each inner list contains up to three indices. If only one or two indices (inner list elements) gets provided, missing indices needs to added in the form of "Gesamt" entries.
+
+        """
 
         logging.getLogger().error("/" * 80)
 
-        # Check if argument has valid type
-        is_balance_aggregates_a_list_of_lists(
-            balance_aggregates=balance_aggregates)
+        # Index should be after slicing:
+        # rows: balance_aggregate
+        # columns: years, energy_source, provinces
 
-        df = pickle.load(open(file_paths["db_pickles"] / "eb.p", "rb"))
+        if is_res:
 
-        print("df head: ", df.head())
+            df = pickle.load(open(file_paths["db_pickles"] / "res.p", "rb"))
 
-        df = (
-            slice_pickled_eb_df(
+            # Midx after slicing => rows: BAGGS; columns: PROV, YEAR, ES
+            df, balance_aggregates = slice_pickled_res_df(
+                df=df,
+                provinces=provinces,
+                balance_aggregates=balance_aggregates,
+                years=years,
+            )
+            # Fill missing AT values
+            # TODO: Put this into conversion process
+            for year in years:
+
+                df.loc[IDX[:], IDX["AT", year, "RES"]] = df.loc[
+                    IDX[:], IDX[:, year, "RES"]
+                ].sum(axis=1)
+
+            energy_sources = ["RES"]
+
+            # # columns: YEAR,PROV, ES
+            # df = df.swaplevel(0, 1, axis=1).sort_index(axis=1, level=0)
+
+            # # columns: YEAR, ES, PROV
+            # df = df.swaplevel(1, 2, axis=1).sort_index(axis=1, level=0)
+
+        else:
+            df = pickle.load(open(file_paths["db_pickles"] / "eb.p", "rb"))
+
+            df, balance_aggregates = slice_pickled_eb_df(
                 df=df,
                 balance_aggregates=balance_aggregates,
                 energy_aggregates=energy_aggregates,
                 energy_sources=energy_sources,
                 years=years,
             )
-            .swaplevel(0, 2, axis=1)
-            .sort_index(axis=1, level=0)
-        )
+
+        print("\n\ndf head: ", df.head())
 
         data = Data(
             # frame=frame,
@@ -134,9 +165,8 @@ class DataSet:
             per_energy_aggregate=per_energy_aggregate,
             per_years=per_years,
             show_source_values_for_energy_aggregates=show_source_values_for_energy_aggregates,
+            is_res=is_res,
         )
-
-        print("df head: ", df.head())
 
         if per_energy_aggregate:
 
@@ -164,12 +194,12 @@ class DataSet:
         # Get all energy sources for selected energy aggregates
         energy_sources = list(
             flatten(
-                [energy_aggregate_lookup[source]
-                    for source in data.energy_aggregates]
+                [energy_aggregate_lookup[source] for source in data.energy_aggregates]
             )
         )
 
         for balance_aggregate in data.balance_aggregates:
+            print("balance_aggregate: ", balance_aggregate)
 
             energy_aggregates = []
 
@@ -181,13 +211,21 @@ class DataSet:
                         IDX[balance_aggregate],
                         IDX[:, energy_aggregate_lookup[energy_aggregate], :],
                     ]
-                    .to_frame()
-                    .stack()
-                    .unstack(["PROV", "YEAR", None])
+                    # .to_frame()
+                    # .stack(1)#.unstack("BAGG_0")
+                    .stack("ES")
+                    # .swaplevel(0, 1, axis=0)
+                    # .unstack("BAGG_0")
                 )
+
+                df_I.index = df_I.index.droplevel(["BAGG_0"])
+
+                df_I = df_I.drop_duplicates(keep="first")
+                print("df_I: ", df_I)
 
                 df_I.loc["SUM", :] = df_I.sum(numeric_only=True, axis=0)
 
+                # Add level to multiindex
                 df_I = pd.concat({energy_aggregate: df_I}, names=["ES_AGG"])
 
                 energy_aggregates.append(df_I)
@@ -197,7 +235,7 @@ class DataSet:
             for year in data.years:
 
                 name, key = get_name_and_key(
-                    balance_aggregate.replace(" ", "_"),
+                    balance_aggregate[0].replace(" ", "_"),
                     data_type="Energie_Aggregate",
                     year=year,
                     key="BAGGS",
@@ -207,7 +245,7 @@ class DataSet:
 
                 df_III.reset_index(inplace=True)
 
-                df_III.columns = df_III.columns.droplevel([None, "YEAR"])
+                df_III.columns = df_III.columns.droplevel(["YEAR"])
 
                 df_III = add_total_per_col(df=df_III)
 
@@ -237,7 +275,7 @@ class DataSet:
                 )
 
                 # Slice
-                df_I = df.loc[IDX[:], IDX[year, energy_source, provinces, ]].stack(
+                df_I = df.loc[IDX[:], IDX[year, energy_source, provinces,]].stack(
                     [0, 1]
                 )
 
@@ -271,8 +309,7 @@ class DataSet:
                 )
 
                 df_I = (
-                    df.loc[IDX[balance_aggregate],
-                           IDX[:, energy_source, provinces, ], ]
+                    df.loc[IDX[balance_aggregate], IDX[:, energy_source, provinces,],]
                     .to_frame()
                     .stack()
                     .unstack("PROV")
@@ -280,6 +317,7 @@ class DataSet:
 
                 # level_2: BAGG_0 index lost due to series slicing and stack
                 df_I = add_sums(df=df_I, drop_cols=["ES", "level_2"])
+                print("df_I: ", df_I)
 
                 self.add_data_per_year(
                     data=data,
@@ -364,9 +402,7 @@ class DataSet:
                             IDX[:], IDX[:, energy_source, usage_category, year]
                         ].stack([1, 2, 3])
 
-                        df_I = add_sums(
-                            df=df_I, drop_cols=[
-                                "ES", "UC", "YEAR"])
+                        df_I = add_sums(df=df_I, drop_cols=["ES", "UC", "YEAR"])
 
                         self.add_data_per_year(
                             data=data,
@@ -397,8 +433,7 @@ class DataSet:
 
                         # Unstack col idx to row idx, except provinces
                         df_I = df.loc[
-                            IDX[balance_aggregate], IDX[:,
-                                                        energy_source, :, year]
+                            IDX[balance_aggregate], IDX[:, energy_source, :, year]
                         ].unstack("PROV")
 
                         df_I = add_sums(df=df_I, drop_cols=["ES", "YEAR"])
@@ -432,8 +467,7 @@ class DataSet:
 
                         # Unstack col idx to row idx, except provinces
                         df_I = df.loc[
-                            IDX[balance_aggregate], IDX[:,
-                                                        :, usage_category, year],
+                            IDX[balance_aggregate], IDX[:, :, usage_category, year],
                         ].unstack("PROV")
 
                         df_I = add_sums(df=df_I, drop_cols=["UC", "YEAR"])
@@ -496,25 +530,19 @@ class DataSet:
 
     @check_balance_aggregates_type
     def add_res_data(
-        self,
-        provinces: List,
-        years: List,
-        balance_aggregates: List,
+        self, provinces: List, years: List, balance_aggregates: List,
     ):
-        provinces
-        print('add provinces: ', provinces)
         logging.getLogger().error("/" * 80)
 
         df = pickle.load(open(file_paths["db_pickles"] / "res.p", "rb"))
 
-        print("df head: ", df.head())
+        print("df head: \n", df.head())
 
-        df = (
-            slice_pickled_res_df(
-                df=df,
-                balance_aggregates=balance_aggregates,
-                years=years,
-            )
+        df = slice_pickled_res_df(
+            df=df,
+            provinces=provinces,
+            balance_aggregates=balance_aggregates,
+            years=years,
         )
 
         # data = Data(

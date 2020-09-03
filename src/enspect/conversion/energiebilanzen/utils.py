@@ -31,18 +31,14 @@ def create_indices(provinces: List, last_year: int):
     path_midx_res = file_paths["files_eb"] / "midx_rows_res.xlsx"
 
     for path, sheet_name in zip(
-        [path_midx_eb, path_midx_res],
-        ["MIDX_EB", "MIDX_RES"],
+        [path_midx_eb, path_midx_res], ["MIDX_EB", "MIDX_RES"],
     ):
 
         midx = pd.MultiIndex.from_tuples(
             tuples=[
                 tuple(x)
                 for x in pd.read_excel(
-                    io=path,
-                    sheet_name=sheet_name,
-                    na_filter=False,
-                    header=None,
+                    io=path, sheet_name=sheet_name, na_filter=False, header=None,
                 ).values
             ],
             names=["BAGG_0", "BAGG_1", "BAGG_2", "BAGG_3", "BAGG_4"],
@@ -72,10 +68,7 @@ def create_indices(provinces: List, last_year: int):
 
     # Create a column muliindex with levels [province, Jahre]
     res_col_midx = pd.MultiIndex.from_product(
-        [
-            provinces,
-            list(range(1988, last_year + 1, 1)),
-        ],  # years
+        [provinces, list(range(1988, last_year + 1, 1)),],  # years
         names=["PROV", "YEAR"],
     )
 
@@ -131,18 +124,12 @@ def fetch_from_xlsx(file: str, years: pd.Series):
 
         # Exclude columns with years '70 until '88
         energy_sources_sheets = pd.read_excel(
-            io=file,
-            sheet_name=None,
-            na_filter=False,
-            usecols="A,T:AX",
+            io=file, sheet_name=None, na_filter=False, usecols="A,T:AX",
         )
 
         # Exclude unwanted columns (==years)
         energy_sources_sheets["Mischgas"] = pd.read_excel(
-            io=file,
-            sheet_name="Mischgas",
-            na_filter=False,
-            usecols="A,P:X",
+            io=file, sheet_name="Mischgas", na_filter=False, usecols="A,P:X",
         )
 
         # This sheet only appears in "ET_AT_70_18"
@@ -154,9 +141,7 @@ def fetch_from_xlsx(file: str, years: pd.Series):
     # All other provinces
     else:
         energy_sources_sheets = pd.read_excel(
-            io=str(file),
-            sheet_name=None,
-            na_filter=False,
+            io=str(file), sheet_name=None, na_filter=False,
         )
 
     # Delete non relevant sheets
@@ -383,23 +368,17 @@ def copy_eb_data(
         if len(eb_data.index) != len(eb_idx_template):
 
             eb_data = add_missing_row_indices(
-                data_type="sectors_data",
-                data=eb_data,
-                template_index=eb_idx_template,
+                data_type="sectors_data", data=eb_data, template_index=eb_idx_template,
             )
 
         check_index_errors(
-            data=eb_data,
-            template_index=eb_idx_template,
+            data=eb_data, template_index=eb_idx_template,
         )
 
         eb_data.index, eb_data.columns = (
             eb_row_midx,
             eb_df.loc[IDX[:], IDX[province, energy_source, :]].columns,
         )
-
-        # eb_data.sort_index(inplace=True, axis="rows", level=0)
-        # eb_data.sort_index(inplace=True, axis="rows")
 
         # Copy current energy source data to container eb_df
         eb_df.loc[IDX[:], IDX[province, energy_source, :]] = eb_data  #
@@ -456,10 +435,7 @@ def preprocess_res_sheet(
 
     # Drop rows that are not used
     res_sheet.drop(
-        index=deviations,
-        axis=0,
-        inplace=True,
-        errors="raise",
+        index=deviations, axis=0, inplace=True, errors="raise",
     )
 
     res_sheet = res_sheet.apply(pd.to_numeric, errors="coerce").round(2)

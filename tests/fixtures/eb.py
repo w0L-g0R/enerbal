@@ -71,26 +71,20 @@ def test_eb_energy_source_elektrische_energie():
     ]
 
 
-# ////////////////////////////////////////////////////////////////////// E-AGGS
-@pytest.fixture(scope="session")
-def test_eb_energy_aggregates():
-    return [
-        "Elektrische",
-        "Fernwärme",
-        "Erneuerbare",
-        "Fossil-fest",
-        "Fossil-flüssig",
-        "Fossil-gasförmig",
-        "Biogen-fest",
-        "Biogen-flüssig",
-        "Biogen-gasförmig",
-    ]
-
-
 # ////////////////////////////////////////////////////////////////////// B-AGGS
+
+
+@pytest.fixture(scope="session")
+def test_eb_balance_aggregates_energetischer():
+    fxt = [
+        "Energetischer Endverbrauch",
+    ]
+    return [[x] for x in fxt]
+
+
 @pytest.fixture(scope="session")
 def test_eb_balance_aggregates_inputs_output():
-    return [
+    fxt = [
         "Inländ. Erzeugung v. Rohenergie",
         "Importe",
         "Lager",
@@ -104,23 +98,44 @@ def test_eb_balance_aggregates_inputs_output():
         "Nichtenergetischer Verbrauch",
         "Energetischer Endverbrauch",
     ]
+    return [[x] for x in fxt]
 
 
-@pytest.fixture(scope="session")
-def test_eb_balance_aggregates_energetischer():
-    return [
-        "Energetischer Endverbrauch",
-    ]
-
-
-# ////////////////////////////////////////////////////////////////// B-SECTORS
 @pytest.fixture(scope="session")
 def test_eb_balance_aggregates_sectors():
-    return [
+    fxt = [
         "Energetischer Endverbrauch",
         "Produzierender Bereich",
         "Verkehr",
         "Öffentliche und Private Dienstleistungen",
         "Private Haushalte",
         "Landwirtschaft",
+    ]
+
+    return [[x] for x in fxt]
+
+
+@pytest.fixture(scope="session")
+def test_eb_umwandlungsausstoss_and_umwandlungseinsatz():
+    fxt = [
+        ["Umwandlungsausstoß", "Kraftwerke", "davon: UEA"],
+        ["Umwandlungsausstoß", "Kraftwerke", "davon: UEA", "aus Kohlegase"],
+        ["Umwandlungseinsatz", "Kraftwerke", "davon: EVU"],
+    ]
+    return fxt
+
+
+# ////////////////////////////////////////////////////////////////////// E-AGGS
+@pytest.fixture(scope="session")
+def test_eb_energy_aggregates():
+    return [
+        "Elektrische",
+        "Fernwärme",
+        "Erneuerbare",
+        "Fossil-fest",
+        "Fossil-flüssig",
+        "Fossil-gasförmig",
+        "Biogen-fest",
+        "Biogen-flüssig",
+        "Biogen-gasförmig",
     ]

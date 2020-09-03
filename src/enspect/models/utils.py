@@ -1,3 +1,4 @@
+import itertools
 import logging
 import os
 import pickle
@@ -114,39 +115,16 @@ def add_total_per_col(df: pd.DataFrame):
     return df
 
 
-# def decorator(*args, **kwargs):
-#     print("Inside decorator")
-
-#     def inner(func):
-
-#         # code functionality here
-#         print("Inside inner function")
-#         print("I like", kwargs['like'])
-
-#         func()
-
-#     # reurning inner function
-#     return inner
-
-
-# @decorator(like="geeksforgeeks")
-# def my_func():
-#     print("Inside actual function")
-
-
-def check_balance_aggregates_type(
-    func
-):
+def check_balance_aggregates_type(func):
     def wrapper(*args, **kwargs):
 
-        print('["balance_aggregates"]: ', kwargs["balance_aggregates"])
         # Make sure balance_aggregates comes a list of list
         assert isinstance(
-            kwargs["balance_aggregates"], list), "Balance aggregate argument must be a list"
+            kwargs["balance_aggregates"], list
+        ), "Balance aggregate argument must be a list"
 
         for element in kwargs["balance_aggregates"]:
-            assert isinstance(
-                element, list), f"{element} is not a list!"
+            assert isinstance(element, list), f"{element} is not a list!"
             assert element != [], f"{element} is an empty list!"
 
         func(*args, **kwargs)
@@ -156,100 +134,106 @@ def check_balance_aggregates_type(
     return wrapper
 
 
-def slice_pickled_eb_df(df: pd.DataFrame,
-                        energy_sources: List,
-                        energy_aggregates: List,
-                        balance_aggregates: List,
-                        years=List
-                        ):
+def slice_pickled_eb_df(
+    df: pd.DataFrame,
+    energy_sources: List,
+    energy_aggregates: List,
+    balance_aggregates: List,
+    years: List,
+):
 
     # Filter energy sources for energy aggregates if necessary
     if energy_sources is None:
 
         energy_sources = list(
             flatten(
-                [energy_aggregate_lookup[aggregate]
-                 for aggregate in energy_aggregates]
+                [energy_aggregate_lookup[aggregate] for aggregate in energy_aggregates]
             )
         )
 
-    ausstoss_indices = 0
-    einsatz_indices = 0
+    # In case all baggs elements only contain less than the max nr of levels..
+    dummy = ["Gesamt", "Gesamt", "Gesamt", "Gesamt", "Gesamt"]
 
-    for aggregate in balance_aggregates:
+    # .. add this dummy, wich gets used as ref to fill missing index values ..
+    balance_aggregates.insert(0, dummy)
 
-        if "Umwandlungsausstoß" in aggregate:
-            try:
-                ausstoss_indices = len(aggregate.split("_"))
-            except BaseException:
-                pass
-        if "Umwandlungseinsatz" in aggregate:
-            try:
-                einsatz_indices = len(aggregate.split("_"))
-            except BaseException:
-                pass
+    # .. in the course of combining aggregates for slicing
+    balance_aggregates = tuple(
+        itertools.zip_longest(*balance_aggregates, fillvalue="Gesamt")
+    )
+    # pprint(energy_sources)
 
-    cutoff_indices = list(range(4, max(ausstoss_indices, einsatz_indices), -1))
-
-    df = df.droplevel(level=cutoff_indices[::-1], axis=0)
-
+    # Slice -> dummy indices will not be considered since not in index
     df = df.loc[IDX[balance_aggregates], IDX[:, energy_sources, years]]
+    # df = df.loc[IDX[i], IDX[:, years]]
 
-    return df
+    # Flatten with underline separation, pass over "Gesamt" indices
+    index = [
+        "_".join(val).rstrip("_").split("_Gesamt")[0]
+        for val in df.index.values
+        if val != "Gesamt"
+    ]
+    df.index = index
+
+    df.index.name = "BAGG_0"
+
+    # columns: YEAR,PROV, ES
+    df = df.swaplevel(0, 2, axis=1).sort_index(axis=1, level=0)
+    print("\ndf SLICE: ", df.head())
+
+    return df, index
 
 
-def slice_pickled_res_df(df: pd.DataFrame,
-                         balance_aggregates: List,
-                         provinces=List,
-                         years=List
-                         ):
+def slice_pickled_res_df(
+    df: pd.DataFrame, balance_aggregates: List, provinces: List, years: List
+):
 
-    # ausstoss_indices = 0
-    # einsatz_indices = 0
-    print('slice provinces: ', provinces)
+    # In case all baggs elements only contain one or two strings..
+    dummy = ["Gesamt", "Gesamt", "Gesamt"]
 
-    idx_max_len = 0
+    # .. add this dummy, wich then gets used to fill missing index values ..
+    balance_aggregates.insert(0, dummy)
 
-    balance_aggregates_updated = []
+    # .. when combining aggregates for slicing
+    i = tuple(itertools.zip_longest(*balance_aggregates, fillvalue="Gesamt"))
 
-    for aggregate in balance_aggregates:
-        print('aggregate: ', aggregate)
+    # Slice
+    df = df.loc[IDX[i], IDX[:, years]]
 
-        if len(aggregate) > idx_max_len:
-            idx_max_len = len(aggregate)
+    # Flatten with underline seperation, pass over "Gesamt"
+    index = [
+        "_".join(val).rstrip("_").split("_Gesamt")[0]
+        for val in df.index.values
+        if val != "Gesamt"
+    ]
+    df.index = index
+    # TODO: Add the level in the conversion process
+    # Add another row level
+    df = pd.concat({"RES": df}, names=["ES"])
 
-        if len(aggregate) < idx_max_len:
+    # Turn row into column index
+    df = df.unstack("ES")
 
-            balance_aggregates_updated.append(
-                aggregate.extend(["Gesamt"] * (idx_min_len - len(aggregate)))
-            )
-        else:
-            balance_aggregates_updated.append(aggregate)
+    # Rename
+    df.index.name = "BAGG_0"
 
-    print('balance_aggregates_updated: ', balance_aggregates_updated)
+    # columns: YEAR,PROV, ES
+    df = df.swaplevel(0, 1, axis=1).sort_index(axis=1, level=0)
 
-    if idx_max_len != df.index.nlevels:
+    # columns: YEAR, ES, PROV
+    df = df.swaplevel(1, 2, axis=1).sort_index(axis=1, level=0)
 
-        cutoff_indices = list(range(0, df.index.nlevels, 1))
-        print('cutoff_indices: ', cutoff_indices)
-        print('cutoff_indices[idx_max_len:]: ', cutoff_indices[idx_max_len:])
+    print("\n\ndf: ", df)
+    print("index: ", index)
 
-        df = df.droplevel(level=cutoff_indices[idx_max_len:], axis=0)
-
-    df = df.loc[IDX[:], IDX[:, years]]
-
-    return df
+    return df, index  # , #list(df.index)
 
 
 def get_name_and_key(*args, **kwargs):
     name = "_".join((kwargs["data_type"], *args, str(kwargs["year"])))
 
     key = "_".join(
-        [
-            kwargs["key"],
-            *[arg[:3].upper() for arg in args],
-            str(kwargs["year"])[-2:],
-        ]
+        [kwargs["key"], *[arg[:3].upper() for arg in args], str(kwargs["year"])[-2:],]
     )
 
     return name, key
@@ -334,6 +318,7 @@ def get_name_and_key(*args, **kwargs):
 #         df = df.reindex(columns=list(df.columns[1:]) + ["AT"])
 
 #     return df
+
 
 def extend_eb_row_index(balance_aggregates: Union[List, str]):
     """

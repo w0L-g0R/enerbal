@@ -1,8 +1,7 @@
-
 res_bagg_0 = [
     "Energetischer Endverbrauch Erneuerbare (TJ)",  # -> bagg_1
-    "Elektrische Energie Produktion erneuerbar (TJ)",  # -> bagg_1
-    "Fernwärme Produktion erneuerbar (TJ)",  # -> bagg_1
+    "Elektrische Energie Produktion erneuerbar (TJ)",  # -> bagg_2
+    "Fernwärme Produktion erneuerbar (TJ)",  # -> bagg_3
     "Anrechenbarer Erneuerbare (TJ)",
     "Energetischer Endverbrauch (TJ)",
     "Verbrauch Sektor Energie (TJ)",

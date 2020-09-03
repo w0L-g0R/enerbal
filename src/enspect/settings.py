@@ -63,9 +63,7 @@ unit_converter = {
 
 
 DEFAULT_CHART_CONFIG = {
-    "edits": {
-        "titleText": True,
-    },
+    "edits": {"titleText": True,},
     "modeBarButtons": [
         [
             "toImage",

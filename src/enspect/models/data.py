@@ -51,6 +51,11 @@ class Data:
     per_usage_category: bool = False
     per_years: bool = False
     show_source_values_for_energy_aggregates: bool = False
+    is_eb: bool = False
+    is_res: bool = False
+    is_nea: bool = False
+    is_thg: bool = False
+    is_stat: bool = False
 
     # Chart specific
     has_overlay: bool = False

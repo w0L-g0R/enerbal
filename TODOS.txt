@@ -1,3 +1,12 @@
 
 [*] 
     Add unit test for dataset object setter method. This test should check if   duplicates get filtered out properly.
+
+[*] 
+    Add index level information for eb in aggregates.eb
+
+[*] 
+    Add index level information for res in aggregates.res
+
+[*] 
+    Move midx_eb.xlsx from database folder to conversion folder. Update path information and rerun conversion.

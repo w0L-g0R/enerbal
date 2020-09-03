@@ -33,7 +33,7 @@ def test_res_workbook():
         else:
             del wb.book[sheet]
 
-    wb.add_sheets(["RES"])
+    wb.add_sheets(["RES_OVER_YEARS", "RES_PER_YEAR"])
 
     wb.save()
 
@@ -42,75 +42,40 @@ def test_res_workbook():
 
 # /////////////////////////////////////////////////////////////////// E-SOURCES
 
+
+@pytest.fixture(scope="session")
+def test_res_balance_aggregates():
+    return [
+        ["Anteil anrechenbare Erneuerbare insgesamt"],
+        ["Anteil anrechenbare Erneuerbare Elektrizitätserzeugung"],
+        [
+            "Elektrische Energie Produktion erneuerbar (TJ)",
+            "Wasserkraft ohne Pumpe normalisiert (MWh)",
+            "Ausnutzungsdauer (h)",
+        ],
+        ["Fernwärme Produktion erneuerbar (TJ)", "Laugen"],
+        ["Energetischer Endverbrauch Erneuerbare (TJ)", "Scheitholz"],
+    ]
+
+
 @pytest.fixture(scope="session")
 def test_res_shares():
     return [
-        "Anteil anrechenbare Erneuerbare insgesamt",
-        "Anteil anrechenbare Erneuerbare Elektrizitätserzeugung",
-        "Anteil anrechenbare Erneuerbare Fernwärmeerzeugung",
-        "Anteil anrechenbare Erneuerbare Verkehr",
-        "Anteil anrechenbare Erneuerbare Industrie",
-        "Anteil anrechenbare Erneuerbare Dienstleistungen",
-        "Anteil anrechenbare Erneuerbare Haushalte",
-        "Anteil Erneuerbare Landwirtschaft",
+        ["Anteil anrechenbare Erneuerbare insgesamt"],
+        ["Anteil anrechenbare Erneuerbare Elektrizitätserzeugung"],
+        ["Anteil anrechenbare Erneuerbare Fernwärmeerzeugung"],
+        ["Anteil anrechenbare Erneuerbare Verkehr"],
+        ["Anteil anrechenbare Erneuerbare Industrie"],
+        ["Anteil anrechenbare Erneuerbare Dienstleistungen"],
+        ["Anteil anrechenbare Erneuerbare Haushalte"],
+        ["Anteil Erneuerbare Landwirtschaft"],
     ]
 
 
 @pytest.fixture(scope="session")
 def test_res_intalled_cap_hydro():
-
-    midx = {
-        "bagg_0": [
-            "Elektrische Energie Produktion erneuerbar (TJ)"
-        ],
-        "bagg_1": [
-            "Wasserkraft mit Pumpe normalisiert (MWh)",
-        ],
-        "bagg_2": [
-            "Installierte Kapazität mit Pumpe (MW)",
-        ],
-
-    }
-
-    return midx
-
-
-@pytest.fixture(scope="session")
-def test_res_usage_time_hydro():
-
-    midx = {
-        "bagg_0": [
-            "Elektrische Energie Produktion erneuerbar (TJ)"
-        ],
-        "bagg_1": [
-            "Wasserkraft ohne Pumpe normalisiert (MWh)",
-        ],
-        "bagg_2": [
-            "Ausnutzungsdauer (h)",
-        ],
-    }
-
-    return midx
-
-
-@pytest.fixture(scope="session")
-def test_res_generation_run_of_river():
-
-    # midx = {
-    #     "bagg_0": [
-    #         "Elektrische Energie Produktion erneuerbar (TJ)"
-    #     ],
-    #     "bagg_1": [
-    #         "Wasserkraft ohne Pumpe normalisiert (MWh)",
-    #     ],
-    #     "bagg_2": [
-    #         "Erzeugung aus natürlichem Zufluß (MWh)",
-    #     ],
-    # }
-
-    # return midx
     return [
         "Elektrische Energie Produktion erneuerbar (TJ)",
-        "Wasserkraft ohne Pumpe normalisiert (MWh)",
-        "Erzeugung aus natürlichem Zufluß (MWh)",
+        "Wasserkraft mit Pumpe normalisiert (MWh)",
+        "Installierte Kapazität mit Pumpe (MW)",
     ]
