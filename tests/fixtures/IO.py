@@ -9,7 +9,8 @@ from enspect.models.dataset import DataSet
 from enspect.models.workbook import Workbook
 from enspect.paths import file_paths
 
-CWD = Path(__file__).parent.resolve()
+
+CWD = Path(__file__).parents[1].resolve()
 
 
 def print_inside_tests(*args, **kwargs):

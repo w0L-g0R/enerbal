@@ -114,12 +114,54 @@ def add_total_per_col(df: pd.DataFrame):
     return df
 
 
-def slice_pickled_df(df: pd.DataFrame,
-                     energy_sources: List,
-                     energy_aggregates: List,
-                     balance_aggregates: List,
-                     years=List
-                     ):
+# def decorator(*args, **kwargs):
+#     print("Inside decorator")
+
+#     def inner(func):
+
+#         # code functionality here
+#         print("Inside inner function")
+#         print("I like", kwargs['like'])
+
+#         func()
+
+#     # reurning inner function
+#     return inner
+
+
+# @decorator(like="geeksforgeeks")
+# def my_func():
+#     print("Inside actual function")
+
+
+def check_balance_aggregates_type(
+    func
+):
+    def wrapper(*args, **kwargs):
+
+        print('["balance_aggregates"]: ', kwargs["balance_aggregates"])
+        # Make sure balance_aggregates comes a list of list
+        assert isinstance(
+            kwargs["balance_aggregates"], list), "Balance aggregate argument must be a list"
+
+        for element in kwargs["balance_aggregates"]:
+            assert isinstance(
+                element, list), f"{element} is not a list!"
+            assert element != [], f"{element} is an empty list!"
+
+        func(*args, **kwargs)
+
+        return
+
+    return wrapper
+
+
+def slice_pickled_eb_df(df: pd.DataFrame,
+                        energy_sources: List,
+                        energy_aggregates: List,
+                        balance_aggregates: List,
+                        years=List
+                        ):
 
     # Filter energy sources for energy aggregates if necessary
     if energy_sources is None:
@@ -131,27 +173,70 @@ def slice_pickled_df(df: pd.DataFrame,
             )
         )
 
-    ua_indices = 0
-    ue_indices = 0
+    ausstoss_indices = 0
+    einsatz_indices = 0
 
     for aggregate in balance_aggregates:
 
         if "Umwandlungsausstoß" in aggregate:
             try:
-                ua_indices = len(aggregate.split("_"))
+                ausstoss_indices = len(aggregate.split("_"))
             except BaseException:
                 pass
         if "Umwandlungseinsatz" in aggregate:
             try:
-                ue_indices = len(aggregate.split("_"))
+                einsatz_indices = len(aggregate.split("_"))
             except BaseException:
                 pass
 
-    cutoff_indices = list(range(4, max(ua_indices, ue_indices), -1))
+    cutoff_indices = list(range(4, max(ausstoss_indices, einsatz_indices), -1))
 
     df = df.droplevel(level=cutoff_indices[::-1], axis=0)
 
     df = df.loc[IDX[balance_aggregates], IDX[:, energy_sources, years]]
+
+    return df
+
+
+def slice_pickled_res_df(df: pd.DataFrame,
+                         balance_aggregates: List,
+                         provinces=List,
+                         years=List
+                         ):
+
+    # ausstoss_indices = 0
+    # einsatz_indices = 0
+    print('slice provinces: ', provinces)
+
+    idx_max_len = 0
+
+    balance_aggregates_updated = []
+
+    for aggregate in balance_aggregates:
+        print('aggregate: ', aggregate)
+
+        if len(aggregate) > idx_max_len:
+            idx_max_len = len(aggregate)
+
+        if len(aggregate) < idx_max_len:
+
+            balance_aggregates_updated.append(
+                aggregate.extend(["Gesamt"] * (idx_min_len - len(aggregate)))
+            )
+        else:
+            balance_aggregates_updated.append(aggregate)
+
+    print('balance_aggregates_updated: ', balance_aggregates_updated)
+
+    if idx_max_len != df.index.nlevels:
+
+        cutoff_indices = list(range(0, df.index.nlevels, 1))
+        print('cutoff_indices: ', cutoff_indices)
+        print('cutoff_indices[idx_max_len:]: ', cutoff_indices[idx_max_len:])
+
+        df = df.droplevel(level=cutoff_indices[idx_max_len:], axis=0)
+
+    df = df.loc[IDX[:], IDX[:, years]]
 
     return df
 
@@ -250,57 +335,57 @@ def get_name_and_key(*args, **kwargs):
 
 #     return df
 
-# def extend_eb_row_index(balance_aggregates: Union[List, str]):
-#     """
-#     Takes a list or a single aggregates and adds additional indices.
-#     This way one don't have to specify all five levels of the row multiindex.
+def extend_eb_row_index(balance_aggregates: Union[List, str]):
+    """
+    Takes a list or a single aggregates and adds additional indices.
+    This way one don't have to specify all five levels of the row multiindex.
 
-#     add_all:
-# Adds ":" (without quotation marks!) for the missing
-# indices[balance_aggregate, :, : , : , :]
+    add_all:
+Adds ":" (without quotation marks!) for the missing
+indices[balance_aggregate, :, : , : , :]
 
-#     add_total:
-# Adds "Gesamt" (without quotation marks!) for the missing
-# indices[balance_aggregate, "Gesamt", "Gesamt" , "Gesamt" , "Gesamt"]
+    add_total:
+Adds "Gesamt" (without quotation marks!) for the missing
+indices[balance_aggregate, "Gesamt", "Gesamt" , "Gesamt" , "Gesamt"]
 
-#     """
-#     # balance_aggregates_extended = []
+    """
+    # balance_aggregates_extended = []
 
-#     # for aggregate in balance_aggregates:
-#     #     print("aggregate: ", aggregate)
+    # for aggregate in balance_aggregates:
+    #     print("aggregate: ", aggregate)
 
-#     if not isinstance(balance_aggregates, list):
-#         aggregate = list(balance_aggregates)
+    if not isinstance(balance_aggregates, list):
+        aggregate = list(balance_aggregates)
 
-#     # if add_all:
+    # if add_all:
 
-#     #     # # Extend the  with : if not specified
-#     #     # for x in range(0, row_midx_addon):
+    #     # # Extend the  with : if not specified
+    #     # for x in range(0, row_midx_addon):
 
-#     #     #     aggregate.append(IDX[:])
-#     # per: str,
-#     balance_aggregates = []
-#     for aggregate in balance_aggregates:
+    #     #     aggregate.append(IDX[:])
+    # per: str,
+    balance_aggregates = []
+    for aggregate in balance_aggregates:
 
-#         # Check for missing level values (eb row idx == 5 Levels)
-#         row_midx_addon = 5 - len(aggregate)
+        # Check for missing level values (eb row idx == 5 Levels)
+        row_midx_addon = 5 - len(aggregate)
 
-#         # Extend the  with "Gesamt" if not specified
-#         aggregate.extend(["Gesamt"] * row_midx_addon)
+        # Extend the  with "Gesamt" if not specified
+        aggregate.extend(["Gesamt"] * row_midx_addon)
 
-#         balance_aggregates.append(aggregate)
+        balance_aggregates.append(aggregate)
 
-#         # balance_aggregates.append(
-#         #     IDX[aggregate, "Gesamt", "Gesamt", "Gesamt", "Gesamt"]
-#         # )
+        # balance_aggregates.append(
+        #     IDX[aggregate, "Gesamt", "Gesamt", "Gesamt", "Gesamt"]
+        # )
 
-#     balance_aggregates = IDX[aggregate, "Gesamt", "Gesamt", "Gesamt", "Gesamt"]
-#     print("balance_aggregates: ", balance_aggregates)
+    balance_aggregates = IDX[aggregate, "Gesamt", "Gesamt", "Gesamt", "Gesamt"]
+    print("balance_aggregates: ", balance_aggregates)
 
-#     # balance_aggregates_extended.append(aggregate)
-#     # print("balance_aggregates_extended: ", balance_aggregates_extended)
+    # balance_aggregates_extended.append(aggregate)
+    # print("balance_aggregates_extended: ", balance_aggregates_extended)
 
-#     return balance_aggregates
+    return balance_aggregates
 
 
 # def convert_round(func):

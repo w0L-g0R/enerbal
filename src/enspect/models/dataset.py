@@ -20,7 +20,9 @@ from enspect.models.utils import (
     energy_aggregate_lookup,
     add_total_per_row,
     get_name_and_key,
-    slice_pickled_df,
+    slice_pickled_eb_df,
+    slice_pickled_res_df,
+    check_balance_aggregates_type,
 )
 from enspect.paths import file_paths
 from enspect.settings import unit_converter
@@ -29,41 +31,28 @@ IDX = pd.IndexSlice
 
 
 class DataSet:
+
+    '''
+        balance_aggregates: List of list
+    '''
+
     def __init__(self, name: str, file_paths=file_paths):
         self._objects = []
         self.name = name
         logging.getLogger().error(f"Added: {self.name}")
         return
 
-    @property
-    def objects(self):
-        return FilterData(self._objects)
-
     def __repr__(self):
         return self.name
 
-    # @property
-    # def data(self):
-    #     return self._data
+    @property
+    def objects(self):
+        return FilterData(self._objects)
 
     @objects.setter
     def objects(self, _objects: List = list):
 
         # TODO: Catch duplicates here
-
-        # print(data)
-        # if not isinstance(_objects, list):
-        #     _objects = [_objects]
-
-        _ids = [
-            data.key
-            for data in self._objects
-            # if not isinstance(_object, list)
-        ]
-
-        # print("_ids: ", _ids)
-
-        # if not _ids:
         self._objects.append(_objects)
         # else:
         #     # for key in _ids:
@@ -73,13 +62,21 @@ class DataSet:
         #     else:
         #         self._objects.append(data)
 
-        _ids = [
-            data.key
-            for data in self._objects
-            # if not isinstance(_object, list)
-        ]
+    def add_data_per_year(self, data: Data, **kwargs):
 
-        # print("_ids: ", _ids)
+        # Copy
+        _data = deepcopy(data)
+
+        # Assign keyword arguments to _data instance's attributes
+        for attr_name, attr_value in kwargs.items():
+            if attr_name != "data":
+                setattr(_data, attr_name, attr_value)
+
+        # pprint(vars(_data))
+
+        self.objects = _data
+
+        return
 
     # __________________________________________________________________________
     #
@@ -87,7 +84,7 @@ class DataSet:
     # //////////////////////////////  EB DATA  ////////////////////////////////
     # /////////////////////////////////////////////////////////////////////////
     # __________________________________________________________________________
-
+    @check_balance_aggregates_type
     def add_eb_data(
         self,
         provinces: List,
@@ -104,12 +101,16 @@ class DataSet:
 
         logging.getLogger().error("/" * 80)
 
+        # Check if argument has valid type
+        is_balance_aggregates_a_list_of_lists(
+            balance_aggregates=balance_aggregates)
+
         df = pickle.load(open(file_paths["db_pickles"] / "eb.p", "rb"))
 
         print("df head: ", df.head())
 
         df = (
-            slice_pickled_df(
+            slice_pickled_eb_df(
                 df=df,
                 balance_aggregates=balance_aggregates,
                 energy_aggregates=energy_aggregates,
@@ -163,7 +164,8 @@ class DataSet:
         # Get all energy sources for selected energy aggregates
         energy_sources = list(
             flatten(
-                [energy_aggregate_lookup[source] for source in data.energy_aggregates]
+                [energy_aggregate_lookup[source]
+                    for source in data.energy_aggregates]
             )
         )
 
@@ -235,7 +237,7 @@ class DataSet:
                 )
 
                 # Slice
-                df_I = df.loc[IDX[:], IDX[year, energy_source, provinces,]].stack(
+                df_I = df.loc[IDX[:], IDX[year, energy_source, provinces, ]].stack(
                     [0, 1]
                 )
 
@@ -269,7 +271,8 @@ class DataSet:
                 )
 
                 df_I = (
-                    df.loc[IDX[balance_aggregate], IDX[:, energy_source, provinces,],]
+                    df.loc[IDX[balance_aggregate],
+                           IDX[:, energy_source, provinces, ], ]
                     .to_frame()
                     .stack()
                     .unstack("PROV")
@@ -294,7 +297,7 @@ class DataSet:
     # //////////////////////////////  NEA DATA  ///////////////////////////////
     # /////////////////////////////////////////////////////////////////////////
     # __________________________________________________________________________
-
+    @check_balance_aggregates_type
     def add_nea_data(
         self,
         provinces: List,
@@ -361,7 +364,9 @@ class DataSet:
                             IDX[:], IDX[:, energy_source, usage_category, year]
                         ].stack([1, 2, 3])
 
-                        df_I = add_sums(df=df_I, drop_cols=["ES", "UC", "YEAR"])
+                        df_I = add_sums(
+                            df=df_I, drop_cols=[
+                                "ES", "UC", "YEAR"])
 
                         self.add_data_per_year(
                             data=data,
@@ -392,7 +397,8 @@ class DataSet:
 
                         # Unstack col idx to row idx, except provinces
                         df_I = df.loc[
-                            IDX[balance_aggregate], IDX[:, energy_source, :, year]
+                            IDX[balance_aggregate], IDX[:,
+                                                        energy_source, :, year]
                         ].unstack("PROV")
 
                         df_I = add_sums(df=df_I, drop_cols=["ES", "YEAR"])
@@ -426,7 +432,8 @@ class DataSet:
 
                         # Unstack col idx to row idx, except provinces
                         df_I = df.loc[
-                            IDX[balance_aggregate], IDX[:, :, usage_category, year],
+                            IDX[balance_aggregate], IDX[:,
+                                                        :, usage_category, year],
                         ].unstack("PROV")
 
                         df_I = add_sums(df=df_I, drop_cols=["UC", "YEAR"])
@@ -480,21 +487,52 @@ class DataSet:
 
         return
 
-    def add_data_per_year(self, data: Data, **kwargs):
+    # __________________________________________________________________________
+    #
+    # /////////////////////////////////////////////////////////////////////////
+    # //////////////////////////////  RES DATA  ///////////////////////////////
+    # /////////////////////////////////////////////////////////////////////////
+    # __________________________________________________________________________
 
-        # Copy
-        _data = deepcopy(data)
+    @check_balance_aggregates_type
+    def add_res_data(
+        self,
+        provinces: List,
+        years: List,
+        balance_aggregates: List,
+    ):
+        provinces
+        print('add provinces: ', provinces)
+        logging.getLogger().error("/" * 80)
 
-        # Assign keyword arguments to _data instance's attributes
-        for attr_name, attr_value in kwargs.items():
-            if attr_name != "data":
-                setattr(_data, attr_name, attr_value)
+        df = pickle.load(open(file_paths["db_pickles"] / "res.p", "rb"))
 
-        # pprint(vars(_data))
+        print("df head: ", df.head())
 
-        self.objects = _data
+        df = (
+            slice_pickled_res_df(
+                df=df,
+                balance_aggregates=balance_aggregates,
+                years=years,
+            )
+        )
 
-        return
+        # data = Data(
+        #     # frame=frame,
+        #     unit="TJ",
+        #     balance_aggregates=balance_aggregates,
+        #     energy_sources=energy_sources,
+        #     energy_aggregates=energy_aggregates,
+        #     years=years,
+        #     provinces=provinces,
+        #     per_balance_aggregate=per_balance_aggregate,
+        #     per_energy_source=per_energy_source,
+        #     per_energy_aggregate=per_energy_aggregate,
+        #     per_years=per_years,
+        #     show_source_values_for_energy_aggregates=show_source_values_for_energy_aggregates,
+        # )
+
+        # print("df head: ", df.head())
 
     # def add_nea_per_energy_source(
     #     self,

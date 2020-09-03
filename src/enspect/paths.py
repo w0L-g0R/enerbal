@@ -1,7 +1,9 @@
 from pathlib import Path
 
+# App entrypoint
 CWD = Path(__file__).parent.resolve()  # / ("src/enspect")
 
+# App routing
 file_paths = {
     "files_eb": CWD / Path("database/energiebilanzen"),
     "files_nea": CWD / Path("database/nutzenergieanalysen"),
