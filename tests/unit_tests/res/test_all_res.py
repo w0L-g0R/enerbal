@@ -14,7 +14,7 @@ def test_all_res(
     test_write_to_xlsx,
 ):
 
-    from tests.unit_tests.res.test_baggs_per_year import test_res_baggs_per_year
+    from tests.unit_tests.res.test_res_baggs_per_year import test_res_baggs_per_year
 
     test_res_baggs_per_year(
         test_dataset,

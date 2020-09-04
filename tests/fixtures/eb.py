@@ -59,9 +59,7 @@ def test_eb_main_energy_sources():
 
 @pytest.fixture(scope="session")
 def test_eb_energy_source_gesamtbilanz():
-    return [
-        "Gesamtenergiebilanz",
-    ]
+    return ["Gesamtenergiebilanz", "KOHLE"]
 
 
 @pytest.fixture(scope="session")

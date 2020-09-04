@@ -15,12 +15,13 @@ def test_all_eb(
     test_eb_energy_source_elektrische_energie,
     test_eb_energy_source_gesamtbilanz,
     test_eb_main_energy_sources,
+    test_eb_umwandlungsausstoss_and_umwandlungseinsatz,
     test_write_to_xlsx,
 ):
 
-    from tests.unit_tests.eb.test_baggs_per_year import test_baggs_per_year
+    from tests.unit_tests.eb.test_eb_baggs_per_year import test_eb_baggs_per_year
 
-    test_baggs_per_year(
+    test_eb_baggs_per_year(
         test_dataset,
         test_provinces,
         test_eb_workbook,
@@ -29,9 +30,9 @@ def test_all_eb(
         test_eb_energy_source_gesamtbilanz,
         test_write_to_xlsx,
     )
-    from tests.unit_tests.eb.test_eggs_per_year import test_eggs_per_year
+    from tests.unit_tests.eb.test_eb_eggs_per_year import test_eb_eggs_per_year
 
-    test_eggs_per_year(
+    test_eb_eggs_per_year(
         test_dataset,
         test_eb_workbook,
         test_provinces,
@@ -40,14 +41,16 @@ def test_all_eb(
         test_eb_balance_aggregates_sectors,
         test_write_to_xlsx,
     )
-    from tests.unit_tests.eb.test_es_over_years import test_es_over_years
+    from tests.unit_tests.eb.test_eb_es_over_years import test_eb_es_over_years
 
-    test_es_over_years(
+    test_eb_es_over_years(
         test_dataset,
         test_provinces,
         test_eb_workbook,
         test_eb_main_energy_sources,
+        test_eb_energy_source_gesamtbilanz,
         test_eb_balance_aggregates_sectors,
+        test_eb_umwandlungsausstoss_and_umwandlungseinsatz,
         test_write_to_xlsx,
     )
     return

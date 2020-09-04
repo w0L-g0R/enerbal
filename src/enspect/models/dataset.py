@@ -17,12 +17,11 @@ from enspect.models.data import Data, FilterData
 from enspect.models.utils import (
     add_sums,
     add_total_per_col,
-    energy_aggregate_lookup,
     add_total_per_row,
     get_name_and_key,
     slice_pickled_eb_df,
-    slice_pickled_res_df,
     check_balance_aggregates_type,
+    energy_aggregate_lookup,
 )
 from enspect.paths import file_paths
 from enspect.settings import unit_converter
@@ -108,27 +107,30 @@ class DataSet:
 
         logging.getLogger().error("/" * 80)
 
+        # NOTE:
         # Index should be after slicing:
-        # rows: balance_aggregate
-        # columns: years, energy_source, provinces
+
+        # rows: BAGG_0
+        # columns: PROV, ES, YEAR
 
         if is_res:
 
             df = pickle.load(open(file_paths["db_pickles"] / "res.p", "rb"))
 
-            # Midx after slicing => rows: BAGGS; columns: PROV, YEAR, ES
-            df, balance_aggregates = slice_pickled_res_df(
+            # Midx after slicing => rows: BAGGS; columns: PROV, ES, YEAR
+            df, balance_aggregates = slice_pickled_eb_df(
                 df=df,
                 provinces=provinces,
                 balance_aggregates=balance_aggregates,
                 years=years,
+                is_res=True,
             )
             # Fill missing AT values
             # TODO: Put this into conversion process
             for year in years:
 
-                df.loc[IDX[:], IDX["AT", year, "RES"]] = df.loc[
-                    IDX[:], IDX[:, year, "RES"]
+                df.loc[IDX[:], IDX["AT", "RES", year]] = df.loc[
+                    IDX[:], IDX[provinces, "RES", year]
                 ].sum(axis=1)
 
             energy_sources = ["RES"]
@@ -140,6 +142,8 @@ class DataSet:
             # df = df.swaplevel(1, 2, axis=1).sort_index(axis=1, level=0)
 
         else:
+
+            # Midx after slicing => rows: BAGGS; columns: PROV, YEAR, ES
             df = pickle.load(open(file_paths["db_pickles"] / "eb.p", "rb"))
 
             df, balance_aggregates = slice_pickled_eb_df(
@@ -148,9 +152,16 @@ class DataSet:
                 energy_aggregates=energy_aggregates,
                 energy_sources=energy_sources,
                 years=years,
+                provinces=provinces,
             )
 
-        print("\n\ndf head: ", df.head())
+        df = df.sort_index()
+        # print("\n\ndf head: ", df.head())
+        provinces
+        print("provinces: ", provinces)
+        print("balance_aggregates: ", balance_aggregates)
+        print("energy_sources: ", energy_sources)
+        # pprint(df.columns)
 
         data = Data(
             # frame=frame,
@@ -209,21 +220,24 @@ class DataSet:
                 df_I = (
                     df.loc[
                         IDX[balance_aggregate],
-                        IDX[:, energy_aggregate_lookup[energy_aggregate], :],
-                    ]
+                        IDX[
+                            data.provinces, energy_aggregate_lookup[energy_aggregate], :
+                        ],
+                    ].fillna(0)
                     # .to_frame()
                     # .stack(1)#.unstack("BAGG_0")
-                    .stack("ES")
+                    # .stack("PROV")
+                    .unstack(["PROV", "YEAR"])
                     # .swaplevel(0, 1, axis=0)
                     # .unstack("BAGG_0")
-                )
+                ).copy()
 
-                df_I.index = df_I.index.droplevel(["BAGG_0"])
+                # print("\ndf_I: ", df_I)
+                # df_I.index = df_I.index.droplevel(["BAGG_0"])
 
                 df_I = df_I.drop_duplicates(keep="first")
-                print("df_I: ", df_I)
 
-                df_I.loc["SUM", :] = df_I.sum(numeric_only=True, axis=0)
+                df_I.loc["SUM", :] = df_I.sum(axis=0)
 
                 # Add level to multiindex
                 df_I = pd.concat({energy_aggregate: df_I}, names=["ES_AGG"])
@@ -235,7 +249,7 @@ class DataSet:
             for year in data.years:
 
                 name, key = get_name_and_key(
-                    balance_aggregate[0].replace(" ", "_"),
+                    balance_aggregate.replace(" ", "_"),
                     data_type="Energie_Aggregate",
                     year=year,
                     key="BAGGS",
@@ -274,10 +288,8 @@ class DataSet:
                     key="BAGGS",
                 )
 
-                # Slice
-                df_I = df.loc[IDX[:], IDX[year, energy_source, provinces,]].stack(
-                    [0, 1]
-                )
+                # Slice, keep provinces as columns index
+                df_I = df.loc[IDX[:], IDX[:, energy_source, year]].stack([1, 2]).copy()
 
                 df_I = add_sums(df=df_I, drop_cols=["ES", "YEAR"])
 
@@ -309,15 +321,16 @@ class DataSet:
                 )
 
                 df_I = (
-                    df.loc[IDX[balance_aggregate], IDX[:, energy_source, provinces,],]
+                    df.loc[IDX[balance_aggregate], IDX[:, energy_source, :],]
+                    .fillna(0)
                     .to_frame()
                     .stack()
                     .unstack("PROV")
-                )
+                ).copy()
 
-                # level_2: BAGG_0 index lost due to series slicing and stack
-                df_I = add_sums(df=df_I, drop_cols=["ES", "level_2"])
-                print("df_I: ", df_I)
+                df_I.index.set_names(["ES", "YEAR", "BAGG_0"], inplace=True)
+
+                df_I = add_sums(df=df_I, drop_cols=["ES", "BAGG_0"])
 
                 self.add_data_per_year(
                     data=data,

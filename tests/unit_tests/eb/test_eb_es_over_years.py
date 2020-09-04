@@ -4,12 +4,14 @@ import pytest
 
 
 @pytest.mark.dependency()
-def test_es_over_years(
+def test_eb_es_over_years(
     test_dataset,
     test_provinces,
     test_eb_workbook,
     test_eb_main_energy_sources,
+    test_eb_energy_source_gesamtbilanz,
     test_eb_balance_aggregates_sectors,
+    test_eb_umwandlungsausstoss_and_umwandlungseinsatz,
     test_write_to_xlsx,
 ):
     years = list(range(2010, 2019))
@@ -17,8 +19,10 @@ def test_es_over_years(
     ds = test_dataset
 
     ds.add_eb_data(
-        energy_sources=test_eb_main_energy_sources,
-        balance_aggregates=test_eb_balance_aggregates_sectors,
+        # energy_sources=test_eb_main_energy_sources,
+        energy_sources=test_eb_energy_source_gesamtbilanz,
+        # balance_aggregates=test_eb_balance_aggregates_sectors,
+        balance_aggregates=test_eb_umwandlungsausstoss_and_umwandlungseinsatz,
         years=years,
         provinces=test_provinces,
         per_years=True,
@@ -31,7 +35,7 @@ def test_es_over_years(
     )
 
 
-@pytest.mark.dependency(depends=["test_es_over_years"])
+@pytest.mark.dependency(depends=["test_eb_es_over_years"])
 def test_launch(test_launch_xlsx, test_eb_workbook):
 
     test_launch_xlsx(wb=test_eb_workbook)

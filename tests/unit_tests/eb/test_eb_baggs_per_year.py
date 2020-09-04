@@ -4,7 +4,7 @@ import pytest
 
 
 @pytest.mark.dependency()
-def test_baggs_per_year(
+def test_eb_baggs_per_year(
     test_dataset,
     test_provinces,
     test_eb_workbook,
@@ -34,7 +34,7 @@ def test_baggs_per_year(
     )
 
 
-@pytest.mark.dependency(depends=["test_baggs_per_year"])
+@pytest.mark.dependency(depends=["test_eb_baggs_per_year"])
 def test_launch(test_launch_xlsx, test_eb_workbook):
 
     test_launch_xlsx(wb=test_eb_workbook)

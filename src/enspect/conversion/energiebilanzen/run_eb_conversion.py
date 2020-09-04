@@ -5,6 +5,4 @@ from enspect.conversion.energiebilanzen.to_dataframe import (
 from enspect.settings import set_pd_options
 
 set_pd_options()
-convert_energy_balances_to_dataframe(
-    last_year=2018,
-)
+convert_energy_balances_to_dataframe(last_year=2018,)
