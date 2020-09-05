@@ -6,6 +6,7 @@ import pytest
 
 @pytest.mark.dependency()
 def test_all_res(
+    test_data_instance,
     test_dataset,
     test_provinces,
     test_res_workbook,
@@ -17,6 +18,7 @@ def test_all_res(
     from tests.unit_tests.res.test_res_baggs_per_year import test_res_baggs_per_year
 
     test_res_baggs_per_year(
+        test_data_instance,
         test_dataset,
         test_provinces,
         test_res_workbook,
@@ -25,9 +27,10 @@ def test_all_res(
         test_write_to_xlsx,
     )
 
-    from tests.unit_tests.res.test_res_over_years import test_res_over_years
+    from tests.unit_tests.res.test_res_years import test_res_years
 
-    test_res_over_years(
+    test_res_years(
+        test_data_instance,
         test_dataset,
         test_provinces,
         test_res_workbook,

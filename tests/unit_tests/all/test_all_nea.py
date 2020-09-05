@@ -5,6 +5,7 @@ import pytest
 
 @pytest.mark.dependency()
 def test_all_nea(
+    test_data_instance,
     test_dataset,
     test_nea_workbook,
     test_provinces,
@@ -15,11 +16,10 @@ def test_all_nea(
     test_write_to_xlsx,
 ):
 
-    from tests.unit_tests.nea.test_uc_per_year import (
-        test_stacked_usage_categories_per_year,
-    )
+    from tests.unit_tests.nea.test_nea_uc_per_year import test_nea_uc_per_year
 
-    test_stacked_usage_categories_per_year(
+    test_nea_uc_per_year(
+        test_data_instance,
         test_dataset,
         test_nea_workbook,
         test_provinces,
@@ -30,11 +30,10 @@ def test_all_nea(
         test_write_to_xlsx,
     )
 
-    from tests.unit_tests.nea.test_es_per_year import (
-        test_stacked_energy_sources_per_year,
-    )
+    from tests.unit_tests.nea.test_nea_es_per_year import test_nea_es_per_year
 
-    test_stacked_energy_sources_per_year(
+    test_nea_es_per_year(
+        test_data_instance,
         test_dataset,
         test_nea_workbook,
         test_provinces,
@@ -44,11 +43,10 @@ def test_all_nea(
         test_launch_xlsx,
         test_write_to_xlsx,
     )
-    from tests.unit_tests.nea.test_baggs_per_year import (
-        test_stacked_balance_aggregates_per_year,
-    )
+    from tests.unit_tests.nea.test_nea_baggs_per_year import test_nea_baggs_per_year
 
-    test_stacked_balance_aggregates_per_year(
+    test_nea_baggs_per_year(
+        test_data_instance,
         test_dataset,
         test_nea_workbook,
         test_provinces,
@@ -59,9 +57,10 @@ def test_all_nea(
         test_write_to_xlsx,
     )
 
-    from tests.unit_tests.nea.test_over_years import test_over_years
+    from tests.unit_tests.nea.test_nea_years import test_nea_years
 
-    test_over_years(
+    test_nea_years(
+        test_data_instance,
         test_dataset,
         test_nea_workbook,
         test_provinces,

@@ -9,7 +9,7 @@ from gui.app import app
 from gui.utils import show_callback_context
 from settings import eev_indices
 
-IDX = pd.IndexSlice
+from pandas import IndexSlice as IDX
 
 
 def callback_on_select_eev_dropdowns(

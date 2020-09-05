@@ -23,12 +23,11 @@ from enspect.conversion.energiebilanzen.convert.get_energy_source_aggregates imp
     energy_source_aggregates,
 )
 
-IDX = pd.IndexSlice
+from pandas import IndexSlice as IDX
 
 
 def callback_return_on_select_aggregate(
-    updates_scale: str = no_update,
-    absolute_values: List = no_update,
+    updates_scale: str = no_update, absolute_values: List = no_update,
 ):
     return [updates_scale, absolute_values]
 
@@ -40,12 +39,8 @@ def callback_return_on_select_aggregate(
 def create_on_select_aggregate(graph_id: str):
     @app.callback(
         Output(f"{graph_id}-energy-sources", "value"),
-        [
-            Input(f"{graph_id}-aggregate-eb", "value"),
-        ],
-        [
-            State(f"tabs-{graph_id}", "active_tab"),
-        ],
+        [Input(f"{graph_id}-aggregate-eb", "value"),],
+        [State(f"tabs-{graph_id}", "active_tab"),],
     )
     def on_select_aggregate(aggregate_eb, active_tab):
 

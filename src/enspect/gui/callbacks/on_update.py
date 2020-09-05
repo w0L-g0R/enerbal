@@ -19,7 +19,7 @@ from gui.layouts import get_graph_layout
 from gui.utils import show_callback_context
 from settings import DEFAULT_CHART_CONFIG, scale_options
 
-IDX = pd.IndexSlice
+from pandas import IndexSlice as IDX
 
 
 def create_on_update(graph_id: str):
@@ -99,11 +99,11 @@ def create_on_update(graph_id: str):
                 update["scale"] = scale_options[scale[0]]["label"]
                 print('update["scale"]: ', update["scale"])
 
-            return update, html.Div(
-                dbc.Container(
-                    style={"margin-top": 12},
-                    id=f"{graph_id}-box",
-                )
+            return (
+                update,
+                html.Div(
+                    dbc.Container(style={"margin-top": 12}, id=f"{graph_id}-box",)
+                ),
             )
 
         else:

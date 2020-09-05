@@ -8,7 +8,7 @@ from dash.exceptions import PreventUpdate
 from gui.app import app
 from gui.utils import show_callback_context
 
-IDX = pd.IndexSlice
+from pandas import IndexSlice as IDX
 
 
 # def callback_on_reset_dropdowns(
@@ -42,9 +42,7 @@ def create_on_reset_dropdowns(graph_id: str):
             Output(f"idx-res-1-{graph_id}", "value"),
             Output(f"idx-res-2-{graph_id}", "value"),
         ],
-        [
-            Input(f"{graph_id}-plot", "data"),
-        ],
+        [Input(f"{graph_id}-plot", "data"),],
         [
             State(f"idx-eev-1-{graph_id}", "disabled"),
             State(f"idx-eev-2-{graph_id}", "disabled"),

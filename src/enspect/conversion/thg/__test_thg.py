@@ -15,7 +15,7 @@
 # pd.set_option("display.max_rows", None)  # or 1000
 # pd.set_option("display.width", None)  # or 1000
 
-# IDX = pd.IndexSlice
+# from pandas import IndexSlice as IDX
 
 # # %%
 

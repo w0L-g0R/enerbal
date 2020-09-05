@@ -25,7 +25,7 @@ from pandas.core.common import flatten
 from settings import DEFAULT_CHART_CONFIG
 from utils import multiplicator
 
-IDX = pd.IndexSlice
+from pandas import IndexSlice as IDX
 
 
 def create_eev_figures(setup: Dict):
@@ -58,9 +58,7 @@ def create_eev_figures(setup: Dict):
                     title = " <br> ".join([title, idx])
 
             data_slice, unit = change_unit(
-                scale=setup["scale"],
-                setup=setup,
-                energy_source=energy_source,
+                scale=setup["scale"], setup=setup, energy_source=energy_source,
             )
 
             # /////////////////////////////////////////////////// TRACES
@@ -70,11 +68,7 @@ def create_eev_figures(setup: Dict):
                 y_data = np.array(
                     data_slice.loc[
                         IDX[tuple(setup["row_index"])],
-                        IDX[
-                            province,
-                            energy_source,
-                            setup["years"],
-                        ],
+                        IDX[province, energy_source, setup["years"],],
                     ]
                     .T.fillna(0)
                     .values
@@ -142,9 +136,7 @@ def create_eev_figures(setup: Dict):
             #          in setup["energy_sources"]][0]
 
             data_slice, unit = change_unit(
-                scale=setup["scale"],
-                setup=setup,
-                year=year,
+                scale=setup["scale"], setup=setup, year=year,
             )
 
             # /////////////////////////////////////////////////// TRACES
@@ -158,11 +150,7 @@ def create_eev_figures(setup: Dict):
                     np.array(
                         data_slice.loc[
                             IDX[tuple(setup["row_index"])],
-                            IDX[
-                                setup["provinces"],
-                                energy_source,
-                                year,
-                            ],
+                            IDX[setup["provinces"], energy_source, year,],
                         ].T
                     ).flatten()
                 )

@@ -8,7 +8,7 @@ from dash.exceptions import PreventUpdate
 from gui.app import app
 from gui.utils import show_callback_context
 
-IDX = pd.IndexSlice
+from pandas import IndexSlice as IDX
 
 
 def callback_on_select_renewables_dropdown(
@@ -55,9 +55,7 @@ def create_on_select_renewables_dropdowns(graph_id: str):
         ],
     )
     def on_select_renewables_dropdowns(
-        idx_0_value: str,
-        idx_1_value: str,
-        idx_2_value: str,
+        idx_0_value: str, idx_1_value: str, idx_2_value: str,
     ):
 
         show_callback_context(

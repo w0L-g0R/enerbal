@@ -16,7 +16,8 @@ from enspect.logger.setup import setup_logging
 from enspect.paths import file_paths
 from enspect.utils import timeit
 
-IDX = pd.IndexSlice
+from pandas import IndexSlice as IDX
+
 # ///////////////////////////////////////////////////////////////////// INDICES
 
 

@@ -19,23 +19,19 @@ from gui.layouts import get_graph_layout
 from gui.utils import show_callback_context
 from settings import DEFAULT_CHART_CONFIG
 
-IDX = pd.IndexSlice
+from pandas import IndexSlice as IDX
 
 
 def create_on_update(graph_id: str):
     @app.callback(
         Output(f"{graph_id}-box", "children"),
-        [
-            Input(f"{graph_id}-plots", "data"),
-            Input(f"{graph_id}-axes", "data"),
-        ],
+        [Input(f"{graph_id}-plots", "data"), Input(f"{graph_id}-axes", "data"),],
         # [
         # State(f"{graph_id}-unit", "value"),
         # ]
     )
     def on_update(
-        is_plot_data,
-        flip_axes,
+        is_plot_data, flip_axes,
     ):
 
         # Log callback information
@@ -83,9 +79,7 @@ def create_on_update(graph_id: str):
                         )
                     )
 
-                    graphs.append(
-                        html.Hr(style={"background-color": "lightblue"}),
-                    )
+                    graphs.append(html.Hr(style={"background-color": "lightblue"}),)
             else:
                 data = figure["data"]
                 layout = figure["layout"]
@@ -157,10 +151,7 @@ def create_on_update(graph_id: str):
                         y0=min(trace["y"]),
                         x1=0,
                         y1=max(trace["y"]),
-                        line=dict(
-                            color="white",
-                            width=3,
-                        ),
+                        line=dict(color="white", width=3,),
                     )
 
                     # fig.add_shape(
@@ -205,9 +196,7 @@ def create_on_update(graph_id: str):
                         #     ]
                         # )
                     )
-                    graphs.append(
-                        html.Hr(style={"background-color": "lightblue"}),
-                    )
+                    graphs.append(html.Hr(style={"background-color": "lightblue"}),)
 
             return graphs
         else:

@@ -23,7 +23,7 @@ from pandas.core.common import flatten
 from settings import DEFAULT_CHART_CONFIG
 from utils import multiplicator
 
-IDX = pd.IndexSlice
+from pandas import IndexSlice as IDX
 
 
 def create_traces(

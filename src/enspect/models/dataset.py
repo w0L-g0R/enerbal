@@ -20,13 +20,12 @@ from enspect.models.utils import (
     add_total_per_row,
     get_name_and_key,
     slice_pickled_eb_df,
-    check_balance_aggregates_type,
     energy_aggregate_lookup,
 )
 from enspect.paths import file_paths
 from enspect.settings import unit_converter
 
-IDX = pd.IndexSlice
+from pandas import IndexSlice as IDX
 
 
 class DataSet:
@@ -77,26 +76,8 @@ class DataSet:
 
         return
 
-    # __________________________________________________________________________
-    #
-    # /////////////////////////////////////////////////////////////////////////
-    # //////////////////////////////  EB DATA  ////////////////////////////////
-    # /////////////////////////////////////////////////////////////////////////
-    # __________________________________________________________________________
-    @check_balance_aggregates_type
-    def add_eb_data(
-        self,
-        provinces: List,
-        years: List,
-        balance_aggregates: List = None,
-        energy_sources: List = None,
-        energy_aggregates: List = None,
-        per_balance_aggregate: bool = False,
-        per_energy_source: bool = False,
-        per_energy_aggregate: bool = False,
-        per_years: bool = False,
-        show_source_values_for_energy_aggregates: bool = False,
-        is_res: bool = False,
+    def add_data(
+        self, data,
     ):
 
         """
@@ -113,288 +94,137 @@ class DataSet:
         # rows: BAGG_0
         # columns: PROV, ES, YEAR
 
-        if is_res:
+        if data.per_energy_aggregate:
 
-            df = pickle.load(open(file_paths["db_pickles"] / "res.p", "rb"))
+            self.add_energy_aggregates(data=data)
 
-            # Midx after slicing => rows: BAGGS; columns: PROV, ES, YEAR
-            df, balance_aggregates = slice_pickled_eb_df(
-                df=df,
-                provinces=provinces,
-                balance_aggregates=balance_aggregates,
-                years=years,
-                is_res=True,
-            )
-            # Fill missing AT values
-            # TODO: Put this into conversion process
-            for year in years:
+        elif data.per_usage_category:
 
-                df.loc[IDX[:], IDX["AT", "RES", year]] = df.loc[
-                    IDX[:], IDX[provinces, "RES", year]
-                ].sum(axis=1)
+            self.add_usage_categories(data=data)
 
-            energy_sources = ["RES"]
+        elif data.per_balance_aggregate:
 
-            # # columns: YEAR,PROV, ES
-            # df = df.swaplevel(0, 1, axis=1).sort_index(axis=1, level=0)
+            self.add_balance_aggregates(data=data)
 
-            # # columns: YEAR, ES, PROV
-            # df = df.swaplevel(1, 2, axis=1).sort_index(axis=1, level=0)
+        elif data.per_energy_source:
 
-        else:
+            self.add_energy_sources(data=data)
 
-            # Midx after slicing => rows: BAGGS; columns: PROV, YEAR, ES
-            df = pickle.load(open(file_paths["db_pickles"] / "eb.p", "rb"))
+        # All years
+        elif data.per_years:
 
-            df, balance_aggregates = slice_pickled_eb_df(
-                df=df,
-                balance_aggregates=balance_aggregates,
-                energy_aggregates=energy_aggregates,
-                energy_sources=energy_sources,
-                years=years,
-                provinces=provinces,
-            )
-
-        df = df.sort_index()
-        # print("\n\ndf head: ", df.head())
-        provinces
-        print("provinces: ", provinces)
-        print("balance_aggregates: ", balance_aggregates)
-        print("energy_sources: ", energy_sources)
-        # pprint(df.columns)
-
-        data = Data(
-            # frame=frame,
-            unit="TJ",
-            balance_aggregates=balance_aggregates,
-            energy_sources=energy_sources,
-            energy_aggregates=energy_aggregates,
-            years=years,
-            provinces=provinces,
-            per_balance_aggregate=per_balance_aggregate,
-            per_energy_source=per_energy_source,
-            per_energy_aggregate=per_energy_aggregate,
-            per_years=per_years,
-            show_source_values_for_energy_aggregates=show_source_values_for_energy_aggregates,
-            is_res=is_res,
-        )
-
-        if per_energy_aggregate:
-
-            self.add_eb_energy_aggregates(df=df, data=data)
-
-        else:
-
-            if per_balance_aggregate:
-
-                self.add_eb_balance_aggregates(df=df, data=data)
-
-            elif per_energy_source:
-
-                self.add_eb_balance_aggregates(df=df, data=data)
-
-            # All years
-            elif per_years:
-                self.add_eb_over_all_years(df=df, data=data)
-        return
-
-    # ////////////////////////////////////////////////////////////////// E-AGGS
-
-    def add_eb_energy_aggregates(self, df: pd.DataFrame, data: Data):
-
-        # Get all energy sources for selected energy aggregates
-        energy_sources = list(
-            flatten(
-                [energy_aggregate_lookup[source] for source in data.energy_aggregates]
-            )
-        )
-
-        for balance_aggregate in data.balance_aggregates:
-            print("balance_aggregate: ", balance_aggregate)
-
-            energy_aggregates = []
-
-            # Iter over energy aggregates
-            for energy_aggregate in data.energy_aggregates:
-
-                df_I = (
-                    df.loc[
-                        IDX[balance_aggregate],
-                        IDX[
-                            data.provinces, energy_aggregate_lookup[energy_aggregate], :
-                        ],
-                    ].fillna(0)
-                    # .to_frame()
-                    # .stack(1)#.unstack("BAGG_0")
-                    # .stack("PROV")
-                    .unstack(["PROV", "YEAR"])
-                    # .swaplevel(0, 1, axis=0)
-                    # .unstack("BAGG_0")
-                ).copy()
-
-                # print("\ndf_I: ", df_I)
-                # df_I.index = df_I.index.droplevel(["BAGG_0"])
-
-                df_I = df_I.drop_duplicates(keep="first")
-
-                df_I.loc["SUM", :] = df_I.sum(axis=0)
-
-                # Add level to multiindex
-                df_I = pd.concat({energy_aggregate: df_I}, names=["ES_AGG"])
-
-                energy_aggregates.append(df_I)
-
-            df_II = pd.concat(energy_aggregates, axis=0)
-
-            for year in data.years:
-
-                name, key = get_name_and_key(
-                    balance_aggregate.replace(" ", "_"),
-                    data_type="Energie_Aggregate",
-                    year=year,
-                    key="BAGGS",
-                )
-
-                df_III = df_II.groupby(level="YEAR", axis=1).get_group(year)
-
-                df_III.reset_index(inplace=True)
-
-                df_III.columns = df_III.columns.droplevel(["YEAR"])
-
-                df_III = add_total_per_col(df=df_III)
-
-                self.add_data_per_year(
-                    data=data,
-                    name=name,
-                    key=key,
-                    frame=df_III,
-                    balance_aggregates=balance_aggregate,
-                    years=year,
-                )
-        return
-
-    # ////////////////////////////////////////////////////////////////// E-SRCS
-
-    def add_eb_balance_aggregates(self, df: pd.DataFrame, data: pd.DataFrame):
-
-        for energy_source in data.energy_sources:
-
-            for year in data.years:
-
-                name, key = get_name_and_key(
-                    energy_source.replace(" ", "_"),
-                    data_type="Bilanz_Aggregate",
-                    year=year,
-                    key="BAGGS",
-                )
-
-                # Slice, keep provinces as columns index
-                df_I = df.loc[IDX[:], IDX[:, energy_source, year]].stack([1, 2]).copy()
-
-                df_I = add_sums(df=df_I, drop_cols=["ES", "YEAR"])
-
-                self.add_data_per_year(
-                    data=data,
-                    name=name,
-                    key=key,
-                    frame=df_I,
-                    energy_sources=energy_source,
-                    years=year,
-                )
+            self.add_years(data=data)
 
         return
 
-    # ////////////////////////////////////////////////////////////////// YEARLY
+    def add_energy_aggregates(self, data: Data):
 
-    def add_eb_over_all_years(self, df: pd.DataFrame, data: Data):
+        if data.is_res or data.is_eb:
 
-        for energy_source in data.energy_sources:
+            # Get all energy sources for selected energy aggregates
+            energy_sources = list(
+                flatten(
+                    [
+                        energy_aggregate_lookup[source]
+                        for source in data.energy_aggregates
+                    ]
+                )
+            )
 
             for balance_aggregate in data.balance_aggregates:
 
-                name, key = get_name_and_key(
-                    energy_source.replace(" ", "_"),
-                    balance_aggregate.replace(" ", "_"),
-                    data_type="Entwicklung",
-                    year="_".join((str(data.years[0]), str(data.years[-1]))),
-                    key="YEARS",
-                )
+                energy_aggregates = []
 
-                df_I = (
-                    df.loc[IDX[balance_aggregate], IDX[:, energy_source, :],]
-                    .fillna(0)
-                    .to_frame()
-                    .stack()
-                    .unstack("PROV")
-                ).copy()
+                # Iter over energy aggregates
+                for energy_aggregate in data.energy_aggregates:
 
-                df_I.index.set_names(["ES", "YEAR", "BAGG_0"], inplace=True)
+                    df_I = (
+                        data.frame.loc[
+                            IDX[balance_aggregate],
+                            IDX[
+                                data.provinces,
+                                energy_aggregate_lookup[energy_aggregate],
+                                :,
+                            ],
+                        ]
+                        # .fillna(0)
+                        .unstack(["PROV", "YEAR"])
+                    ).copy()
 
-                df_I = add_sums(df=df_I, drop_cols=["ES", "BAGG_0"])
+                    # print("\ndf_I: ", df_I)
+                    # df_I.index = df_I.index.droplevel(["BAGG_0"])
 
-                self.add_data_per_year(
-                    data=data,
-                    name=name,
-                    key=key,
-                    frame=df_I,
-                    balance_aggregates=balance_aggregate,
-                    energy_sources=energy_source,
-                    years=data.years,
-                )
+                    df_I = df_I.drop_duplicates(keep="first")
 
-    # __________________________________________________________________________
-    #
-    # /////////////////////////////////////////////////////////////////////////
-    # //////////////////////////////  NEA DATA  ///////////////////////////////
-    # /////////////////////////////////////////////////////////////////////////
-    # __________________________________________________________________________
-    @check_balance_aggregates_type
-    def add_nea_data(
-        self,
-        provinces: List,
-        years: List,
-        balance_aggregates: List = None,
-        energy_sources: List = None,
-        usage_categories: List = None,
-        per_usage_category: bool = False,
-        per_balance_aggregate: bool = False,
-        per_energy_source: bool = False,
-        per_years: bool = False,
-    ):
+                    df_I.loc["SUM", :] = df_I.sum(axis=0)
 
-        logging.getLogger().error("/" * 80)
+                    # Add level to multiindex
+                    df_I = pd.concat({energy_aggregate: df_I}, names=["ES_AGG"])
 
-        df = (
-            pickle.load(open(file_paths["db_pickles"] / "nea.p", "rb")).sort_index(
-                axis=1, level=0
-            )
-            # .swaplevel(0, 2, axis=1)
-        )
+                    energy_aggregates.append(df_I)
 
-        print("df head: ", df.head())
+                df_II = pd.concat(energy_aggregates, axis=0)
 
-        # Filter aggregates
-        df = df.loc[
-            IDX[balance_aggregates],
-            IDX[provinces, energy_sources, usage_categories, years],
-        ]
+                for year in data.years:
 
-        data = Data(
-            # frame=frame,
-            unit="TJ",
-            balance_aggregates=balance_aggregates,
-            energy_sources=energy_sources,
-            usage_categories=usage_categories,
-            years=years,
-            provinces=provinces,
-            per_usage_category=per_usage_category,
-            per_balance_aggregate=per_balance_aggregate,
-            per_energy_source=per_energy_source,
-            per_years=per_years,
-        )
+                    name, key = get_name_and_key(
+                        balance_aggregate.replace(" ", "_"),
+                        data_type="Energie_Aggregate",
+                        year=year,
+                        key="EB_BAGGS",
+                    )
 
-        # CASE 1.1: X-Axis: ES-UC-PROV, Y-Axis: Stacked BAGGS
-        if per_balance_aggregate:
+                    df_III = df_II.groupby(level="YEAR", axis=1).get_group(year)
+
+                    df_III.reset_index(inplace=True)
+
+                    df_III.columns = df_III.columns.droplevel(["YEAR"])
+
+                    df_III = add_total_per_col(df=df_III)
+
+                    self.add_data_per_year(
+                        data=data,
+                        name=name,
+                        key=key,
+                        frame=df_III,
+                        balance_aggregates=balance_aggregate,
+                        years=year,
+                    )
+        return
+
+    def add_balance_aggregates(self, data: Data):
+
+        if data.is_res or data.is_eb:
+
+            for energy_source in data.energy_sources:
+
+                for year in data.years:
+
+                    name, key = get_name_and_key(
+                        energy_source.replace(" ", "_"),
+                        data_type="Bilanz_Aggregate",
+                        year=year,
+                        key="EB_BAGGS",
+                    )
+
+                    # Slice, keep provinces as columns index
+                    df_I = (
+                        data.frame.loc[IDX[:], IDX[:, energy_source, year]].copy()
+                        # .fillna(0)
+                        .stack([1, 2])
+                    )
+
+                    df_I = add_sums(df=df_I, drop_cols=["ES", "YEAR"])
+
+                    self.add_data_per_year(
+                        data=data,
+                        name=name,
+                        key=key,
+                        frame=df_I,
+                        energy_sources=energy_source,
+                        years=year,
+                    )
+        elif data.is_nea:
 
             for energy_source in data.energy_sources:
 
@@ -407,13 +237,17 @@ class DataSet:
                             usage_category.replace(" ", "_"),
                             data_type="Sektoranteile",
                             year=str(year),
-                            key="STACKED_BAGGS",
+                            key="NEA_BAGGS",
                         )
 
                         # Unstack col idx to row idx, except provinces
-                        df_I = df.loc[
-                            IDX[:], IDX[:, energy_source, usage_category, year]
-                        ].stack([1, 2, 3])
+                        df_I = (
+                            data.frame.loc[
+                                IDX[:], IDX[:, energy_source, usage_category, year]
+                            ].copy()
+                            # .fillna(0)
+                            .stack([1, 2, 3])
+                        )
 
                         df_I = add_sums(df=df_I, drop_cols=["ES", "UC", "YEAR"])
 
@@ -427,75 +261,48 @@ class DataSet:
                             years=year,
                         )
 
-        # CASE 1.2: X-Axis: ES-SEC-PROV, Y-Axis: Stacked ES
-        if per_usage_category:
+        return
+
+    def add_years(self, data: Data):
+
+        if data.is_eb or data.is_res:
 
             for energy_source in data.energy_sources:
 
                 for balance_aggregate in data.balance_aggregates:
 
-                    for year in data.years:
+                    name, key = get_name_and_key(
+                        energy_source.replace(" ", "_"),
+                        balance_aggregate.replace(" ", "_"),
+                        data_type="Entwicklung",
+                        year="_".join((str(data.years[0]), str(data.years[-1]))),
+                        key="EB_YEARS",
+                    )
 
-                        name, key = get_name_and_key(
-                            balance_aggregate.replace(" ", "_"),
-                            energy_source.replace(" ", "_"),
-                            data_type="Nutzenergieanteile",
-                            year=str(year),
-                            key="STACKED_UC",
-                        )
+                    df_I = (
+                        data.frame.loc[
+                            IDX[balance_aggregate], IDX[:, energy_source, :],
+                        ]
+                        # .fillna(0)
+                        .to_frame()
+                        .stack()
+                        .unstack("PROV")
+                    ).copy()
 
-                        # Unstack col idx to row idx, except provinces
-                        df_I = df.loc[
-                            IDX[balance_aggregate], IDX[:, energy_source, :, year]
-                        ].unstack("PROV")
+                    df_I.index.set_names(["ES", "YEAR", "BAGG_0"], inplace=True)
 
-                        df_I = add_sums(df=df_I, drop_cols=["ES", "YEAR"])
-                        print("df_I: ", df_I)
+                    df_I = add_sums(df=df_I, drop_cols=["ES", "BAGG_0"])
 
-                        self.add_data_per_year(
-                            data=data,
-                            name=name,
-                            key=key,
-                            frame=df_I,
-                            balance_aggregates=balance_aggregate,
-                            energy_sources=energy_source,
-                            years=year,
-                        )
-
-        if per_energy_source:
-
-            for usage_category in data.usage_categories:
-
-                for balance_aggregate in data.balance_aggregates:
-
-                    for year in data.years:
-
-                        name, key = get_name_and_key(
-                            balance_aggregate.replace(" ", "_"),
-                            usage_category.replace(" ", "_"),
-                            data_type="Energieträgeranteile",
-                            year=str(year),
-                            key="STACKED_ES",
-                        )
-
-                        # Unstack col idx to row idx, except provinces
-                        df_I = df.loc[
-                            IDX[balance_aggregate], IDX[:, :, usage_category, year],
-                        ].unstack("PROV")
-
-                        df_I = add_sums(df=df_I, drop_cols=["UC", "YEAR"])
-
-                        self.add_data_per_year(
-                            data=data,
-                            name=name,
-                            key=key,
-                            frame=df_I,
-                            balance_aggregates=balance_aggregate,
-                            usage_category=usage_category,
-                            years=year,
-                        )
-
-        if per_years:
+                    self.add_data_per_year(
+                        data=data,
+                        name=name,
+                        key=key,
+                        frame=df_I,
+                        balance_aggregates=balance_aggregate,
+                        energy_sources=energy_source,
+                        years=data.years,
+                    )
+        elif data.is_nea:
 
             for balance_aggregate in data.balance_aggregates:
 
@@ -511,11 +318,11 @@ class DataSet:
                             str(data.years[-1])[2:],
                             data_type="Entwicklung",
                             year="",
-                            key="YEARS",
+                            key="NEA_YEARS",
                         )
 
                         # Unstack col idx to row idx, except provinces
-                        df_I = df.loc[
+                        df_I = data.frame.loc[
                             IDX[balance_aggregate],
                             IDX[:, energy_source, usage_category, data.years],
                         ].unstack("PROV")
@@ -532,7 +339,272 @@ class DataSet:
                             energy_source=energy_source,
                         )
 
+    def add_energy_sources(self, data):
+
+        for usage_category in data.usage_categories:
+
+            for balance_aggregate in data.balance_aggregates:
+
+                for year in data.years:
+
+                    name, key = get_name_and_key(
+                        balance_aggregate.replace(" ", "_"),
+                        usage_category.replace(" ", "_"),
+                        data_type="Energieträgeranteile",
+                        year=str(year),
+                        key="NEA_UC",
+                    )
+
+                    # Unstack col idx to row idx, except provinces
+                    df_I = (
+                        data.frame.loc[
+                            IDX[balance_aggregate], IDX[:, :, usage_category, year],
+                        ]
+                        .copy()
+                        .unstack("PROV")
+                    )
+
+                    df_I = add_sums(df=df_I, drop_cols=["UC", "YEAR"])
+
+                    self.add_data_per_year(
+                        data=data,
+                        name=name,
+                        key=key,
+                        frame=df_I,
+                        balance_aggregates=balance_aggregate,
+                        usage_category=usage_category,
+                        years=year,
+                    )
+
         return
+
+    def add_usage_categories(self, data):
+
+        if data.is_nea:
+
+            for energy_source in data.energy_sources:
+
+                for balance_aggregate in data.balance_aggregates:
+
+                    for year in data.years:
+
+                        name, key = get_name_and_key(
+                            balance_aggregate.replace(" ", "_"),
+                            energy_source.replace(" ", "_"),
+                            data_type="Nutzenergieanteile",
+                            year=str(year),
+                            key="NEA_ES",
+                        )
+
+                        # Unstack col idx to row idx, except provinces
+                        df_I = (
+                            data.frame.loc[
+                                IDX[balance_aggregate], IDX[:, energy_source, :, year]
+                            ].copy()
+                            # .fillna(0)
+                            .unstack("PROV")
+                        )
+
+                        df_I = add_sums(df=df_I, drop_cols=["ES", "YEAR"])
+
+                        self.add_data_per_year(
+                            data=data,
+                            name=name,
+                            key=key,
+                            frame=df_I,
+                            balance_aggregates=balance_aggregate,
+                            energy_sources=energy_source,
+                            years=year,
+                        )
+        return
+
+    # @check_balance_aggregates_type
+    # def add_nea_data(
+    #     self,
+    #     data
+    #     # provinces: List,
+    #     # years: List,
+    #     # balance_aggregates: List = None,
+    #     # energy_sources: List = None,
+    #     # usage_categories: List = None,
+    #     # per_usage_category: bool = False,
+    #     # per_balance_aggregate: bool = False,
+    #     # per_energy_source: bool = False,
+    #     # per_years: bool = False,
+    # ):
+
+    #     logging.getLogger().error("/" * 80)
+
+    # df = (
+    #     pickle.load(open(file_paths["db_pickles"] / "nea.p", "rb")).sort_index(
+    #         axis=1, level=0
+    #     )
+    #     # .swaplevel(0, 2, axis=1)
+    # )
+
+    # print("df head: ", df.head())
+
+    # # Filter aggregates
+    # df = df.loc[
+    #     IDX[balance_aggregates],
+    #     IDX[provinces, energy_sources, usage_categories, years],
+    # ]
+
+    # data = Data(
+    #     # frame=frame,
+    #     unit="TJ",
+    #     balance_aggregates=balance_aggregates,
+    #     energy_sources=energy_sources,
+    #     usage_categories=usage_categories,
+    #     years=years,
+    #     provinces=provinces,
+    #     per_usage_category=per_usage_category,
+    #     per_balance_aggregate=per_balance_aggregate,
+    #     per_energy_source=per_energy_source,
+    #     per_years=per_years,
+    # )
+
+    # CASE 1.1: X-Axis: ES-UC-PROV, Y-Axis: Stacked BAGGS
+    # if per_balance_aggregate:
+
+    # for energy_source in data.energy_sources:
+
+    #     for usage_category in data.usage_categories:
+
+    #         for year in data.years:
+
+    #             name, key = get_name_and_key(
+    #                 energy_source.replace(" ", "_"),
+    #                 usage_category.replace(" ", "_"),
+    #                 data_type="Sektoranteile",
+    #                 year=str(year),
+    #                 key="STACKED_BAGGS",
+    #             )
+
+    #             # Unstack col idx to row idx, except provinces
+    #             df_I = data.frame.loc[
+    #                 IDX[:], IDX[:, energy_source, usage_category, year]
+    #             ].stack([1, 2, 3])
+
+    #             df_I = add_sums(df=df_I, drop_cols=["ES", "UC", "YEAR"])
+
+    #             self.add_data_per_year(
+    #                 data=data,
+    #                 name=name,
+    #                 key=key,
+    #                 frame=df_I,
+    #                 usage_categories=usage_category,
+    #                 energy_sources=energy_source,
+    #                 years=year,
+    # )
+
+    # CASE 1.2: X-Axis: ES-SEC-PROV, Y-Axis: Stacked ES
+    # def add_nea_usage_categories(self, data)
+    # if per_usage_category:
+
+    #     for energy_source in data.energy_sources:
+
+    #         for balance_aggregate in data.balance_aggregates:
+
+    #             for year in data.years:
+
+    #                 name, key = get_name_and_key(
+    #                     balance_aggregate.replace(" ", "_"),
+    #                     energy_source.replace(" ", "_"),
+    #                     data_type="Nutzenergieanteile",
+    #                     year=str(year),
+    #                     key="STACKED_UC",
+    #                 )
+
+    #                 # Unstack col idx to row idx, except provinces
+    #                 df_I = data.frame.loc[
+    #                     IDX[balance_aggregate], IDX[:, energy_source, :, year]
+    #                 ].unstack("PROV")
+
+    #                 df_I = add_sums(df=df_I, drop_cols=["ES", "YEAR"])
+    #                 print("df_I: ", df_I)
+
+    #                 self.add_data_per_year(
+    #                     data=data,
+    #                     name=name,
+    #                     key=key,
+    #                     frame=df_I,
+    #                     balance_aggregates=balance_aggregate,
+    #                     energy_sources=energy_source,
+    #                     years=year,
+    #                 )
+
+    # if per_energy_source:
+
+    # for usage_category in data.usage_categories:
+
+    #     for balance_aggregate in data.balance_aggregates:
+
+    #         for year in data.years:
+
+    #             name, key = get_name_and_key(
+    #                 balance_aggregate.replace(" ", "_"),
+    #                 usage_category.replace(" ", "_"),
+    #                 data_type="Energieträgeranteile",
+    #                 year=str(year),
+    #                 key="STACKED_ES",
+    #             )
+
+    #             # Unstack col idx to row idx, except provinces
+    #             df_I = data.frame.loc[
+    #                 IDX[balance_aggregate], IDX[:, :, usage_category, year],
+    #             ].unstack("PROV")
+
+    #             df_I = add_sums(df=df_I, drop_cols=["UC", "YEAR"])
+
+    #             self.add_data_per_year(
+    #                 data=data,
+    #                 name=name,
+    #                 key=key,
+    #                 frame=df_I,
+    #                 balance_aggregates=balance_aggregate,
+    #                 usage_category=usage_category,
+    #                 years=year,
+    #             )
+
+    # if per_years:
+
+    # for balance_aggregate in data.balance_aggregates:
+
+    #     for energy_source in data.energy_sources:
+
+    #         for usage_category in data.usage_categories:
+
+    #             name, key = get_name_and_key(
+    #                 balance_aggregate.replace(" ", "_"),
+    #                 usage_category.replace(" ", "_"),
+    #                 energy_source.replace(" ", "_"),
+    #                 str(data.years[0])[2:],
+    #                 str(data.years[-1])[2:],
+    #                 data_type="Entwicklung",
+    #                 year="",
+    #                 key="YEARS",
+    #             )
+
+    #             # Unstack col idx to row idx, except provinces
+    #             df_I = data.frame.loc[
+    #                 IDX[balance_aggregate],
+    #                 IDX[:, energy_source, usage_category, data.years],
+    #             ].unstack("PROV")
+
+    #             df_I = add_sums(df=df_I, drop_cols=["UC", "ES"])
+
+    #             self.add_data_per_year(
+    #                 data=data,
+    #                 name=name,
+    #                 key=key[:-1],
+    #                 frame=df_I,
+    #                 balance_aggregates=balance_aggregate,
+    #                 usage_category=usage_category,
+    #                 energy_source=energy_source,
+    #             )
+
+    # return
 
     # __________________________________________________________________________
     #
@@ -541,39 +613,39 @@ class DataSet:
     # /////////////////////////////////////////////////////////////////////////
     # __________________________________________________________________________
 
-    @check_balance_aggregates_type
-    def add_res_data(
-        self, provinces: List, years: List, balance_aggregates: List,
-    ):
-        logging.getLogger().error("/" * 80)
+    # @check_balance_aggregates_type
+    # def add_res_data(
+    #     self, provinces: List, years: List, balance_aggregates: List,
+    # ):
+    #     logging.getLogger().error("/" * 80)
 
-        df = pickle.load(open(file_paths["db_pickles"] / "res.p", "rb"))
+    #     df = pickle.load(open(file_paths["db_pickles"] / "res.p", "rb"))
 
-        print("df head: \n", df.head())
+    #     print("df head: \n", df.head())
 
-        df = slice_pickled_res_df(
-            df=df,
-            provinces=provinces,
-            balance_aggregates=balance_aggregates,
-            years=years,
-        )
+    #     df = slice_pickled_res_df(
+    #         df=df,
+    #         provinces=provinces,
+    #         balance_aggregates=balance_aggregates,
+    #         years=years,
+    #     )
 
-        # data = Data(
-        #     # frame=frame,
-        #     unit="TJ",
-        #     balance_aggregates=balance_aggregates,
-        #     energy_sources=energy_sources,
-        #     energy_aggregates=energy_aggregates,
-        #     years=years,
-        #     provinces=provinces,
-        #     per_balance_aggregate=per_balance_aggregate,
-        #     per_energy_source=per_energy_source,
-        #     per_energy_aggregate=per_energy_aggregate,
-        #     per_years=per_years,
-        #     show_source_values_for_energy_aggregates=show_source_values_for_energy_aggregates,
-        # )
+    # data = Data(
+    #     # frame=frame,
+    #     unit="TJ",
+    #     balance_aggregates=balance_aggregates,
+    #     energy_sources=energy_sources,
+    #     energy_aggregates=energy_aggregates,
+    #     years=years,
+    #     provinces=provinces,
+    #     per_balance_aggregate=per_balance_aggregate,
+    #     per_energy_source=per_energy_source,
+    #     per_energy_aggregate=per_energy_aggregate,
+    #     per_years=per_years,
+    #     show_source_values_for_energy_aggregates=show_source_values_for_energy_aggregates,
+    # )
 
-        # print("df head: ", df.head())
+    # print("df head: ", df.head())
 
     # def add_nea_per_energy_source(
     #     self,

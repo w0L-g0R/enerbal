@@ -24,15 +24,13 @@ from enspect.conversion.energiebilanzen.utils import (
 )
 from enspect.paths import file_paths
 
-IDX = pd.IndexSlice
+from pandas import IndexSlice as IDX
 
 # //////////////////////////////////////////////////////////// CONVERT_EB_TO_DF
 
 
 @timeit
-def convert_energy_balances_to_dataframe(
-    last_year: int,
-):
+def convert_energy_balances_to_dataframe(last_year: int,):
     """
     Make sure energy balance files follow the name convention: prefix "EB" + provinces_name + year_start(last two digits only) + year_end(last two digits only) , connected with underlines, eg. EB_Bgl_88_18. Use the province abbrevations as given in enspect.settings!
     """

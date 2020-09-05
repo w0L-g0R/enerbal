@@ -23,7 +23,7 @@ def concat_generators(*args):
         yield from gen
 
 
-IDX = pd.IndexSlice
+from pandas import IndexSlice as IDX
 
 
 class Workbook:
@@ -48,6 +48,15 @@ class Workbook:
         # self.index_row_nr = 2
         self.height_info = 6
         self.width_df = 0
+
+    @staticmethod
+    def close_xlsx():
+
+        try:
+            os.system("TASKKILL /F /IM excel.exe")
+
+        except Exception:
+            print("No open excel file.")
 
     def launch(self):
         os.system(f"start EXCEL.EXE {self.filename}")
@@ -87,6 +96,7 @@ class Workbook:
         self,
         data: pd.DataFrame,
         sheet: Worksheet,
+        energy_aggregates_details: bool = True
         # scale: str = "absolute",
         # shares: str = None,
     ):
@@ -102,7 +112,7 @@ class Workbook:
 
             self.write_to_cells(ws=ws, df=df_sums_only, data=data)
 
-            if data.show_source_values_for_energy_aggregates:
+            if energy_aggregates_details:
 
                 self.update_next_empty_row(
                     ws=ws, up_shift=len(df_sums_only) + self.len_info
@@ -162,9 +172,7 @@ class Workbook:
 
     @staticmethod
     def update_next_empty_row(
-        ws: Worksheet,
-        down_shift: int = None,
-        up_shift: int = None,
+        ws: Worksheet, down_shift: int = None, up_shift: int = None,
     ):
 
         if down_shift is not None:

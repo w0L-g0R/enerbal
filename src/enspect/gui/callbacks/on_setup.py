@@ -18,7 +18,8 @@ from gui.app import app
 from gui.utils import show_callback_context
 from settings import chart_type_options, provinces, scale_options
 
-IDX = pd.IndexSlice
+from pandas import IndexSlice as IDX
+
 # _________________________________________________________________________
 # ///////////////////////////////////////////////////////////////// DISPATCH EL
 
@@ -36,12 +37,8 @@ IDX = pd.IndexSlice
 
 def create_on_setup(graph_id: str):
     @app.callback(
-        [
-            Output(f"{graph_id}-setup", "data"),
-        ],
-        [
-            Input(f"{graph_id}-btn-setup", "n_clicks"),
-        ],
+        [Output(f"{graph_id}-setup", "data"),],
+        [Input(f"{graph_id}-btn-setup", "n_clicks"),],
         [  # TAB
             State(f"tabs-{graph_id}", "active_tab"),
             # DATA
@@ -49,104 +46,35 @@ def create_on_setup(graph_id: str):
             # TIME
             State(f"active-years", "value"),
             # PROVINCE ACTIVE
-            State(
-                f"checklist-AT",
-                "value",
-            ),
-            State(
-                f"checklist-Bgd",
-                "value",
-            ),
-            State(
-                f"checklist-Ktn",
-                "value",
-            ),
-            State(
-                f"checklist-Noe",
-                "value",
-            ),
-            State(
-                f"checklist-Ooe",
-                "value",
-            ),
-            State(
-                f"checklist-Sbg",
-                "value",
-            ),
-            State(
-                f"checklist-Stk",
-                "value",
-            ),
-            State(
-                f"checklist-Tir",
-                "value",
-            ),
-            State(
-                f"checklist-Vbg",
-                "value",
-            ),
-            State(
-                f"checklist-Wie",
-                "value",
-            ),
+            State(f"checklist-AT", "value",),
+            State(f"checklist-Bgd", "value",),
+            State(f"checklist-Ktn", "value",),
+            State(f"checklist-Noe", "value",),
+            State(f"checklist-Ooe", "value",),
+            State(f"checklist-Sbg", "value",),
+            State(f"checklist-Stk", "value",),
+            State(f"checklist-Tir", "value",),
+            State(f"checklist-Vbg", "value",),
+            State(f"checklist-Wie", "value",),
             # PROVINCE PLOT NAME
-            State(
-                f"plot-name-AT",
-                "value",
-            ),
-            State(
-                f"plot-name-Bgd",
-                "value",
-            ),
-            State(
-                f"plot-name-Ktn",
-                "value",
-            ),
-            State(
-                f"plot-name-Noe",
-                "value",
-            ),
-            State(
-                f"plot-name-Ooe",
-                "value",
-            ),
-            State(
-                f"plot-name-Sbg",
-                "value",
-            ),
-            State(
-                f"plot-name-Stk",
-                "value",
-            ),
-            State(
-                f"plot-name-Tir",
-                "value",
-            ),
-            State(
-                f"plot-name-Vbg",
-                "value",
-            ),
-            State(
-                f"plot-name-Wie",
-                "value",
-            ),
+            State(f"plot-name-AT", "value",),
+            State(f"plot-name-Bgd", "value",),
+            State(f"plot-name-Ktn", "value",),
+            State(f"plot-name-Noe", "value",),
+            State(f"plot-name-Ooe", "value",),
+            State(f"plot-name-Sbg", "value",),
+            State(f"plot-name-Stk", "value",),
+            State(f"plot-name-Tir", "value",),
+            State(f"plot-name-Vbg", "value",),
+            State(f"plot-name-Wie", "value",),
             # TITLE
             # State(f"{graph_id}-title", "value",),
             # SCALE
-            State(
-                f"{graph_id}-scale",
-                "value",
-            ),
+            State(f"{graph_id}-scale", "value",),
             # INDEX YEAR
-            State(
-                f"{graph_id}-index-year",
-                "value",
-            ),
+            State(f"{graph_id}-index-year", "value",),
             # AGGREGATE
-            State(
-                f"{graph_id}-aggregate-eb",
-                "value",
-            ),
+            State(f"{graph_id}-aggregate-eb", "value",),
             # ENERGY SOURCE
             State(f"{graph_id}-energy-sources", "value"),
             # UNIT

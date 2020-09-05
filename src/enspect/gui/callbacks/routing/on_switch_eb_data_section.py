@@ -8,7 +8,7 @@ from dash.exceptions import PreventUpdate
 from gui.app import app
 from gui.utils import show_callback_context
 
-IDX = pd.IndexSlice
+from pandas import IndexSlice as IDX
 
 
 def callback_return_on_switch_eb_data_section(
@@ -34,9 +34,7 @@ def create_on_switch_eb_data_section(graph_id: str):
             Output(f"idx-sector-energy-{graph_id}", "style"),
             Output(f"idx-renewables-{graph_id}", "style"),
         ],
-        [
-            Input(f"{graph_id}-data-section", "value"),
-        ],
+        [Input(f"{graph_id}-data-section", "value"),],
     )
     def on_switch_eb_data_section(data_section):
 

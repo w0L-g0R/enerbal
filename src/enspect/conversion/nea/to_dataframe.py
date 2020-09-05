@@ -17,13 +17,11 @@ from enspect.conversion.nea.utils import (
 from enspect.paths import file_paths
 from enspect.utils import timeit
 
-IDX = pd.IndexSlice
+from pandas import IndexSlice as IDX
 
 
 @timeit
-def convert_nea_to_dataframe(
-    last_year: int,
-):
+def convert_nea_to_dataframe(last_year: int,):
 
     # //////////////////////////////////////////////////// CREATE MULTI INDEX
 
@@ -44,8 +42,7 @@ def convert_nea_to_dataframe(
     files = list(file_paths["files_nea"].glob("*.xlsx"))
 
     write_to_log_file(
-        log_file=file_paths["conversion_logs"] / "nutzenergieanalyse.log",
-        files=files,
+        log_file=file_paths["conversion_logs"] / "nutzenergieanalyse.log", files=files,
     )
 
     for file in files:
@@ -95,11 +92,7 @@ def convert_nea_to_dataframe(
                     _sector = sheets[nea_year].iloc[starting_row, 0]
 
                     logging.getLogger().warning(
-                        "{}{}-Sector: {}".format(
-                            "\t" * 4,
-                            province,
-                            sector,
-                        )
+                        "{}{}-Sector: {}".format("\t" * 4, province, sector,)
                     )
 
                     # Extract sector data from sheet

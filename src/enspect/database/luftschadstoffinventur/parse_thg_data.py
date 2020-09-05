@@ -8,7 +8,7 @@ import pandas as pd
 import PyPDF2
 import xlwings as xw
 
-IDX = pd.IndexSlice
+from pandas import IndexSlice as IDX
 
 
 def chunks(lst, n):

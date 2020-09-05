@@ -9,7 +9,7 @@
 
 # from gui.app import app
 # from gui.utils import show_callback_context
-# IDX = pd.IndexSlice
+# from pandas import IndexSlice as IDX
 
 
 # def create_on_switch_axes(graph_id: str):

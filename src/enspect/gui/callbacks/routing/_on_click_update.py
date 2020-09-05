@@ -8,7 +8,8 @@ from dash.exceptions import PreventUpdate
 from gui.app import app
 from gui.utils import show_callback_context
 
-IDX = pd.IndexSlice
+from pandas import IndexSlice as IDX
+
 # _________________________________________________________________________
 # ///////////////////////////////////////////////////////////////// DISPATCH EL
 
@@ -30,9 +31,7 @@ def create_on_click_update(graph_id: str):
             # Output(f"{graph_id}-clicked-thg-update", "data"),
             # Output(f"{graph_id}-clicked-stats-update", "data"),
         ],
-        [
-            Input(f"btn-plot-{graph_id}", "n_clicks"),
-        ],
+        [Input(f"btn-plot-{graph_id}", "n_clicks"),],
         [
             State(f"tabs-{graph_id}", "active_tab"),
             State(f"data-section-{graph_id}", "value"),

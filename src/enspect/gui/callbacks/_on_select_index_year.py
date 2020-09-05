@@ -9,18 +9,14 @@ from dash.exceptions import PreventUpdate
 from gui.app import app
 from gui.utils import show_callback_context
 
-IDX = pd.IndexSlice
+from pandas import IndexSlice as IDX
 
 
 def create_on_select_index_year(graph_id: str):
     @app.callback(
         Output(f"{graph_id}-scale", "marks"),
-        [
-            Input(f"{graph_id}-index-year", "value"),
-        ],
-        [
-            State(f"active-years", "value"),
-        ],
+        [Input(f"{graph_id}-index-year", "value"),],
+        [State(f"active-years", "value"),],
     )
     def on_select_index_year(index_year: str, active_years: List):
 

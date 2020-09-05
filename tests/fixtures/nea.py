@@ -35,7 +35,7 @@ def test_nea_workbook():
         else:
             del wb.book[sheet]
 
-    wb.add_sheets(["STACKED_UC", "STACKED_BAGGS", "STACKED_ES", "YEARS"])
+    wb.add_sheets(["UC_PER_YEAR", "BAGGS_PER_YEAR", "ES_PER_YEAR", "YEARS"])
 
     wb.save()
 
@@ -70,7 +70,7 @@ def test_nea_usage_categories():
 # ////////////////////////////////////////////////////////////////// B-SECTORS
 @pytest.fixture(scope="session")
 def test_nea_balance_aggregates():
-    return [
+    fxt = [
         "Gesamt (ohne E1 - E7)",
         "Produzierender Bereich Gesamt",
         "Transport Gesamt",
@@ -78,3 +78,4 @@ def test_nea_balance_aggregates():
         "Private Haushalte",
         "Landwirtschaft",
     ]
+    return [[x] for x in fxt]

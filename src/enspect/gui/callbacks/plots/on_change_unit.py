@@ -23,7 +23,7 @@ from pandas.core.common import flatten
 from settings import DEFAULT_CHART_CONFIG
 from utils import multiplicator
 
-IDX = pd.IndexSlice
+from pandas import IndexSlice as IDX
 
 
 def change_unit(scale: str, setup: Dict, energy_source: str = None, year: int = None):
@@ -35,11 +35,7 @@ def change_unit(scale: str, setup: Dict, energy_source: str = None, year: int = 
                 setup["data"]
                 .loc[
                     IDX[setup["row_index"]],
-                    IDX[
-                        setup["provinces"],
-                        energy_source,
-                        setup["years"],
-                    ],
+                    IDX[setup["provinces"], energy_source, setup["years"],],
                 ]
                 .fillna(0)
             )
@@ -47,13 +43,7 @@ def change_unit(scale: str, setup: Dict, energy_source: str = None, year: int = 
         if "ErnRL" in setup["data_section"]:
             data_slice = (
                 setup["data"]
-                .loc[
-                    IDX[setup["row_index"]],
-                    IDX[
-                        setup["provinces"],
-                        setup["years"],
-                    ],
-                ]
+                .loc[IDX[setup["row_index"]], IDX[setup["provinces"], setup["years"],],]
                 .fillna(0)
             )
 
@@ -85,11 +75,7 @@ def change_unit(scale: str, setup: Dict, energy_source: str = None, year: int = 
                 setup["data"]
                 .loc[
                     IDX[setup["row_index"]],
-                    IDX[
-                        setup["provinces"],
-                        setup["energy_sources"],
-                        year,
-                    ],
+                    IDX[setup["provinces"], setup["energy_sources"], year,],
                 ]
                 .fillna(0)
             )
@@ -97,13 +83,7 @@ def change_unit(scale: str, setup: Dict, energy_source: str = None, year: int = 
         if "ErnRL" in setup["data_section"]:
             data_slice = (
                 setup["data"]
-                .loc[
-                    IDX[setup["row_index"]],
-                    IDX[
-                        setup["provinces"],
-                        year,
-                    ],
-                ]
+                .loc[IDX[setup["row_index"]], IDX[setup["provinces"], year,],]
                 .fillna(0)
             )
 

@@ -23,7 +23,7 @@ from pandas.core.common import flatten
 from settings import DEFAULT_CHART_CONFIG
 from utils import multiplicator
 
-IDX = pd.IndexSlice
+from pandas import IndexSlice as IDX
 
 
 def rotate_axes(setup: dict):
@@ -56,10 +56,7 @@ def rotate_axes(setup: dict):
         # fig = go.Figure(dict_of_fig)
 
         fig.update_layout(
-            xaxis=dict(
-                title=figure["layout"]["yaxis"]["title"]["text"],
-                tickangle=0,
-            ),
+            xaxis=dict(title=figure["layout"]["yaxis"]["title"]["text"], tickangle=0,),
             yaxis=dict(
                 title=figure["layout"]["xaxis"]["title"]["text"],
                 # categoryorder="array",

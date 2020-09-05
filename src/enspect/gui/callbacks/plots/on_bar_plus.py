@@ -23,7 +23,7 @@ from pandas.core.common import flatten
 from settings import DEFAULT_CHART_CONFIG
 from utils import multiplicator
 
-IDX = pd.IndexSlice
+from pandas import IndexSlice as IDX
 
 
 def on_bar_plus(setup: dict):
@@ -54,10 +54,7 @@ def on_bar_plus(setup: dict):
         fig = go.Figure(dict_of_fig)
 
         fig.update_layout(
-            xaxis=dict(
-                title=figure["layout"]["yaxis"]["title"]["text"],
-                tickangle=0,
-            ),
+            xaxis=dict(title=figure["layout"]["yaxis"]["title"]["text"], tickangle=0,),
             yaxis=dict(
                 title=figure["layout"]["xaxis"]["title"]["text"],
                 # categoryorder="array",
@@ -81,8 +78,6 @@ def on_bar_plus(setup: dict):
             #     ]
             # )
         )
-        graphs.append(
-            html.Hr(style={"background-color": "lightblue"}),
-        )
+        graphs.append(html.Hr(style={"background-color": "lightblue"}),)
 
     return graphs, setup

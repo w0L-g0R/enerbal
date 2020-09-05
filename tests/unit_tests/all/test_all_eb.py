@@ -6,6 +6,7 @@ import pytest
 
 @pytest.mark.dependency()
 def test_all_eb(
+    test_data_instance,
     test_dataset,
     test_provinces,
     test_eb_workbook,
@@ -22,10 +23,12 @@ def test_all_eb(
     from tests.unit_tests.eb.test_eb_baggs_per_year import test_eb_baggs_per_year
 
     test_eb_baggs_per_year(
+        test_data_instance,
         test_dataset,
         test_provinces,
         test_eb_workbook,
         test_eb_balance_aggregates_sectors,
+        test_eb_umwandlungsausstoss_and_umwandlungseinsatz,
         test_eb_energy_source_elektrische_energie,
         test_eb_energy_source_gesamtbilanz,
         test_write_to_xlsx,
@@ -33,6 +36,7 @@ def test_all_eb(
     from tests.unit_tests.eb.test_eb_eggs_per_year import test_eb_eggs_per_year
 
     test_eb_eggs_per_year(
+        test_data_instance,
         test_dataset,
         test_eb_workbook,
         test_provinces,
@@ -41,9 +45,10 @@ def test_all_eb(
         test_eb_balance_aggregates_sectors,
         test_write_to_xlsx,
     )
-    from tests.unit_tests.eb.test_eb_es_over_years import test_eb_es_over_years
+    from tests.unit_tests.eb.test_eb_years import test_eb_years
 
-    test_eb_es_over_years(
+    test_eb_years(
+        test_data_instance,
         test_dataset,
         test_provinces,
         test_eb_workbook,

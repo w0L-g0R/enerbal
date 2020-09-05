@@ -26,7 +26,7 @@ from pandas.core.common import flatten
 from settings import DEFAULT_CHART_CONFIG
 from utils import multiplicator
 
-IDX = pd.IndexSlice
+from pandas import IndexSlice as IDX
 
 
 def create_on_plot(graph_id: str):
@@ -35,9 +35,7 @@ def create_on_plot(graph_id: str):
         Output(f"{graph_id}-box", "children"),
         # Output(f"{graph_id}-plots", "data"),
         # ],
-        [
-            Input(f"{graph_id}-update", "data"),
-        ],
+        [Input(f"{graph_id}-update", "data"),],
         [
             # ]
             State(f"{graph_id}-setup", "data"),
@@ -82,9 +80,7 @@ def create_on_plot(graph_id: str):
             with open(setup["graph_id"] + ".p", "rb") as file:
                 setup = pickle.load(file)
 
-            graphs, setup = rotate_axes(
-                setup=setup,
-            )
+            graphs, setup = rotate_axes(setup=setup,)
 
         if update["type"] == "scale":
 

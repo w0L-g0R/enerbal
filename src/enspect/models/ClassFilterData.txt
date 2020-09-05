@@ -1,0 +1,58 @@
+
+# NOTE:code_source=https://stackoverflow.com/questions/58309731/doing-class-objects-filter-pattern-in-python
+
+
+{% comment %} 
+DATA = [
+    Data(
+        name="BTU_ONE_12",
+        unit="TJ",
+        years=[2017, 2018],
+        _type="per_years"
+    ),
+    Data(
+        name="BTU_TWO_222",
+        unit="TJ",
+        years=[2017, 2018],
+        _type="per_sectors"
+    ),
+    Data(
+        name="BTU_ONE_123",
+        unit="GWh",
+        years=[2000],
+        _type="per_years"
+    )
+]
+
+fdata = FilterData(DATA)
+
+p = [v.unit for v in fdata.filter(name="BTU_ONE_12")]
+print('p: ', p)
+
+assert [v["id"] for v in fdata.filter(color="red")] == [1, 3]
+assert [v["id"] for v in fdata.filter(id__gt=2)] == [3, 4, 5, 6]
+assert [v["id"] for v in fdata.filter(color__startswith="gr")] == [5, 6]
+
+fmgr = DataManager(DATA)
+
+p = [v.name for v in fmgr.objects.filter(unit="TJ")]
+p = [v.name for v in fmgr.objects.all()]
+print('p: ', p)
+
+assert [v["id"] for v in fmgr.objects.filter(name="paul")] == [3]
+assert [v["id"] for v in fmgr.objects.filter(color="red")] == [1, 3]
+assert [v["id"] for v in fmgr.objects.filter(id__gt=2)] == [3, 4, 5, 6]
+assert [v["id"] for v in fmgr.objects.filter(color__startswith="gr")] == [5, 6]
+assert [v["id"] for v in fmgr.objects.filter(
+    color__startswith="gr", id__lt=6)] == [5]
+assert [v["id"] for v in fmgr.objects.filter(
+    color__startswith="gr", id__lt=6)] == [5]
+
+assert [v["id"] for v in fmgr.objects.filter(
+    color__startswith="gr").filter(id__lt=6)] == [5]
+
+assert fmgr.objects.filter(
+    color__startswith="gr").filter(id__lt=6).count() == 1
+assert fmgr.objects.filter(id__gt=2).count() == 4
+assert fmgr.objects.count() == 6
+assert [v["id"] for v in fmgr.objects.all()] == list(range(1, 7)) {% endcomment %}

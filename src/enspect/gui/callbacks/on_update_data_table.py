@@ -12,7 +12,7 @@ from gui.app import app
 from gui.assets.AEA_colors import provinces_color_table
 from gui.utils import show_callback_context
 
-IDX = pd.IndexSlice
+from pandas import IndexSlice as IDX
 
 
 # _________________________________________________________________________
@@ -71,8 +71,7 @@ def create_on_update_data_table(graph_id: str):
         ],
     )
     def on_update_data_table(
-        eev_data_A,
-        eev_data_B,
+        eev_data_A, eev_data_B,
     ):
 
         # Log callback information

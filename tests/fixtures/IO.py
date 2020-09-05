@@ -6,6 +6,7 @@ from pprint import pprint
 import pytest
 
 from enspect.models.dataset import DataSet
+from enspect.models.data import Data
 from enspect.models.workbook import Workbook
 from enspect.paths import file_paths
 
@@ -29,10 +30,12 @@ def print_inside_tests(*args, **kwargs):
 
 @pytest.fixture(scope="session")
 def test_dataset():
-    """
-    Pass the templates filesystem from src to tests
-    """
     return DataSet(name=f"Testset", file_paths=file_paths)
+
+
+@pytest.fixture(scope="session")
+def test_data_instance():
+    return Data()
 
 
 @pytest.fixture(scope="session")
