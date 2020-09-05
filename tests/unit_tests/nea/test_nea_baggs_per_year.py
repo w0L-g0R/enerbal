@@ -24,14 +24,14 @@ def test_nea_baggs_per_year(
         usage_categories=test_nea_usage_categories,
         years=years,
         provinces=test_provinces,
-        per_balance_aggregate=True,
+        stacked_balance_aggregates=True,
         is_nea=True,
     )
 
     test_dataset.add_data(data=test_data_instance)
 
     test_data_objects = [
-        _data for _data in test_dataset.objects.filter(per_balance_aggregate=True)
+        _data for _data in test_dataset.objects.filter(stacked_balance_aggregates=True)
     ]
 
     test_write_to_xlsx(

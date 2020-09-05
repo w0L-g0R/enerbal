@@ -57,10 +57,7 @@ def create_control_box_layout(graph_id: str):
                                     ),
                                     dbc.Col(
                                         width=2,
-                                        style={
-                                            "margin-right": 12,
-                                            "margin-top": 12,
-                                        },
+                                        style={"margin-right": 12, "margin-top": 12,},
                                         children=[get_index_year(graph_id=graph_id)],
                                     ),
                                 ],

@@ -12,6 +12,7 @@ from tests.fixtures.eb import *
 from tests.fixtures.IO import *
 from tests.fixtures.nea import *
 from tests.fixtures.res import *
+from tests.fixtures.thg import *
 
 
 @pytest.fixture(scope="session")

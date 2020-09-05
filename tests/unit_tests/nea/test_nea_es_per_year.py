@@ -24,14 +24,14 @@ def test_nea_es_per_year(
         usage_categories=test_nea_usage_categories,
         years=years,
         provinces=test_provinces,
-        per_energy_source=True,
+        stacked_energy_sources=True,
         is_nea=True,
     )
 
     test_dataset.add_data(data=test_data_instance)
 
     test_data_objects = [
-        _data for _data in test_dataset.objects.filter(per_energy_source=True)
+        _data for _data in test_dataset.objects.filter(stacked_energy_sources=True)
     ]
 
     test_write_to_xlsx(

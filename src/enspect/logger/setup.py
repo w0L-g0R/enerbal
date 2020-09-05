@@ -54,18 +54,10 @@ def setup_logging(
         "version": 1,
         "disable_existing_loggers": False,
         "filters": {
-            "debug_only": {
-                "()": DebugFilter,
-            },
-            "info_only": {
-                "()": InfoFilter,
-            },
-            "warning_only": {
-                "()": WarningFilter,
-            },
-            "critical_only": {
-                "()": CriticalFilter,
-            },
+            "debug_only": {"()": DebugFilter,},
+            "info_only": {"()": InfoFilter,},
+            "warning_only": {"()": WarningFilter,},
+            "critical_only": {"()": CriticalFilter,},
         },
         "formatters": {
             "standard": {"format": LOG_OUTPUT_STANDARD, "datefmt": LOG_DATE_FORMAT},
@@ -73,10 +65,7 @@ def setup_logging(
                 "format": LOG_OUTPUT_STANDARD_NO_TIME,
                 "datefmt": LOG_DATE_FORMAT,
             },
-            "logfile": {
-                "format": LOG_FILE,
-                "datefmt": LOG_DATE_FORMAT,
-            },
+            "logfile": {"format": LOG_FILE, "datefmt": LOG_DATE_FORMAT,},
         },
         "handlers": {
             "null_out": {"class": "logging.NullHandler"},
@@ -121,10 +110,7 @@ def setup_logging(
             #     "level": "WARNING",
             # },
         },
-        "root": {
-            "level": "DEBUG",
-            "handlers": [],
-        },
+        "root": {"level": "DEBUG", "handlers": [],},
         # "interface": {
         #     "level": "INFO",
         #     "handlers": ["info_html_out", "warning_html_out"],

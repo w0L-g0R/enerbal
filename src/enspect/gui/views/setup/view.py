@@ -29,11 +29,7 @@ def create_eb_graph_view(graph_id: str):
         children=[
             xaxis_type_row(graph_id=graph_id),
             html.Br(),
-            dbc.CardFooter(
-                children=[
-                    eb_aggregate_row(graph_id=graph_id),
-                ]
-            ),
+            dbc.CardFooter(children=[eb_aggregate_row(graph_id=graph_id),]),
             dbc.CardFooter(
                 children=[
                     eb_data_section_row(graph_id=graph_id),
@@ -96,8 +92,7 @@ def create_setup_layout(graph_id: str, title: str):
                                     dbc.Tabs(
                                         [
                                             dbc.Tab(
-                                                label="EB",
-                                                tab_id=f"tab-eb-{graph_id}",
+                                                label="EB", tab_id=f"tab-eb-{graph_id}",
                                             ),
                                             dbc.Tab(
                                                 label="NEA",
@@ -122,9 +117,7 @@ def create_setup_layout(graph_id: str, title: str):
                     ),
                 ]
             ),
-            dbc.CardBody(
-                id=f"{graph_id}-content",
-            ),
+            dbc.CardBody(id=f"{graph_id}-content",),
             create_control_box_layout(graph_id=graph_id),
         ],
     )

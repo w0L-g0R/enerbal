@@ -17,9 +17,7 @@ def create_table_layout(graph_id: str):
                         children=[
                             dbc.Col(
                                 # width=7,
-                                children=[
-                                    html.H5(graph_id, className="card-title"),
-                                ],
+                                children=[html.H5(graph_id, className="card-title"),],
                             ),
                             dbc.Col(
                                 # width={"offset": 7, "size": 5},
@@ -62,10 +60,7 @@ def create_table_layout(graph_id: str):
                     ),
                 ]
             ),
-            dbc.CardBody(
-                id=f"table-{graph_id}",
-                children=[],
-            ),
+            dbc.CardBody(id=f"table-{graph_id}", children=[],),
         ],
     )
 

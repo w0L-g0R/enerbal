@@ -24,14 +24,14 @@ def test_nea_uc_per_year(
         usage_categories=test_nea_usage_categories,
         years=years,
         provinces=test_provinces,
-        per_usage_category=True,
+        stacked_usage_categories=True,
         is_nea=True,
     )
 
     test_dataset.add_data(data=test_data_instance)
 
     test_data_objects = [
-        _data for _data in test_dataset.objects.filter(per_usage_category=True)
+        _data for _data in test_dataset.objects.filter(stacked_usage_categories=True)
     ]
 
     test_write_to_xlsx(

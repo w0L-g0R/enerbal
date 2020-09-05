@@ -14,31 +14,11 @@ def create_graph_layout(graph_id: str):
         button_group = dbc.ButtonGroup(
             # style={"margin-right": 32},
             children=[
-                dbc.Button(
-                    "Table A",
-                    color="success",
-                    id=f"table-A-{graph_id}",
-                ),
-                dbc.Button(
-                    "Table B",
-                    color="success",
-                    id=f"table-B-{graph_id}",
-                ),
-                dbc.Button(
-                    "Graph A",
-                    color="success",
-                    id=f"show-A-{graph_id}",
-                ),
-                dbc.Button(
-                    "Graph B",
-                    color="success",
-                    id=f"show-B-{graph_id}",
-                ),
-                dbc.Button(
-                    "Graph A/B",
-                    color="success",
-                    id=f"show-{graph_id}",
-                ),
+                dbc.Button("Table A", color="success", id=f"table-A-{graph_id}",),
+                dbc.Button("Table B", color="success", id=f"table-B-{graph_id}",),
+                dbc.Button("Graph A", color="success", id=f"show-A-{graph_id}",),
+                dbc.Button("Graph B", color="success", id=f"show-B-{graph_id}",),
+                dbc.Button("Graph A/B", color="success", id=f"show-{graph_id}",),
                 dbc.Button("Excel", color="success"),
             ],
         )
@@ -46,13 +26,7 @@ def create_graph_layout(graph_id: str):
         width = 520
         button_group = dbc.ButtonGroup(
             # style={"margin": 0},
-            children=[
-                dbc.Button(
-                    "Update",
-                    color="success",
-                    id=f"update-{graph_id}",
-                ),
-            ],
+            children=[dbc.Button("Update", color="success", id=f"update-{graph_id}",),],
         )
 
     return dbc.Card(
@@ -66,9 +40,7 @@ def create_graph_layout(graph_id: str):
                         children=[
                             dbc.Col(
                                 # width=7,
-                                children=[
-                                    html.H5(graph_id, className="card-title"),
-                                ],
+                                children=[html.H5(graph_id, className="card-title"),],
                             ),
                             dbc.Col(
                                 # width={"offset": 7, "size": 5},

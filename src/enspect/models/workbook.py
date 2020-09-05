@@ -102,7 +102,7 @@ class Workbook:
     ):
         ws = self.book[sheet]
 
-        if data.per_energy_aggregate:
+        if data.stacked_energy_aggregates:
 
             df = data.frame
 
@@ -210,7 +210,7 @@ class Workbook:
     def reset_empty_col(ws: Worksheet):
         ws.next_empty_col = 1
 
-    # if data.per_energy_aggregate:
+    # if data.stacked_energy_aggregates:
 
     #     for year, years_dict in dfs.items():
 

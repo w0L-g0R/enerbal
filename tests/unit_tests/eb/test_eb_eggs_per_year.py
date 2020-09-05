@@ -23,14 +23,14 @@ def test_eb_eggs_per_year(
         balance_aggregates=test_eb_balance_aggregates_sectors,
         years=years,
         provinces=test_provinces,
-        per_energy_aggregate=True,
+        stacked_energy_aggregates=True,
         is_eb=True,
     )
 
     test_dataset.add_data(data=test_data_instance)
 
     test_data_objects = [
-        _data for _data in test_dataset.objects.filter(per_energy_aggregate=True)
+        _data for _data in test_dataset.objects.filter(stacked_energy_aggregates=True)
     ]
 
     test_write_to_xlsx(

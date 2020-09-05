@@ -63,17 +63,18 @@ class Data:
     energy_sources: List = None  # e.g. "Steinkohle"
     energy_aggregates: List = None  # e.g. "Fossil-Fest"
     usage_categories: List = None
-    emittents: List = None
+    emittent_sinks: List = None
     years: List = None
     provinces: List = None
     stats: List = None
 
     # Data classification
-    per_balance_aggregate: bool = False
-    per_energy_source: bool = False
-    per_energy_aggregate: bool = False
-    per_usage_category: bool = False
+    stacked_balance_aggregates: bool = False
+    stacked_energy_sources: bool = False
+    stacked_energy_aggregates: bool = False
+    stacked_usage_categories: bool = False
     per_years: bool = False
+    per_emittent_sink: bool = False
     energy_aggregates_sum_only: bool = False
     is_eb: bool = False
     is_res: bool = False
@@ -124,9 +125,9 @@ class Data:
             #     energy_aggregates=self.energy_aggregates,
             #     years=self.years,
             #     provinces=self.provinces,
-            #     per_balance_aggregate=self.per_balance_aggregate,
-            #     per_energy_source=self.per_energy_source,
-            #     per_energy_aggregate=self.per_energy_aggregate,
+            #     stacked_balance_aggregates=self.stacked_balance_aggregates,
+            #     stacked_energy_sources=self.stacked_energy_sources,
+            #     stacked_energy_aggregates=self.stacked_energy_aggregates,
             #     per_years=self.per_years,
             #     show_source_values_for_energy_aggregates=self.show_source_values_for_energy_aggregates,
             # )
@@ -142,16 +143,19 @@ class Data:
         years: List,
         balance_aggregates: List = None,
         energy_sources: List = None,
+        emittent_shares: List = None,
         energy_aggregates: List = None,
         usage_categories: List = None,
-        per_balance_aggregate: bool = False,
-        per_energy_source: bool = False,
-        per_energy_aggregate: bool = False,
-        per_usage_category: bool = False,
+        stacked_balance_aggregates: bool = False,
+        stacked_energy_sources: bool = False,
+        stacked_energy_aggregates: bool = False,
+        stacked_usage_categories: bool = False,
         per_years: bool = False,
+        stacked_emittent_shares: bool = False,
         is_res: bool = False,
         is_eb: bool = False,
         is_nea: bool = False,
+        is_thg: bool = False,
         unit: str = "TJ",
     ):
 
@@ -209,8 +213,29 @@ class Data:
                 IDX[provinces, energy_sources, usage_categories, years],
             ].copy()
 
+        elif is_thg:
+
+            df = (
+                pickle.load(open(file_paths["db_pickles"] / "thg.p", "rb")).sort_index(
+                    axis=1, level=0
+                )
+                # .swaplevel(0, 2, axis=1)
+            )
+
+            balance_aggregates = list(flatten(balance_aggregates))
+
+            # Filter aggregates
+            df = df.loc[
+                IDX[balance_aggregates], IDX[provinces, emittent_shares, years],
+            ].copy()
+
+            unit = "kton CO2-Eq."
+
+            energy_sources = emittent_shares
+
         # Lex-sort for performance (and warnings)
         df = df.copy().fillna(0).sort_index()
+        print("df: ", df)
 
         # TODO: Unit check for RES and STATS?
 
@@ -218,18 +243,21 @@ class Data:
         self.unit = unit
         self.balance_aggregates = balance_aggregates
         self.energy_sources = energy_sources
+        self.emittent_shares = emittent_shares
         self.energy_aggregates = energy_aggregates
         self.usage_categories = usage_categories
         self.years = years
         self.provinces = provinces
-        self.per_balance_aggregate = per_balance_aggregate
-        self.per_energy_source = per_energy_source
-        self.per_energy_aggregate = per_energy_aggregate
+        self.stacked_balance_aggregates = stacked_balance_aggregates
+        self.stacked_energy_sources = stacked_energy_sources
+        self.stacked_energy_aggregates = stacked_energy_aggregates
         self.per_years = per_years
-        self.per_usage_category = per_usage_category
+        self.stacked_usage_categories = stacked_usage_categories
+        self.stacked_emittent_shares = stacked_emittent_shares
         self.is_eb = is_eb
         self.is_res = is_res
         self.is_nea = is_nea
+        self.is_thg = is_thg
 
         return
 
@@ -319,7 +347,7 @@ class UnknownOperator(Exception):
 #    def xlsx_formatted(self):
 
 # dfs = {}
-# if self.per_balance_aggregate:
+# if self.stacked_balance_aggregates:
 
 #     for year in self.years:
 #         dfs[year] = {}
@@ -346,7 +374,7 @@ class UnknownOperator(Exception):
 #             dfs[year][energy_source] = df
 
 # All energy aggregates
-# elif self.per_energy_aggregate:
+# elif self.stacked_energy_aggregates:
 
 #     for year in self.years:
 #         dfs[year] = {}

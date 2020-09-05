@@ -31,8 +31,7 @@ def create_graph_setup_layout(graph_id: str, title: str):
                                     dbc.Tabs(
                                         [
                                             dbc.Tab(
-                                                label="EB",
-                                                tab_id=f"tab-eb-{graph_id}",
+                                                label="EB", tab_id=f"tab-eb-{graph_id}",
                                             ),
                                             dbc.Tab(
                                                 label="NEA",
@@ -57,9 +56,7 @@ def create_graph_setup_layout(graph_id: str, title: str):
                     ),
                 ]
             ),
-            dbc.CardBody(
-                id=f"{graph_id}-content",
-            ),
+            dbc.CardBody(id=f"{graph_id}-content",),
         ],
     )
 

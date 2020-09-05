@@ -10,9 +10,7 @@ from enspect.logger.setup import setup_logging
 
 
 def create_nea_col_midx(
-    last_year: int,
-    sectors: List,
-    energy_usage_types: List,
+    last_year: int, sectors: List, energy_usage_types: List,
 ) -> pd.MultiIndex:
 
     years = [x for x in range(1993, last_year + 1, 1)]
@@ -30,10 +28,7 @@ def fetch_from_xlsx(file: Path):
     # Extract all sheets (=energieträger) from file at once and save them
     # to a dictionary
     sheets = pd.read_excel(
-        io=str(Path(file)),
-        sheet_name=None,
-        na_filter=False,
-        usecols="A:I",
+        io=str(Path(file)), sheet_name=None, na_filter=False, usecols="A:I",
     )
 
     # Delete unnecessary sheets

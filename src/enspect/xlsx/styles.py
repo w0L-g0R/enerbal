@@ -253,11 +253,7 @@ def fit_column_size(ws, index_column_nr, max_column_nr):
     # Fit column size
     for col in range(ws.min_column, ws.max_column):
         dim_holder[get_column_letter(col)] = ColumnDimension(
-            ws,
-            min=col,
-            max=col,
-            auto_size=True,
-            bestFit=True,
+            ws, min=col, max=col, auto_size=True, bestFit=True,
         )
 
     return dim_holder

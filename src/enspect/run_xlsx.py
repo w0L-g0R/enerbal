@@ -27,9 +27,7 @@ from enspect.paths import file_paths
 # ////////////////////////////////////////////////////////////////////// INPUTS
 
 setup_logging(
-    console_log_actived=True,
-    console_log_filter=None,
-    console_out_level=logging.DEBUG,
+    console_log_actived=True, console_log_filter=None, console_out_level=logging.DEBUG,
 )
 
 nea_energy_sources = [
@@ -89,9 +87,9 @@ ds.add_nea_data(
     usage_categories=nea_usage_categories,
     years=years,
     provinces=provinces,
-    # per_usage_category=True,
-    # per_balance_aggregate=True,
-    per_energy_source=True,
+    # stacked_usage_categories=True,
+    # stacked_balance_aggregates=True,
+    stacked_energy_sources=True,
     stacked_usage_category=True,
     # stacked_balance_aggregate=True,
     # stacked_energy_source=True,

@@ -96,14 +96,8 @@ def eb_aggregate_row(graph_id: str):
         style={"font-family": "Quicksand, sans-serif"},
         no_gutters=True,
         children=[
-            dbc.Col(
-                width=12,
-                children=[get_aggregate_eb(graph_id=graph_id)],
-            ),
-            dbc.Col(
-                width=12,
-                children=[get_energy_source(graph_id=graph_id)],
-            ),
+            dbc.Col(width=12, children=[get_aggregate_eb(graph_id=graph_id)],),
+            dbc.Col(width=12, children=[get_energy_source(graph_id=graph_id)],),
             # dbc.Col(
             # width=2, children=[get_energy_source_index(graph_id=graph_id)],
             # ),
@@ -116,14 +110,8 @@ def eb_data_section_row(graph_id: str):
         justify="center",
         # align="center",
         children=[
-            dbc.Col(
-                width=10,
-                children=[get_data_section(graph_id=graph_id)],
-            ),
-            dbc.Col(
-                width=2,
-                children=[get_energy_unit(graph_id=graph_id)],
-            ),
+            dbc.Col(width=10, children=[get_data_section(graph_id=graph_id)],),
+            dbc.Col(width=2, children=[get_energy_unit(graph_id=graph_id)],),
         ],
     )
 
@@ -315,10 +303,5 @@ def xaxis_type_row(graph_id: str):
     return dbc.Row(
         # style={"margin-top": 24},
         no_gutters=True,
-        children=[
-            dbc.Col(
-                width=12,
-                children=[get_xaxis_type(graph_id=graph_id)],
-            ),
-        ],
+        children=[dbc.Col(width=12, children=[get_xaxis_type(graph_id=graph_id)],),],
     )

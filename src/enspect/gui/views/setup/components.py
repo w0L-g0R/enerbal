@@ -198,11 +198,7 @@ def get_energy_source_index(graph_id: str):
     return dbc.FormGroup(
         children=[
             dbc.Label("Nummer", style=label_style),
-            dbc.Input(
-                placeholder="",
-                type="number",
-                id=f"{graph_id}-source-index",
-            ),
+            dbc.Input(placeholder="", type="number", id=f"{graph_id}-source-index",),
         ]
     )
 
@@ -215,22 +211,10 @@ def get_data_section(graph_id: str):
             dbc.RadioItems(
                 style={"font-size": 14},
                 options=[
-                    {
-                        "label": "EEV",
-                        "value": "EEV",
-                    },
-                    {
-                        "label": "Sektoren",
-                        "value": "Sektoren",
-                    },
-                    {
-                        "label": "Sektor Energie",
-                        "value": "Sektor Energie",
-                    },
-                    {
-                        "label": "ErnRL",
-                        "value": "ErnRL",
-                    },
+                    {"label": "EEV", "value": "EEV",},
+                    {"label": "Sektoren", "value": "Sektoren",},
+                    {"label": "Sektor Energie", "value": "Sektor Energie",},
+                    {"label": "ErnRL", "value": "ErnRL",},
                 ],
                 value="EEV",
                 id=f"{graph_id}-data-section",
@@ -299,11 +283,7 @@ def get_xaxis_type(graph_id: str):
     return html.Div(
         children=[
             dbc.Row(
-                children=[
-                    dbc.Col(
-                        children=dbc.Label("X-Achse", style=label_style),
-                    ),
-                ]
+                children=[dbc.Col(children=dbc.Label("X-Achse", style=label_style),),]
             ),
             dbc.Row(
                 style={

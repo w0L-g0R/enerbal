@@ -3,9 +3,7 @@ from gui.assets.logos import header_logo
 
 layout = html.Div(
     # "border-bottom": "1px lightblue solid"},
-    style={
-        "text-align": "center",
-    },
+    style={"text-align": "center",},
     children=[
         header_logo
         # html.H2("Analysis & Visualization"),

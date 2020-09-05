@@ -94,21 +94,13 @@ def timeit(method):
         # else:
         logging.getLogger().debug(
             "{}\t\nExecution time of {}: {} min {} sec\n{}".format(
-                "|" * 79,
-                method.__name__,
-                int(minutes),
-                round(seconds, 0),
-                "|" * 79,
+                "|" * 79, method.__name__, int(minutes), round(seconds, 0), "|" * 79,
             )
         )
 
         print(
             "{}\t\nExecution time of {}: {} min {} sec\n{}".format(
-                "|" * 79,
-                method.__name__,
-                int(minutes),
-                round(seconds, 0),
-                "|" * 79,
+                "|" * 79, method.__name__, int(minutes), round(seconds, 0), "|" * 79,
             )
         )
         return result

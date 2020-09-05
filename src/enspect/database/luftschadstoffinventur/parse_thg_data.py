@@ -11,12 +11,6 @@ import xlwings as xw
 from pandas import IndexSlice as IDX
 
 
-def chunks(lst, n):
-    """Yield successive n-sized chunks from lst."""
-    for i in range(0, len(lst), n):
-        yield lst[i : i + n]
-
-
 pages = 5
 p = Path("THG_2010.pdf")
 pdfFileObj = open(p, "rb")
@@ -51,14 +45,6 @@ emittents = [
 # # print('mytext: ', mytext.find("THG"))
 # mytext = mytext.split("\n")
 # # print('mytext: ', mytext)
-
-
-def is_float(value):
-    try:
-        float(value)
-        return True
-    except ValueError:
-        return False
 
 
 df_index = [

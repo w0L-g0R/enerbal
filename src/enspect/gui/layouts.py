@@ -22,12 +22,7 @@ def get_graph_layout(y_unit: str, x_unit: str, title: str, barmode: str = "relat
         modebar=dict(orientation="v"),
         barmode=barmode,
         showlegend=True,
-        legend=dict(
-            x=0,
-            y=-0.5,
-            xanchor="center",
-            yanchor="bottom",
-        ),
+        legend=dict(x=0, y=-0.5, xanchor="center", yanchor="bottom",),
         legend_orientation="h",
         # template="plotly_dark",
         margin=dict(l=0, r=24, t=top_margin, b=12),
