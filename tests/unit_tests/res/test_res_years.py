@@ -21,12 +21,14 @@ def test_res_years(
         years=years,
         provinces=test_provinces,
         is_res=True,
-        per_years=True,
+        timeseries=True,
     )
 
     test_dataset.add_data(data=test_data_instance)
 
-    test_data_objects = [_data for _data in test_dataset.objects.filter(per_years=True)]
+    test_data_objects = [
+        _data for _data in test_dataset.objects.filter(timeseries=True)
+    ]
 
     test_write_to_xlsx(
         wb=test_res_workbook,

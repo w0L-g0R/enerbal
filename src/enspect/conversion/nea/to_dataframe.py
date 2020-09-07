@@ -39,7 +39,7 @@ def convert_nea_to_dataframe(last_year: int,):
     # ////////////////////////////////////// COLLECT ENERGY BALANCES FILE PATHS
 
     # Array to store energy balance file paths as pathlib objects
-    files = list(file_paths["files_nea"].glob("*.xlsx"))
+    files = list(file_paths["folder_nea"].glob("*.xlsx"))
 
     write_to_log_file(
         log_file=file_paths["conversion_logs"] / "nutzenergieanalyse.log", files=files,
@@ -158,7 +158,7 @@ def convert_nea_to_dataframe(last_year: int,):
     nea_df = nea_df.unstack(level=["PROV", "ES", "UC", "YEAR"])
 
     # Remove existing file if exists
-    pickle_file = file_paths["db_pickles"] / Path("nea.p")
+    pickle_file = file_paths["pickle_nea"]
 
     if pickle_file.exists():
 

@@ -12,7 +12,6 @@ from pandas import IndexSlice as IDX
 from pandas.core.common import flatten
 
 from enspect.paths import file_paths
-from enspect.settings import unit_converter, file_paths
 from enspect.aggregates.eb import energy_aggregate_lookup
 
 
@@ -70,6 +69,11 @@ def add_total_per_col(df: pd.DataFrame):
 
 def check_balance_aggregates_type(func):
     def wrapper(*args, **kwargs):
+
+        # Break if is_stat:
+        if kwargs["is_stat"]:
+            func(*args, **kwargs)
+            return
 
         # Make sure balance_aggregates comes a list of list
         assert isinstance(

@@ -22,13 +22,15 @@ def test_thg_years(
         balance_aggregates=test_thg_balance_aggregates,
         years=years,
         provinces=test_provinces,
-        per_years=True,
+        timeseries=True,
         is_thg=True,
     )
 
     test_dataset.add_data(data=test_data_instance)
 
-    test_data_objects = [_data for _data in test_dataset.objects.filter(per_years=True)]
+    test_data_objects = [
+        _data for _data in test_dataset.objects.filter(timeseries=True)
+    ]
 
     test_write_to_xlsx(
         wb=test_thg_workbook, data_objects=test_data_objects, sheet_name="YEARS",

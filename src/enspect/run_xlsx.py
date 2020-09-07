@@ -93,7 +93,7 @@ ds.add_nea_data(
     stacked_usage_category=True,
     # stacked_balance_aggregate=True,
     # stacked_energy_source=True,
-    # per_years=per_years,
+    # timeseries=timeseries,
 )
 
 filename = Path.cwd() / "wings.xlsx"
@@ -169,7 +169,7 @@ for data in ds.objects:
 
 #         numerator=[
 #             data for data in ds.objects.filter(
-#                 name__contains=aggregate + "_Gesamtenergiebilanz", order="per_years")
+#                 name__contains=aggregate + "_Gesamtenergiebilanz", order="timeseries")
 #         ],
 
 #         denominator=[
@@ -192,7 +192,7 @@ for data in ds.objects:
 #     to_data=[
 #         data for data in ds.objects.filter(
 #             name__startswith="Bruttoinlandsverbrauch",
-#             order="per_years",
+#             order="timeseries",
 #             is_KPI=False
 #         )
 #     ],
@@ -220,7 +220,7 @@ for data in ds.objects:
 # ov_data = [
 #     v.unit
 #     for v in ds.objects.filter(
-#         # order="per_years",
+#         # order="timeseries",
 #         balance_aggregates__in=["Energetischer Endverbrauch"],
 #         # is_KPI=False
 #         # has_overlay=True

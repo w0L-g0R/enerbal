@@ -102,9 +102,10 @@ class Workbook:
     ):
         ws = self.book[sheet]
 
-        if data.stacked_energy_aggregates:
+        df = data.frame
 
-            df = data.frame
+        print("\n\nWRITE: \n", df)
+        if data.stacked_energy_aggregates:
 
             mask = df["ES"].values == "SUM"
 
@@ -126,7 +127,7 @@ class Workbook:
 
         else:
 
-            self.write_to_cells(ws=ws, df=data.frame, data=data)
+            self.write_to_cells(ws=ws, df=df, data=data)
 
     def write_to_cells(self, ws: Worksheet, df: pd.DataFrame, data: Data):
 

@@ -53,9 +53,9 @@ def create_thg_col_midx(
 #         return False
 
 # files = (
-#     file_paths["files_thg"] / "THG_1990_2006.xlsx",
-#     file_paths["files_thg"] / "THG_2000_2017.xlsx",
-#     file_paths["files_thg"] / "THG_ETS_2005_2017.xlsx",
+#     file_paths["folder_thg"] / "THG_1990_2006.xlsx",
+#     file_paths["folder_thg"] / "THG_2000_2017.xlsx",
+#     file_paths["folder_thg"] / "THG_ETS_2005_2017.xlsx",
 # )
 
 # dfs = []

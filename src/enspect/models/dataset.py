@@ -13,7 +13,7 @@ from pandas.core.common import flatten
 
 from enspect.aggregates.common import provinces
 from enspect.aggregates.eb import eev_aggregates, sector_energy, sectors
-from enspect.models.data import Data, FilterData
+from enspect.models.data import Data
 from enspect.models.utils import (
     add_sums,
     add_total_per_col,
@@ -23,7 +23,6 @@ from enspect.models.utils import (
     energy_aggregate_lookup,
 )
 from enspect.paths import file_paths
-from enspect.settings import unit_converter
 
 from pandas import IndexSlice as IDX
 
@@ -32,6 +31,7 @@ class DataSet:
 
     """
         balance_aggregates: List of list
+        turns data in storedobjects
     """
 
     def __init__(self, name: str, file_paths=file_paths):
@@ -60,7 +60,9 @@ class DataSet:
         #     else:
         #         self._objects.append(data)
 
-    def add_data_per_year(self, data: Data, **kwargs):
+    def save(self, data: Data, **kwargs):
+
+        # data.frame = data.frame.set_index(data.frame.columns[0], inplace=True)
 
         # Copy
         _data = deepcopy(data)
@@ -96,28 +98,29 @@ class DataSet:
 
         if data.stacked_energy_aggregates:
 
-            self.stack_energy_aggregates(data=data)
+            self.add_energy_aggregates(data=data)
 
         elif data.stacked_usage_categories:
 
-            self.stack_usage_categories(data=data)
+            self.add_usage_categories(data=data)
 
         elif data.stacked_balance_aggregates:
 
-            self.stack_balance_aggregates(data=data)
+            self.add_balance_aggregates(data=data)
 
         elif data.stacked_energy_sources or data.stacked_emittent_shares:
 
-            self.stack_energy_sources(data=data)
+            self.add_energy_sources(data=data)
 
         # All years
-        elif data.per_years:
+        elif data.timeseries:
 
-            self.stack_years(data=data)
+            self.add_years(data=data)
 
+        print("\n\n ADDED TO")
         return
 
-    def stack_energy_aggregates(self, data: Data):
+    def add_energy_aggregates(self, data: Data):
 
         if data.is_res or data.is_eb:
 
@@ -182,7 +185,7 @@ class DataSet:
 
                     df_III = add_total_per_col(df=df_III)
 
-                    self.add_data_per_year(
+                    self.save(
                         data=data,
                         name=name,
                         key=key,
@@ -192,7 +195,7 @@ class DataSet:
                     )
         return
 
-    def stack_balance_aggregates(self, data: Data):
+    def add_balance_aggregates(self, data: Data):
 
         if data.is_res or data.is_eb or data.is_thg:
 
@@ -216,7 +219,7 @@ class DataSet:
 
                     df_I = add_sums(df=df_I, drop_cols=["ES", "YEAR"])
 
-                    self.add_data_per_year(
+                    self.save(
                         data=data,
                         name=name,
                         key=key,
@@ -251,7 +254,7 @@ class DataSet:
 
                         df_I = add_sums(df=df_I, drop_cols=["ES", "UC", "YEAR"])
 
-                        self.add_data_per_year(
+                        self.save(
                             data=data,
                             name=name,
                             key=key,
@@ -263,7 +266,7 @@ class DataSet:
 
         return
 
-    def stack_years(self, data: Data):
+    def add_years(self, data: Data):
 
         if data.is_eb or data.is_res or data.is_thg:
 
@@ -293,7 +296,7 @@ class DataSet:
 
                     df_I = add_sums(df=df_I, drop_cols=["ES", "BAGG_0"])
 
-                    self.add_data_per_year(
+                    self.save(
                         data=data,
                         name=name,
                         key=key,
@@ -329,7 +332,7 @@ class DataSet:
 
                         df_I = add_sums(df=df_I, drop_cols=["UC", "ES"])
 
-                        self.add_data_per_year(
+                        self.save(
                             data=data,
                             name=name,
                             key=key[:-1],
@@ -339,7 +342,11 @@ class DataSet:
                             energy_source=energy_source,
                         )
 
-    def stack_energy_sources(self, data):
+    def add_energy_sources(self, data):
+
+        if data.is_eb:
+            # TODO:
+            pass
 
         if data.is_thg:
             for balance_aggregate in data.balance_aggregates:
@@ -364,7 +371,7 @@ class DataSet:
 
                     df_I = add_sums(df=df_I, drop_cols=["YEAR"])
 
-                    self.add_data_per_year(
+                    self.save(
                         data=data,
                         name=name,
                         key=key,
@@ -402,7 +409,7 @@ class DataSet:
 
                         df_I = add_sums(df=df_I, drop_cols=["UC", "YEAR"])
 
-                        self.add_data_per_year(
+                        self.save(
                             data=data,
                             name=name,
                             key=key,
@@ -414,7 +421,7 @@ class DataSet:
 
         return
 
-    def stack_usage_categories(self, data):
+    def add_usage_categories(self, data):
 
         if data.is_nea:
 
@@ -443,7 +450,7 @@ class DataSet:
 
                         df_I = add_sums(df=df_I, drop_cols=["ES", "YEAR"])
 
-                        self.add_data_per_year(
+                        self.save(
                             data=data,
                             name=name,
                             key=key,
@@ -453,6 +460,85 @@ class DataSet:
                             years=year,
                         )
         return
+
+
+class FilterData:
+    def __init__(self, data):
+        self.data = data
+
+    # def __repr__(self):
+    #     return [x.name for x in self.data]
+
+    def _filter_step(self, key, value, data):
+        if not "__" in key:
+            return (entry for entry in data if getattr(entry, key) == value)
+        else:
+            key, operator = key.split("__")
+            if operator == "gt":  # greater than
+                return (entry for entry in data if getattr(entry, key) > value)
+            elif operator == "lt":  # less than
+                return (entry for entry in data if getattr(entry, key) < value)
+            elif operator == "startswith":  # starts with
+                return (
+                    entry for entry in data if getattr(entry, key).startswith(value)
+                )
+            elif operator == "in":  # is in
+                return (entry for entry in data if getattr(entry, key) in value)
+            elif operator == "contains":  # contains
+                return (entry for entry in data if value in getattr(entry, key))
+            else:
+                raise UnknownOperator("operator %s is unknown" % operator)
+
+    def _exclude_step(self, key, value, data):
+        if not "__" in key:
+            return (entry for entry in data if getattr(entry, key) != value)
+        else:
+            key, operator = key.split("__")
+            if operator == "gt":  # greater than
+                return (entry for entry in data if getattr(entry, key) <= value)
+            elif operator == "lt":  # less than
+                return (entry for entry in data if getattr(entry, key) >= value)
+            elif operator == "startswith":  # starts with
+                return (
+                    entry for entry in data if not getattr(entry, key).startswith(value)
+                )
+            elif operator == "in":  # starts with
+                return (entry for entry in data if getattr(entry, key) not in value)
+            elif operator == "is_kpi":  # starts with
+                return (entry for entry in data if getattr(entry, key) not in value)
+            else:
+                raise UnknownOperator("operator %s is unknown" % operator)
+
+    def filter(self, **kwargs):
+        data = (entry for entry in self.data)
+        for key, value in kwargs.items():
+            data = self._filter_step(key, value, data)
+
+        return FilterData(data)
+
+    def exclude(self, **kwargs):
+        data = (entry for entry in self.data)
+        for key, value in kwargs.items():
+            data = self._exclude_step(key, value, data)
+
+        return FilterData(data)
+
+    def all(self):
+        return FilterData(self.data)
+
+    def count(self):
+        cnt = 0
+        for cnt, entry in enumerate(self.data, 1):
+            pass
+        return cnt
+
+    def __iter__(self):
+        for entry in self.data:
+            yield entry
+
+
+class UnknownOperator(Exception):
+    """ custom exception """
 
     # @check_balance_aggregates_type
     # def add_nea_data(
@@ -466,7 +552,7 @@ class DataSet:
     #     # stacked_usage_categories: bool = False,
     #     # stacked_balance_aggregates: bool = False,
     #     # stacked_energy_sources: bool = False,
-    #     # per_years: bool = False,
+    #     # timeseries: bool = False,
     # ):
 
     #     logging.getLogger().error("/" * 80)
@@ -497,7 +583,7 @@ class DataSet:
     #     stacked_usage_categories=stacked_usage_categories,
     #     stacked_balance_aggregates=stacked_balance_aggregates,
     #     stacked_energy_sources=stacked_energy_sources,
-    #     per_years=per_years,
+    #     timeseries=timeseries,
     # )
 
     # CASE 1.1: X-Axis: ES-UC-PROV, Y-Axis: Stacked BAGGS
@@ -603,7 +689,7 @@ class DataSet:
     #                 years=year,
     #             )
 
-    # if per_years:
+    # if timeseries:
 
     # for balance_aggregate in data.balance_aggregates:
 
@@ -677,7 +763,7 @@ class DataSet:
     #     stacked_balance_aggregates=stacked_balance_aggregates,
     #     stacked_energy_sources=stacked_energy_sources,
     #     stacked_energy_aggregates=stacked_energy_aggregates,
-    #     per_years=per_years,
+    #     timeseries=timeseries,
     #     show_source_values_for_energy_aggregates=show_source_values_for_energy_aggregates,
     # )
 
@@ -1250,7 +1336,7 @@ class DataSet:
     #             file=file,
     #             provinces=provinces,
     #             years=years,
-    #             order="per_years",
+    #             order="timeseries",
     #         )
     #     )
     #     return
@@ -1353,7 +1439,7 @@ class DataSet:
     #             denominator=denominator[0],
     #             numerator=numerator[0],
     #             is_KPI=True,
-    #             order="per_years",
+    #             order="timeseries",
     #         )
     #     )
     #     return
@@ -1442,7 +1528,7 @@ class DataSet:
     #                 shares_over_columns=df_shares_per_province,
     #                 provinces=provinces,
     #                 years=years,
-    #                 order="per_years"
+    #                 order="timeseries"
     #             )
     #         )
 

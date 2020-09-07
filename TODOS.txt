@@ -10,3 +10,10 @@
 
 [*] 
     Move midx_eb.xlsx from database folder to conversion folder. Update path information and rerun conversion.
+
+[*]
+    Clean up database/luftschadstoffinventur
+
+    
+[*]
+    Fix stats folder (conversion and database)

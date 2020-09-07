@@ -59,7 +59,7 @@ def convert_energy_balances_to_dataframe(last_year: int,):
     res_df = pd.DataFrame(index=res_row_midx, columns=res_col_midx)
 
     # ////////////////////////////////////// COLLECT ENERGY BALANCES FILE PATHS
-    files = list(file_paths["files_eb"].glob("*.xlsx"))
+    files = list(file_paths["folder_eb"].glob("*.xlsx"))
     pprint(files)
 
     # ///////////////////////////////////// COPY VALUES FROM EXCEL TO LOCAL DFS
@@ -130,7 +130,7 @@ def convert_energy_balances_to_dataframe(last_year: int,):
         logging.getLogger().debug("\n=> No files left to convert!")
 
     # Remove existing file if exists
-    pickle_file = file_paths["db_pickles"] / Path("eb.p")
+    pickle_file = file_paths["pickle_eb"] / Path("eb.p")
 
     if pickle_file.exists():
 
@@ -146,7 +146,7 @@ def convert_energy_balances_to_dataframe(last_year: int,):
         pickle.dump(eb_df, file)
 
     # Remove existing file if exists
-    pickle_file = file_paths["db_pickles"] / Path("res.p")
+    pickle_file = file_paths["pickle_res"]
 
     if pickle_file.exists():
 

@@ -33,7 +33,9 @@ def test_eb_workbook():
         else:
             del wb.book[sheet]
 
-    wb.add_sheets(["EGGS_PER_YEAR", "BAGGS_PER_YEAR", "ES_OVER_YEARS"])
+    wb.add_sheets(
+        ["EGGS_PER_YEAR", "BAGGS_PER_YEAR", "ES_OVER_YEARS", "ES_OVER_YEARS_UNIT_CONV"]
+    )
 
     wb.save()
 

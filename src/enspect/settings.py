@@ -51,7 +51,7 @@ scale_options = {
     2: {"label": "Index", "style": range_slider_style},
 }
 
-unit_converter = {
+unit_conversions = {
     "MWh_2_GWh": 0.001,
     "GWh_2_TJ": (1 / 0.27778),
     "GWh_2_MWh": 1000,

@@ -24,13 +24,15 @@ def test_nea_years(
         usage_categories=test_nea_usage_categories,
         years=years,
         provinces=test_provinces,
-        per_years=True,
+        timeseries=True,
         is_nea=True,
     )
 
     test_dataset.add_data(data=test_data_instance)
 
-    test_data_objects = [_data for _data in test_dataset.objects.filter(per_years=True)]
+    test_data_objects = [
+        _data for _data in test_dataset.objects.filter(timeseries=True)
+    ]
 
     test_write_to_xlsx(
         wb=test_nea_workbook, data_objects=test_data_objects, sheet_name="YEARS",

@@ -15,9 +15,9 @@ from pandas import IndexSlice as IDX
 def convert_thg_to_dataframe():
 
     files = (
-        file_paths["files_thg"] / "THG_1990_2006.xlsx",
-        file_paths["files_thg"] / "THG_2000_2017.xlsx",
-        file_paths["files_thg"] / "THG_ETS_2005_2017.xlsx",
+        file_paths["folder_thg"] / "THG_1990_2006.xlsx",
+        file_paths["folder_thg"] / "THG_2000_2017.xlsx",
+        file_paths["folder_thg"] / "THG_ETS_2005_2017.xlsx",
     )
     # Main frame
     y_0 = [x for x in range(1990, 2018)]
@@ -103,5 +103,5 @@ def convert_thg_to_dataframe():
 
     df.index.name = "BAGG_0"
 
-    with open(file_paths["db_pickles"] / "thg.p", "wb") as file:
+    with open(file_paths["pickle_thg"], "wb") as file:
         pickle.dump(df, file)

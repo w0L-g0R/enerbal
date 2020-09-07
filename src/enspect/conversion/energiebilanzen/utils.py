@@ -28,8 +28,8 @@ def create_indices(provinces: List, last_year: int):
     eb_row_midx = None
     res_row_midx = None
 
-    path_midx_eb = file_paths["files_eb"] / "midx_rows_eb.xlsx"
-    path_midx_res = file_paths["files_eb"] / "midx_rows_res.xlsx"
+    path_midx_eb = file_paths["folder_eb"] / "midx_rows_eb.xlsx"
+    path_midx_res = file_paths["folder_eb"] / "midx_rows_res.xlsx"
 
     for path, sheet_name in zip(
         [path_midx_eb, path_midx_res], ["MIDX_EB", "MIDX_RES"],

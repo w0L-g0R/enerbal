@@ -18,6 +18,8 @@ from enspect.models.utils import (
 import pickle
 
 from enspect.paths import file_paths
+from enspect.settings import unit_conversions
+
 
 # NOTE:code_source=https://stackoverflow.com/questions/58309731/doing-class-objects-filter-pattern-in-python
 
@@ -39,48 +41,50 @@ def default_kwargs(**default_kwargs):
 @dataclass
 class Data:
 
-    # __slots__ = ['name', 'key', 'frame', "energy_sources", "usage_categories"]
-    # Shown as chart name
     name: str = None
     key: str = None
-
-    # # Pickle file name
-    # file: str = None
 
     # Origin of the data
     source: str = None
     created: datetime = datetime.now().strftime("%d_%m_%y_%Hh%Mm")
-
+    file: str = None
     # Values
     frame: pd.DataFrame = None
-    # shares_over_rows: pd.DataFrame = None
-    # shares_over_columns: pd.DataFrame = None
-    # indexed: Dict = None
     unit: str = None
 
-    # Data type
-    balance_aggregates: List = None  # Balance aggregate e.g. "Importe"
-    energy_sources: List = None  # e.g. "Steinkohle"
-    energy_aggregates: List = None  # e.g. "Fossil-Fest"
+    # Data inputs
+    provinces: List = None
+    years: List = None
+    balance_aggregates: List = None
+    energy_sources: List = None
+    energy_aggregates: List = None
     usage_categories: List = None
     emittent_sinks: List = None
-    years: List = None
-    provinces: List = None
-    stats: List = None
 
-    # Data classification
+    # Y-axis data
     stacked_balance_aggregates: bool = False
     stacked_energy_sources: bool = False
     stacked_energy_aggregates: bool = False
     stacked_usage_categories: bool = False
-    per_years: bool = False
-    per_emittent_sink: bool = False
-    energy_aggregates_sum_only: bool = False
+    timeseries: bool = False
+    stacked_emittent_shares: bool = False
+
+    # Flags
     is_eb: bool = False
     is_res: bool = False
     is_nea: bool = False
     is_thg: bool = False
     is_stat: bool = False
+    energy_aggregates_sum_only: bool = False
+
+    # Transformation
+    transformed_to_new_unit: str = None
+    transformed_column_percentages: bool = False
+    transformed_row_percentages: bool = False
+    transformed_reference_year: bool = False
+
+    # Add on
+    has_column_percentage: bool = False
 
     # # Chart specific
     # has_overlay: bool = False
@@ -94,44 +98,51 @@ class Data:
     # # Search pattern
     # order: str = None
 
-    def convert(self, *args):
+    @property
+    def frame(self):
 
-        # TODO: Link to settings
-        conversion = {
-            "MWh_2_GWh": 0.001,
-            "gwh_2_tj": (1 / 0.27778),
-            "tj_2_pj": 0.001,
-            "gwh_2_mwh": 1000,
-            "tj_2_gwh": 0.27778,
-            "tj_2_twh": 0.27778 / 1000,
-            "pj_2_tj": 1000,
-        }
+        frame = self._frame.copy()  # .sort_index()
 
-        self.frame *= conversion[args]
-        self.unit = args[0].split("_")[-1]
+        # Unit conversion
+        if self.new_unit is not None:
 
-        return
+            key = self.unit + "_2_" + self.new_unit
+
+            frame = self._frame * unit_conversions[key]
+
+        # Get shares for each each per column
+        if self.is_column_percentages:
+
+            numerator = frame.loc[
+                IDX[:], IDX[frame.columns.isin(self.provinces)]
+            ].copy()
+
+            denominator = frame.loc[
+                IDX["SUM"], IDX[frame.columns.isin(self.provinces)]
+            ].copy()
+
+            frame.loc[IDX[:], IDX[frame.columns.isin(self.provinces)]] = round(
+                (numerator / denominator), 3
+            )
+
+            self.new_unit = "%"
+
+        elif self.is_row_percentages:
+            pass
+
+        elif self.is_reference_year:
+            pass
+
+        return frame
+
+    @frame.setter
+    def frame(self, frame: pd.DataFrame):
+        # TODO: Catch mispelled unit names here (lookup in dict)
+
+        self._frame = frame
 
     def __repr__(self):
-        return pformat(
-            self.__dict__
-            # dict(
-            #     name=self.name,
-            #     key=self.key,
-            #     frame=self.frame,
-            #     unit=self.unit,
-            #     balance_aggregates=self.balance_aggregates,
-            #     energy_sources=self.energy_sources,
-            #     energy_aggregates=self.energy_aggregates,
-            #     years=self.years,
-            #     provinces=self.provinces,
-            #     stacked_balance_aggregates=self.stacked_balance_aggregates,
-            #     stacked_energy_sources=self.stacked_energy_sources,
-            #     stacked_energy_aggregates=self.stacked_energy_aggregates,
-            #     per_years=self.per_years,
-            #     show_source_values_for_energy_aggregates=self.show_source_values_for_energy_aggregates,
-            # )
-        )
+        return pformat(self.__dict__)
 
     def __eq__(self, other):
         return self.key == other.key
@@ -150,18 +161,25 @@ class Data:
         stacked_energy_sources: bool = False,
         stacked_energy_aggregates: bool = False,
         stacked_usage_categories: bool = False,
-        per_years: bool = False,
+        timeseries: bool = False,
         stacked_emittent_shares: bool = False,
         is_res: bool = False,
         is_eb: bool = False,
         is_nea: bool = False,
         is_thg: bool = False,
+        is_stat: bool = False,
         unit: str = "TJ",
+        file: str = None,
     ):
 
         if is_res:
 
-            df = pickle.load(open(file_paths["db_pickles"] / "res.p", "rb"))
+            source = "Energiebilanzen Österreich"
+            energy_sources = ["RES"]
+            file = file_paths["pickle_res"]
+
+            with open(file, "rb") as f:
+                df = pickle.load(f)
 
             # Midx after slicing => rows: BAGGS; columns: PROV, ES, YEAR
             df, balance_aggregates = slice_pickled_eb_df(
@@ -179,13 +197,15 @@ class Data:
                     df.loc[IDX[:], IDX[provinces, "RES", year]].copy().sum(axis=1)
                 )
 
-            energy_sources = ["RES"]
-
         elif is_eb:
 
-            # Midx after slicing => rows: BAGGS; columns: PROV, YEAR, ES
-            df = pickle.load(open(file_paths["db_pickles"] / "eb.p", "rb"))
+            source = "Energiebilanzen Österreich"
+            file = file_paths["pickle_eb"]
 
+            with open(file, "rb") as f:
+                df = pickle.load(f)
+
+            # Midx after slicing => rows: BAGGS; columns: PROV, YEAR, ES
             df, balance_aggregates = slice_pickled_eb_df(
                 df=df,
                 balance_aggregates=balance_aggregates,
@@ -198,12 +218,12 @@ class Data:
 
         elif is_nea:
 
-            df = (
-                pickle.load(open(file_paths["db_pickles"] / "nea.p", "rb")).sort_index(
-                    axis=1, level=0
-                )
-                # .swaplevel(0, 2, axis=1)
-            )
+            source = "Nutzenergieanalysen Österreich"
+            file = file_paths["pickle_eb"]
+
+            with open(file, "rb") as f:
+
+                df = pickle.load(f).sort_index(axis=1, level=0)
 
             balance_aggregates = list(flatten(balance_aggregates))
 
@@ -215,12 +235,12 @@ class Data:
 
         elif is_thg:
 
-            df = (
-                pickle.load(open(file_paths["db_pickles"] / "thg.p", "rb")).sort_index(
-                    axis=1, level=0
-                )
-                # .swaplevel(0, 2, axis=1)
-            )
+            source = "Luftschadstoffinventur UBM"
+            energy_sources = emittent_shares
+            file = file_paths["pickle_thg"]
+
+            with open(file, "rb") as f:
+                df = pickle.load(f).sort_index(axis=1, level=0)
 
             balance_aggregates = list(flatten(balance_aggregates))
 
@@ -231,16 +251,32 @@ class Data:
 
             unit = "kton CO2-Eq."
 
-            energy_sources = emittent_shares
+        elif is_stat:
+
+            with open(file, "rb") as f:
+                stats = pickle.load(f)
+
+            print("stats: ", stats)
+
+            df = stats["df"]
+            # print("frame: ", frame)
+
+            source = stats["source"]
+            # print("source: ", source)
+
+            # print(df)
+            name = stats["name"]
 
         # Lex-sort for performance (and warnings)
         df = df.copy().fillna(0).sort_index()
-        print("df: ", df)
+
+        print("\n CREATE DATA: \n", df)
 
         # TODO: Unit check for RES and STATS?
 
         self.frame = df
         self.unit = unit
+        self.name = name
         self.balance_aggregates = balance_aggregates
         self.energy_sources = energy_sources
         self.emittent_shares = emittent_shares
@@ -251,178 +287,15 @@ class Data:
         self.stacked_balance_aggregates = stacked_balance_aggregates
         self.stacked_energy_sources = stacked_energy_sources
         self.stacked_energy_aggregates = stacked_energy_aggregates
-        self.per_years = per_years
+        self.timeseries = timeseries
         self.stacked_usage_categories = stacked_usage_categories
         self.stacked_emittent_shares = stacked_emittent_shares
         self.is_eb = is_eb
         self.is_res = is_res
         self.is_nea = is_nea
         self.is_thg = is_thg
+        self.provinces = provinces
+        self.file = file
+        self.source = source
 
         return
-
-
-class FilterData:
-    def __init__(self, data):
-        self.data = data
-
-    # def __repr__(self):
-    #     return [x.name for x in self.data]
-
-    def _filter_step(self, key, value, data):
-        if not "__" in key:
-            return (entry for entry in data if getattr(entry, key) == value)
-        else:
-            key, operator = key.split("__")
-            if operator == "gt":  # greater than
-                return (entry for entry in data if getattr(entry, key) > value)
-            elif operator == "lt":  # less than
-                return (entry for entry in data if getattr(entry, key) < value)
-            elif operator == "startswith":  # starts with
-                return (
-                    entry for entry in data if getattr(entry, key).startswith(value)
-                )
-            elif operator == "in":  # is in
-                return (entry for entry in data if getattr(entry, key) in value)
-            elif operator == "contains":  # contains
-                return (entry for entry in data if value in getattr(entry, key))
-            else:
-                raise UnknownOperator("operator %s is unknown" % operator)
-
-    def _exclude_step(self, key, value, data):
-        if not "__" in key:
-            return (entry for entry in data if getattr(entry, key) != value)
-        else:
-            key, operator = key.split("__")
-            if operator == "gt":  # greater than
-                return (entry for entry in data if getattr(entry, key) <= value)
-            elif operator == "lt":  # less than
-                return (entry for entry in data if getattr(entry, key) >= value)
-            elif operator == "startswith":  # starts with
-                return (
-                    entry for entry in data if not getattr(entry, key).startswith(value)
-                )
-            elif operator == "in":  # starts with
-                return (entry for entry in data if getattr(entry, key) not in value)
-            elif operator == "is_kpi":  # starts with
-                return (entry for entry in data if getattr(entry, key) not in value)
-            else:
-                raise UnknownOperator("operator %s is unknown" % operator)
-
-    def filter(self, **kwargs):
-        data = (entry for entry in self.data)
-        for key, value in kwargs.items():
-            data = self._filter_step(key, value, data)
-
-        return FilterData(data)
-
-    def exclude(self, **kwargs):
-        data = (entry for entry in self.data)
-        for key, value in kwargs.items():
-            data = self._exclude_step(key, value, data)
-
-        return FilterData(data)
-
-    def all(self):
-        return FilterData(self.data)
-
-    def count(self):
-        cnt = 0
-        for cnt, entry in enumerate(self.data, 1):
-            pass
-        return cnt
-
-    def __iter__(self):
-        for entry in self.data:
-            yield entry
-
-
-class UnknownOperator(Exception):
-    """ custom exception """
-
-    # def __repr__(self):
-    #     return [entry for entry in self.data]
-
-
-#    def xlsx_formatted(self):
-
-# dfs = {}
-# if self.stacked_balance_aggregates:
-
-#     for year in self.years:
-#         dfs[year] = {}
-
-#         for energy_source in self.energy_sources:
-#             print("energy_source: ", energy_source)
-
-#             df = (
-#                 self.frame.loc[IDX[:], IDX[year, energy_source, :,]]
-#                 .swaplevel(0, 1, axis=1)
-#                 .stack([0, 1])
-#                 # .sort_values(["ET_AGG",])
-#             )
-
-#             df = add_total_per_col(df=df)
-
-#             df.reset_index(inplace=True)
-
-#             # df_sums = df.groupby("ES").get_group("SUM")
-#             df.drop(["ES", "YEAR"], inplace=True, axis=1)
-#             df = add_total_per_row(df=df)
-#             df.iloc[-1, 0] = "SUM"
-
-#             dfs[year][energy_source] = df
-
-# All energy aggregates
-# elif self.stacked_energy_aggregates:
-
-#     for year in self.years:
-#         dfs[year] = {}
-
-#         for aggregate in self.balance_aggregates:
-
-#             df = (
-#                 self.frame.loc[IDX[:, :], IDX[year, aggregate, :,]]
-#                 .swaplevel(0, 1, axis=1)
-#                 .stack([0, 1])
-#                 # .sort_values(["ET_AGG",])
-#             )
-
-#             df = add_total_per_col(df=df)
-
-#             df.reset_index(inplace=True)
-
-#             df_sums = df.groupby("ES").get_group("SUM")
-#             df_sums.drop(["ES", "BAGG_0", "YEAR"], inplace=True, axis=1)
-#             df_sums = add_total_per_row(df=df_sums)
-#             df_sums.iloc[-1, 0] = "SUM"
-
-#             _dfs = []
-#             _dfs.append(df_sums)
-
-#             df.drop(["BAGG_0", "YEAR"], inplace=True, axis=1)
-#             _dfs.append(df)
-
-#             dfs[year][aggregate] = _dfs
-
-# # All years
-# else:
-#     for energy_source in self.energy_sources:
-
-#         dfs[energy_source] = {}
-
-#         for aggregate in self.balance_aggregates:
-
-#             df = (
-#                 self.frame.loc[IDX[:], IDX[energy_source, aggregate, :],]
-#                 .swaplevel(0, 1, axis=1)
-#                 .stack([0, 1])
-#                 .sort_values(["ES", "YEAR"])
-#             )
-
-#             df.reset_index(inplace=True)
-
-#             dfs[energy_source][aggregate] = df
-#     # data
-
-# return dfs

@@ -18,7 +18,7 @@ pd.set_option("max_colwidth", 15)  # or 1000
 
 # ////////////////////////////////////////////////////////////////////////// EB
 # Midx after slicing => rows: BAGGS; columns: PROV, YEAR, ES
-df = pickle.load(open(file_paths["db_pickles"] / "eb.p", "rb"))
+df = pickle.load(open(file_paths["pickle_eb"], "rb"))
 
 
 balance_aggregates = [

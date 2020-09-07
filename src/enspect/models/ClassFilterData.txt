@@ -8,7 +8,7 @@ DATA = [
         name="BTU_ONE_12",
         unit="TJ",
         years=[2017, 2018],
-        _type="per_years"
+        _type="timeseries"
     ),
     Data(
         name="BTU_TWO_222",
@@ -20,7 +20,7 @@ DATA = [
         name="BTU_ONE_123",
         unit="GWh",
         years=[2000],
-        _type="per_years"
+        _type="timeseries"
     )
 ]
 

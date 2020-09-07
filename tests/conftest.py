@@ -13,6 +13,7 @@ from tests.fixtures.IO import *
 from tests.fixtures.nea import *
 from tests.fixtures.res import *
 from tests.fixtures.thg import *
+from tests.fixtures.stats import *
 
 
 @pytest.fixture(scope="session")
